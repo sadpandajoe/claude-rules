@@ -264,13 +264,65 @@ try {
 ## Lessons Learned
 
 ### Implementation Patterns That Work
-<!-- Add successful implementation strategies discovered through experience -->
+- **Working solution first rule** prevents getting stuck in optimization loops
+- **Following existing patterns** reduces integration issues and speeds development
+- **Incremental validation** catches problems early in development cycle
+- **Dependency validation** before implementation prevents import errors
 
 ### Common Implementation Pitfalls
-<!-- Add mistakes to avoid during implementation -->
+- Jumping to optimization before completing working solution
+- Creating new patterns instead of studying existing codebase conventions
+- Skipping dependency verification leads to runtime import failures
+- Making large changes without incremental testing
 
 ### Code Quality Improvements
-<!-- Add quality practices that consistently work well -->
+- **Early returns pattern** significantly improves code readability
+- **File size limits** (≤300 lines) encourage better code organization
+- **Function size limits** (≤20 lines) force clearer logic separation
+- **Error handling consistency** prevents silent failures
 
-### Refactoring Strategies
-<!-- Add effective approaches to improving existing code -->
+### Complex State Management (Emerging Pattern)
+**Note**: Based on recent debugging experience, needs more validation across projects
+
+#### State Update Tracking
+When debugging complex component state:
+```bash
+# Map all state setters in a component
+grep -n "setState\|set[A-Z]" ComponentName.tsx
+
+# Check effect dependencies  
+grep -A 10 "useEffect\|useMemo\|useCallback" ComponentName.tsx
+```
+
+#### React Hooks Debugging Template
+```javascript
+// Debug helper - log all state changes
+const setStateWithDebug = useCallback((newValue) => {
+  console.log('Setting state from:', state, 'to:', newValue);
+  setState(newValue);
+}, [state]);
+
+// Check effect dependencies
+useEffect(() => {
+  console.log('Effect triggered with:', dependency1, dependency2);
+}, [dependency1, dependency2]); // Ensure all referenced vars are here
+```
+
+#### Component Integration Patterns
+- **Helper function approach**: Create specific helpers for complex logic rather than inline
+- **State derivation**: Use memoized computed values instead of duplicating logic  
+- **Timing isolation**: Separate immediate updates from derived updates
+
+### Pre-Implementation Validation Strategy (Emerging Pattern)
+**Note**: Developing approach for projects with unreliable tooling
+
+#### Before Starting Complex Changes
+- [ ] Verify project validation tools work (`npm test`, `npm run lint`, etc.)
+- [ ] If tools don't work, establish manual validation approach
+- [ ] Document validation limitations in PROJECT.md
+- [ ] Plan for reduced validation confidence in risk assessment
+
+#### Validation Tool Failure Handling
+- **Infrastructure vs code issues**: Distinguish between environmental problems and code problems
+- **Fallback validation methods**: Manual syntax checking, import verification, visual inspection
+- **Risk tolerance adjustment**: More conservative changes when tooling unavailable

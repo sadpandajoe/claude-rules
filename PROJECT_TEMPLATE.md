@@ -1,11 +1,17 @@
 ## Overview
 <!-- One-paragraph description of what we are trying to do -->
 
+## Summary
+<!-- High level summary of what was done and accepted solution -->
+
 ## Assumptions
 <!-- What are some assumptions we are making for this project -->
 
 ## Goal
 <!-- What are we trying to accomplish? -->
+
+## Related PRs/Issues
+<!-- Link to Github issues, PRs, other info -->
 
 ## Implementation Notes
 <!-- Technical details, approach, key files -->
@@ -25,16 +31,9 @@
 
 ## Current Status
 <!-- What's done, in progress, not started, what's blocked -->
-- [ ] Not Started: 
-- [ ] In Progress: 
-- [ ] Done: 
-- [ ] Blocked: 
-
-## Related PRs/Issues
-<!-- Link to Github issues, PRs, other info -->
-
-## Notes
-<!-- Additional context, information, details used -->
+**In Progress**:
+**Next**:
+**Blocked**:
 
 ## Development Log
 <!-- Real-time updates of what's being done, discoveries, etc. -->
@@ -44,4 +43,7 @@
 - 
 
 ### [Timestamp] - Action Taken
+
+## Notes
+<!-- Additional context, information, details used -->
 -

@@ -70,19 +70,47 @@ For each option, include:
 - Move failed attempts to "Failed Solutions" with explanation
 - Update "Implementation Notes" with insights gained
 
-## Status Management
+## Plan Mode Integration
 
-### Status Categories
-- **Not Started**: Tasks identified but not begun
-- **In Progress**: Currently working on
-- **Done**: Completed tasks  
-- **Blocked**: Cannot proceed due to external dependency/issue
+### When to Use Plan Mode
+- **Complex investigations** requiring systematic research
+- **Multi-step implementation** with significant risk
+- **Architecture analysis** before making changes
+- **Cross-branch work** requiring careful compatibility assessment
+
+### Plan Mode to Implementation Transition
+Clear indicators for transitioning from planning to execution:
+
+#### Investigation Tasks
+- **Continue planning while**: Root cause unclear, multiple hypotheses to test, solution approach uncertain
+- **Transition to implementation when**: Root cause identified, solution confirmed (e.g., fix exists in another branch), approach validated
+- **Document transition**: Update PROJECT.md with "Investigation Complete - Moving to Implementation"
+
+#### Implementation Tasks  
+- **Continue planning while**: Architecture decisions uncertain, multiple technical approaches possible, risk assessment incomplete
+- **Transition to implementation when**: Technical approach confirmed, dependencies validated, acceptance criteria clear
+- **Document transition**: Update Current Status from "Planning" to "Implementation"
+
+### Plan Mode Documentation Strategy
+- **Heavy documentation upfront**: More detailed analysis in PROJECT.md Solutions section
+- **Research-focused Development Log**: Document investigation findings, hypothesis testing, discovery process
+- **Thorough solution analysis**: Multiple options with detailed pros/cons before choosing approach
+
+### Current Status Format
+Use a simple progress summary instead of rigid checklists:
+
+```markdown
+## Current Status
+**In Progress**: [Brief description of current work]
+**Next**: [What's planned next]
+**Blocked**: [Any blockers, or "None"]
+```
 
 ### Status Update Rules
-- Update status movement in Development Log for context
-- When moving to "Blocked", document what's needed to unblock
-- When completing items, note any deviations from plan
-- Break down large tasks into smaller trackable items
+- Update Current Status summary when major phases change
+- Use Development Log for detailed progress tracking
+- Document blockers immediately when encountered
+- Keep status summary concise - details go in Development Log
 
 ## Session Continuity
 
@@ -113,14 +141,33 @@ The PROJECT.md template is flexible enough to accommodate any project type throu
 
 ## Lessons Learned
 
+### Workflow Hierarchy Effectiveness
+The instruction hierarchy has proven successful:
+1. **Universal guidelines** → Guide to appropriate specialized files
+2. **Specialized files** (Investigation, Cherry-picking) → Structured approach for specific tasks
+3. **Project-specific guidelines** → Technology and architecture context
+4. **Evidence-based investigation** → Direct path to root cause and tested solutions
+
 ### Common Patterns
-<!-- Add insights discovered through experience -->
+- **PROJECT.md-first approach** maintains organization throughout complex tasks
+- **Historical analysis focus** (git blame, commit comparison) essential for debugging
+- **Conservative resolution guidance** helps choose tested solutions over manual patches
+- **Cross-branch comparison** instructions directly applicable to real scenarios
 
 ### Best Practices
-<!-- Add practices that consistently work well -->
+- **Plan mode for investigation** works well when root cause unclear
+- **Clear transition points** from research to implementation prevent confusion
+- **Evidence-based decisions** using git history and existing fixes
+- **Documentation during process** prevents context loss
 
 ### Pitfalls to Avoid
-<!-- Add mistakes that have been made before -->
+- **Jumping to solutions** without understanding root cause
+- **Manual changes** instead of using tested fixes from other branches
+- **Skipping documentation** during investigation process
+- **Unclear mode transitions** leaving team uncertain about current phase
 
 ### Process Improvements
-<!-- Add workflow enhancements discovered over time -->
+- **Plan mode integration** clarifies when to research vs implement
+- **Transition documentation** makes phase changes explicit
+- **Success factor identification** helps replicate effective approaches
+- **Pitfall prevention** builds on real experience avoiding common mistakes

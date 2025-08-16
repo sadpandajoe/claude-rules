@@ -176,13 +176,57 @@ git diff HEAD~1                       # What changed recently
 ## Lessons Learned
 
 ### Common Recovery Patterns
-<!-- Add recovery strategies that have worked well -->
+- **Dependency issues** (npm ci) solve majority of tooling problems
+- **Git stash first** prevents data loss during recovery attempts
+- **Incremental recovery** (small steps) easier to debug than big changes
+- **Documentation during recovery** essential for understanding what broke
 
-### Prevention Strategies
-<!-- Add practices that prevent common issues -->
+### Prevention Strategies  
+- **Commit working states frequently** provides more recovery points
+- **Test changes incrementally** catches issues before they compound
+- **Document environmental assumptions** helps identify infrastructure vs code issues
+- **Maintain clean git history** makes recovery procedures clearer
 
 ### Emergency Procedures
-<!-- Add quick fixes for recurring problems -->
+- **Stop and assess first** prevents making bad situations worse
+- **Safe recovery options first** (stash, checkout) before destructive operations
+- **Document recovery attempts** helps if multiple approaches needed
+- **Verify working state** after recovery before continuing work
 
-### Tool-Specific Recovery
-<!-- Add recovery procedures for specific tools/frameworks -->
+### Release Branch Tooling Issues (Emerging Pattern)
+**Note**: Developing strategies for projects with inconsistent tooling across branches
+
+#### Common Problems
+- **Older dependency versions** with newer config formats cause tool failures
+- **Missing build tools** or PATH issues in different branch environments
+- **Test infrastructure incompatibilities** between development and release environments
+- **Configuration drift** where release branches have stale configs
+
+#### Recovery Strategies
+- **Identify environmental vs code issues**: Distinguish between setup problems and actual code problems
+- **Use manual validation** for low-risk changes when tooling unavailable
+- **Document tooling limitations** in PROJECT.md for future sessions
+- **Consider branch switching** for complex changes requiring full validation
+
+#### Risk Assessment for Tooling Failures
+- **Full automation available**: Normal risk levels, proceed as usual
+- **Partial automation**: Increased risk, more conservative approach required
+- **Manual validation only**: Highest risk, most conservative changes only
+- **Document confidence levels** in PROJECT.md for future reference
+
+### Complex State Issues (Emerging Pattern)
+**Note**: Based on React component debugging experience, may apply to other state management
+
+#### Symptoms and Investigation
+**Symptoms**: Component renders unexpected data, state seems inconsistent
+**Investigation approach**:
+1. **Check all state update locations**: Map every place state gets modified
+2. **Verify timing dependencies**: Look for race conditions between updates  
+3. **Check memoization staleness**: Ensure computed values have correct dependencies
+4. **Trace update sequences**: Use logging to understand state change order
+
+#### Common Fixes
+- **Add missing dependencies** to effect/memo dependency arrays
+- **Use functional state updates**: `setState(prev => newValue)` prevents race conditions
+- **Create helper functions** for complex state derivation logic
+- **Separate concerns** between different state variables to reduce coupling

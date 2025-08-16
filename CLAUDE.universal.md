@@ -16,13 +16,17 @@
 
 ### Investigation Rules
 - [ ] When investigating issues, document findings before proposing solutions
-- [ ] Understand full scope before making changes
+- [ ] **Use historical analysis first** - git blame, commit comparison, and cross-branch investigation
+- [ ] **Understand full scope before making changes** - identify root cause before attempting fixes
+- [ ] **Prefer tested solutions over manual fixes** - look for existing solutions in other branches/commits
 - [ ] Verify dependencies exist before using them
 - [ ] Test incrementally - make small changes and verify
 
 ### Implementation Standards
 - [ ] Plan all tests before writing any code
 - [ ] Study existing patterns before creating new ones
+- [ ] **Use evidence-based decisions** - research git history, existing solutions, and proven approaches
+- [ ] **Choose conservative solutions when possible** - tested fixes over custom implementations
 - [ ] Complete working solution before suggesting optimizations
 - [ ] Commit working state before any refactoring
 
@@ -123,9 +127,10 @@ git bisect start               # Systematic bug hunting
 
 ### Learning Capture & Process Improvement
 - [ ] Review the session for new insights or better approaches
+- [ ] **Document what worked well vs what could be improved** - capture success factors
+- [ ] **Identify effective investigation techniques** - git blame, cross-branch analysis, evidence-based decisions
 - [ ] Identify any workflow gaps or improvements discovered
 - [ ] Update relevant CLAUDE.*.md files with new learnings
-- [ ] Document what worked well vs what could be improved
 
 ### Learning Update Process
 1. Identify which workflow file the learning applies to:
