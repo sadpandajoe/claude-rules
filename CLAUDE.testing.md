@@ -290,18 +290,65 @@ it('creates chart and adds to dashboard', () => {
 ## Lessons Learned
 
 ### Testing Strategies That Work
-<!-- Add successful testing approaches discovered through experience -->
+- **Fixture-driven development** prevents unrealistic test scenarios
+- **Minimal mocking** catches integration issues early
+- **Layer-appropriate testing** reduces maintenance burden
+- **Contract-based testing** keeps API and UI tests synchronized
 
 ### Common Testing Pitfalls
-- Over-mocking internal components
-- Hardcoding test data instead of using fixtures
-- Testing implementation instead of behavior
-- Duplicating test logic across layers
+- Over-mocking internal components creates false confidence
+- Hardcoding test data instead of using realistic fixtures
+- Testing implementation instead of behavior leads to brittle tests
+- Duplicating test logic across layers wastes effort
 
-### Quality Improvements
-- Fixture-driven development prevents unrealistic test scenarios
-- Minimal mocking catches integration issues early
-- Layer-appropriate testing reduces maintenance burden
+### Test Quality Improvements
+- **Test-driven investigation** - failing tests reveal exact specifications
+- **Realistic data structures** from API fixtures prevent integration surprises
+- **User-focused testing** catches real usability issues
+- **Systematic test planning** ensures comprehensive coverage
 
-### Framework-Specific Insights
-<!-- Add insights specific to testing frameworks and tools used -->
+### Manual Testing When Automation Fails (Emerging Pattern)
+**Note**: Developing approaches for projects with limited test infrastructure
+
+#### Manual Testing Strategy for Components
+When automated testing unavailable:
+- **Browser dev tools**: Test component functionality in development mode
+- **Visual inspection**: Verify DOM structure and element rendering manually
+- **Console log validation**: Add temporary logs to trace data flow
+- **Manual component mounting**: Test components in isolation
+
+#### Test Output Analysis Techniques
+```bash
+# Extract specific elements from test output
+npm test -- TestFile.test.tsx -t "test name" 2>&1 > /tmp/test-output.txt
+grep -o "pattern" /tmp/test-output.txt | sort | uniq
+grep -c "expected-element" /tmp/test-output.txt
+
+# Count rendered elements to identify limits
+grep -c "specific-class-name" /tmp/test-output.txt
+
+# Extract text content for analysis
+sed -n 's/.*>\(.*\)<\/div>/\1/p' /tmp/test-output.txt
+```
+
+#### Documentation Requirements for Manual Testing
+- Document what manual testing was performed
+- Note limitations of manual vs automated testing
+- Specify areas that need future automated test coverage
+- Record manual test procedures for repeatability
+
+### Complex Component Testing Debugging (Emerging Pattern)
+**Note**: Based on debugging experience with virtual scrolling and state management
+
+#### Debugging Missing Elements in Tests
+1. **Check if element exists at all**: Search entire test output for expected text
+2. **Verify parent containers**: Missing elements might indicate parent isn't rendering
+3. **Check virtual scrolling**: Element might be below visible area in virtual lists
+4. **Validate data structure**: Ensure test data matches component expectations
+
+#### Component Testing Strategy for Complex State
+- **Test state transitions**, not just final states
+- **Use realistic data structures** from fixtures that match production
+- **Test both positive and negative cases** (success and error scenarios)  
+- **Verify edge cases** (empty data, single items, maximum items)
+- **Test timing issues** with async state updates

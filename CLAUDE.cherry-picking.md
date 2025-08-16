@@ -46,12 +46,18 @@ grep -r "ComponentName\|APIMethod" src/
 ls -la path/to/expected/component/              # Verify path exists
 grep -r "new-import-path" src/                  # Check existing usage patterns
 git log --oneline <branch> -- <import-path>    # See when it was added
+
+# Check import alias patterns between branches
+git show master:path/to/file | grep "^from\|^import"
+git show HEAD:path/to/file | grep "^from\|^import"
+# Look for differences: module vs module as alias
 ```
 
 ### Safe Import Strategy
 - **Rule**: Never accept import changes without verifying modules exist in target branch
 - **Rule**: When in doubt, keep existing import patterns and adapt functionality
 - **Rule**: Check both old and new import locations before making changes
+- **Rule**: Verify import alias patterns match between branches (e.g., `from flask import current_app` vs `from flask import current_app as app`)
 
 ## Architecture Compatibility Analysis
 
@@ -231,14 +237,67 @@ git log --follow --oneline -- src/components/Component/
 
 ## Lessons Learned
 
-### Common Patterns
-<!-- Add insights discovered through experience -->
+### Cherry-Pick Strategies That Work
+- **Conservative resolution** preserves target branch stability
+- **Functional vs structural separation** allows safe feature extraction
+- **Bridge function updates** enable new functionality without architectural changes
+- **Import path validation** prevents runtime failures after cherry-pick
+- **Import alias pattern checking** catches subtle compatibility issues between branches
 
-### Best Practices
-<!-- Add practices that consistently work well -->
+### Common Cherry-Pick Pitfalls
+- Forcing new architectural patterns onto incompatible branches
+- Accepting import changes without verifying module existence
+- **Missing import alias differences** - assuming same module imported with same alias in both branches
+- Cherry-picking structural changes that break existing patterns
+- Skipping validation after conflict resolution
 
-### Pitfalls to Avoid
-<!-- Add mistakes that have been made before -->
+### Adaptation Patterns
+- **Extract business logic** while preserving presentation patterns
+- **Update transformation functions** rather than changing usage everywhere
+- **Document rejected changes** with clear architectural reasoning
+- **Test incrementally** after each adaptation step
 
-### Process Improvements
-<!-- Add workflow enhancements discovered over time -->
+### Infrastructure Validation When Tools Fail (Emerging Pattern)
+**Note**: Developing approaches for cherry-picking when project tooling is unreliable
+
+#### When Standard Validation Fails
+If project validation commands fail (npm test, npm run lint, etc):
+
+1. **Infrastructure Assessment**:
+   - Distinguish between configuration issues vs actual code issues
+   - Try dependency refresh (npm ci) before assuming code problems
+   - Check if validation failure is environmental or cherry-pick related
+
+2. **Risk-Based Decision Making**:
+   - **Low-risk changes** (data additions, conservative adaptations): Proceed with manual validation
+   - **High-risk changes** (API modifications, architectural changes): Stop and fix tooling first
+   - **Document decision reasoning** and confidence level in PROJECT.md
+
+3. **Manual Validation Checklist**:
+   ```bash
+   # Essential manual checks when automation fails
+   grep -E "<<<|===|>>>" **/*           # Conflict markers removed
+   ls -la path/to/expected/imports       # Import paths exist
+   # Visual inspection of modified areas for syntax issues
+   ```
+
+#### Reduced Validation Confidence Strategy
+- **More conservative cherry-picks** when tooling unreliable
+- **Smaller, incremental changes** easier to validate manually
+- **Document validation limitations** for future maintainers
+- **Plan validation debt** - note what needs proper testing later
+
+### Cross-Version Architecture Patterns (Emerging Pattern)
+**Note**: Based on experience with UI library version differences, may apply to other dependency migrations
+
+#### Architecture Evolution Recognition
+- **Identify migration patterns** in target vs source branches (props vs children, config changes)
+- **Find adaptation points** - functions that can bridge architectural differences
+- **Preserve working patterns** in target branch while adding new functionality
+- **Document architectural decisions** for future cherry-picks
+
+#### Bridge Function Development
+- **Enhance existing helpers** rather than creating new patterns
+- **Maintain backward compatibility** with existing usage
+- **Add new functionality incrementally** within existing architectural constraints
+- **Test both old and new usage patterns** to ensure no regressions
