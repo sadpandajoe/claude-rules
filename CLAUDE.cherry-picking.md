@@ -243,6 +243,8 @@ git log --follow --oneline -- src/components/Component/
 - **Bridge function updates** enable new functionality without architectural changes
 - **Import path validation** prevents runtime failures after cherry-pick
 - **Import alias pattern checking** catches subtle compatibility issues between branches
+- **Validate before completing** - Run tests, TypeScript, and linting before `git cherry-pick --continue`
+- **Test-driven validation** - Run specific tests for new functionality first for fastest feedback
 
 ### Common Cherry-Pick Pitfalls
 - Forcing new architectural patterns onto incompatible branches
@@ -301,3 +303,17 @@ If project validation commands fail (npm test, npm run lint, etc):
 - **Maintain backward compatibility** with existing usage
 - **Add new functionality incrementally** within existing architectural constraints
 - **Test both old and new usage patterns** to ensure no regressions
+
+#### Successful Cherry-Pick Validation Pattern
+**Based on successful Superset percentage metric fix (53503e3 → 4.2-release)**
+1. **Attempt cherry-pick** - Let git handle auto-merges first
+2. **Resolve conflicts conservatively** - Preserve target architecture, extract functionality
+3. **Validate incrementally**:
+   - Run new utility tests first (fastest feedback)
+   - Use `pre-commit run --all-files` if available (covers all validation)
+   - Or manually: TypeScript compilation, linting, formatting checks
+   - Check for conflict markers
+4. **Complete only after validation passes**
+5. **Document decisions** in PROJECT.md with specific reasoning
+
+**Success factors**: Conservative resolution + thorough validation + clear documentation = clean cherry-pick with architectural preservation
