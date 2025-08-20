@@ -408,29 +408,6 @@ npm run build 2>&1 | head -20    # Check build output
 
 ## Documentation and Knowledge Building
 
-### Capturing Investigation Outcomes
-
-Always document key learnings in PROJECT.md:
-
-```markdown
-### Investigation Results
-
-#### Root Cause
-[What was the fundamental issue?]
-
-#### Detection Method  
-[How was it identified? What techniques worked?]
-
-#### Resolution Strategy
-[What approach was taken and why?]
-
-#### Prevention
-[How to avoid this issue in the future?]
-
-#### Patterns Learned
-[What patterns emerged that apply to other situations?]
-```
-
 ### Building Investigation Skills
 - Track debugging commands that prove useful for your projects
 - Note common failure patterns in your codebase
@@ -540,27 +517,6 @@ print(f'String repr: {str(test_object.attribute)}')
 
 # Verify function expects strings
 grep -B 2 -A 5 "def function.*str" source_file.py
-```
-
-#### Documentation Pattern for Test Failures
-```markdown
-### Test Failure Analysis: [Test Name]
-
-#### Failure Symptoms
-- [Exact error message]
-- [When it occurs: CI only, locally, etc.]
-
-#### Root Cause Analysis
-1. **Test data validation**: [What types were passed vs expected]
-2. **API contract check**: [Function signature vs test inputs]  
-3. **Environment factors**: [Differences between local/CI]
-
-#### Resolution
-- [What was actually wrong: usually test data, not code]
-- [Changes made to fix the issue]
-
-#### Prevention  
-- [How to avoid this pattern in future tests]
 ```
 
 ### Test Data Contract Debugging
