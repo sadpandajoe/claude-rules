@@ -10,7 +10,6 @@
 
 **CRITICAL RULE**: Every test created must be production-ready and committable to the repository
 
-### Production Test Requirements
 **All tests created must:**
 - [ ] **Be commit-worthy** - Ready to be checked into the repository
 - [ ] **Test actual app code** - Validate real functionality in the codebase
@@ -57,6 +56,46 @@ We adopt a **layered, contract-based testing model** to:
 - 📖 Improve test clarity and separation of concerns
 - 👁 Ensure visual correctness of components and interfaces
 - 🎯 Prevent over-mocking that creates false confidence
+
+## DRY Principles in Testing
+
+When you have multiple similar tests with different inputs, use parameterized testing to reduce duplication while maintaining test clarity and isolation.
+
+### When to Use Parameterized Tests
+- **Same function, different inputs**: Testing ID vs UUID, different data types
+- **Success and failure cases**: Same setup with different expected outcomes  
+- **Boundary conditions**: Testing min, max, edge cases with similar logic
+- **Cross-platform testing**: Same test logic across different environments
+
+### Benefits of Parameterized Testing
+- **Reduces code duplication significantly**: Multiple test methods → single parameterized method
+- **Maintains test isolation**: Each parameter runs as separate test case
+- **Clear failure identification**: Tests get descriptive names like `test_function_0_numeric_id`
+- **Easy maintenance**: Adding new test cases requires only adding parameters
+- **Better coverage visualization**: Each scenario shows up separately in test reports
+
+### Parameterized Testing Pattern
+
+```python
+from parameterized import parameterized
+
+@parameterized.expand([
+    ("test_scenario_name", input_value, expected_result),
+    ("numeric_id", "123", True),
+    ("uuid_string", "550e8400-e29b-41d4-a716-446655440000", True),
+    ("invalid_input", "not-a-number", False),
+])
+def test_function(self, test_name, input_value, expected):
+    """Test function with various input types."""
+    result = function_under_test(input_value)
+    assert result == expected
+```
+
+### When NOT to Use Parameterized Tests
+- **Different test logic**: If test setup or assertions differ significantly
+- **Complex interdependencies**: When parameters affect each other in complex ways
+- **Single test case**: No point in parameterizing one scenario
+- **Different error handling**: When each case needs different exception handling
 
 ## Working with Existing Tests
 
@@ -476,45 +515,6 @@ sed -n 's/.*>\(.*\)<\/div>/\1/p' /tmp/test-output.txt
 - Specify areas that need future automated test coverage
 - Record manual test procedures for repeatability
 
-### DRY Principles in Testing
-
-When you have multiple similar tests with different inputs, use parameterized testing to reduce duplication while maintaining test clarity and isolation.
-
-#### When to Use Parameterized Tests
-- **Same function, different inputs**: Testing ID vs UUID, different data types
-- **Success and failure cases**: Same setup with different expected outcomes  
-- **Boundary conditions**: Testing min, max, edge cases with similar logic
-- **Cross-platform testing**: Same test logic across different environments
-
-#### Benefits of Parameterized Testing
-- **Reduces code duplication significantly**: Multiple test methods → single parameterized method
-- **Maintains test isolation**: Each parameter runs as separate test case
-- **Clear failure identification**: Tests get descriptive names like `test_function_0_numeric_id`
-- **Easy maintenance**: Adding new test cases requires only adding parameters
-- **Better coverage visualization**: Each scenario shows up separately in test reports
-
-#### Parameterized Testing Pattern
-
-```python
-from parameterized import parameterized
-
-@parameterized.expand([
-    ("test_scenario_name", input_value, expected_result),
-    ("numeric_id", "123", True),
-    ("uuid_string", "550e8400-e29b-41d4-a716-446655440000", True),
-    ("invalid_input", "not-a-number", False),
-])
-def test_function(self, test_name, input_value, expected):
-    """Test function with various input types."""
-    result = function_under_test(input_value)
-    assert result == expected
-```
-
-#### When NOT to Use Parameterized Tests
-- **Different test logic**: If test setup or assertions differ significantly
-- **Complex interdependencies**: When parameters affect each other in complex ways
-- **Single test case**: No point in parameterizing one scenario
-- **Different error handling**: When each case needs different exception handling
 
 ### Test Data Contract Validation
 
