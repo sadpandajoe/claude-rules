@@ -24,14 +24,21 @@
 
 | ✅ DO | ❌ DON'T |
 |-------|---------|
-| Use DRY and consolidate similar components | Duplicate logic across files |
+| Write clean, readable code with descriptive variable names | Use unclear abbreviations or names |
+| Follow consistent indentation and formatting | Mix different formatting styles |
+| Include type definitions when using typed languages | Skip type safety where available |
+| Prefer explicit over implicit when it improves clarity | Write ambiguous or unclear code |
+| Use meaningful commit messages following conventional format | Write vague or unhelpful commit messages |
+| Always explain reasoning behind code suggestions | Provide code without context |
+| Show multiple approaches when relevant with pros/cons | Present only one option without alternatives |
+| Include basic error handling in examples | Ignore error handling in code examples |
+| Provide both code and explanation of what it does | Give code without explaining purpose |
 | Follow modular design principles | Mix UI and business logic |
 | Use early returns (≤2 nesting levels) | Create deeply nested blocks |
 | Handle errors gracefully with context | Use silent catches or generic errors |
 | Refactor with clear purpose and reasoning | Refactor without clear objectives |
 | Design for testability from the start | Hard-code dependencies |
 | Modify existing code directly when possible | Create temporary or duplicate versions |
-| Use descriptive variable and function names | Use unclear abbreviations or names |
 
 ### Following Existing Patterns
 
@@ -256,7 +263,7 @@ try {
 - **Styling**: Use existing CSS/styling approaches consistently
 
 ### Performance Considerations
-- **Optimize after working solution** - functionality first, performance second
+- **Optimize after working solution** - functionality first, performance second (prevents optimization loops)
 - **Profile before optimizing** - measure actual bottlenecks
 - **Consider maintainability** - don't sacrifice readability for minor gains
 - **Document performance decisions** - explain trade-offs made
@@ -264,13 +271,11 @@ try {
 ## Lessons Learned
 
 ### Implementation Patterns That Work
-- **Working solution first rule** prevents getting stuck in optimization loops
 - **Following existing patterns** reduces integration issues and speeds development
 - **Incremental validation** catches problems early in development cycle
 - **Dependency validation** before implementation prevents import errors
 
 ### Common Implementation Pitfalls
-- Jumping to optimization before completing working solution
 - Creating new patterns instead of studying existing codebase conventions
 - Skipping dependency verification leads to runtime import failures
 - Making large changes without incremental testing
