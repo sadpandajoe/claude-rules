@@ -24,6 +24,15 @@
 
 | ✅ DO | ❌ DON'T |
 |-------|---------|
+| Write clean, readable code with descriptive variable names | Use unclear abbreviations or names |
+| Follow consistent indentation and formatting | Mix different formatting styles |
+| Include type definitions when using typed languages | Skip type safety where available |
+| Prefer explicit over implicit when it improves clarity | Write ambiguous or unclear code |
+| Use meaningful commit messages following conventional format | Write vague or unhelpful commit messages |
+| Always explain reasoning behind code suggestions | Provide code without context |
+| Show multiple approaches when relevant with pros/cons | Present only one option without alternatives |
+| Include basic error handling in examples | Ignore error handling in code examples |
+| Provide both code and explanation of what it does | Give code without explaining purpose |
 | Use DRY and consolidate similar components | Duplicate logic across files |
 | Follow modular design principles | Mix UI and business logic |
 | Use early returns (≤2 nesting levels) | Create deeply nested blocks |
@@ -31,7 +40,6 @@
 | Refactor with clear purpose and reasoning | Refactor without clear objectives |
 | Design for testability from the start | Hard-code dependencies |
 | Modify existing code directly when possible | Create temporary or duplicate versions |
-| Use descriptive variable and function names | Use unclear abbreviations or names |
 
 ### Following Existing Patterns
 
