@@ -2,19 +2,153 @@
 
 ## Core Testing Philosophy
 
+### Primary Goals (In Priority Order)
+
+1. **Make existing tests pass** - Fix failing tests in the repository
+2. **Create production-ready tests when needed** - Test the actual code/feature being implemented
+3. **Never create throwaway tests** - All tests must be commit-worthy and test real app code
+
+**CRITICAL RULE**: Every test created must be production-ready and committable to the repository
+
+### Production Test Requirements
+**All tests created must:**
+- [ ] **Be commit-worthy** - Ready to be checked into the repository
+- [ ] **Test actual app code** - Validate real functionality in the codebase
+- [ ] **Follow project conventions** - Match existing test structure and patterns
+- [ ] **Be maintainable** - Other developers can understand and maintain them
+- [ ] **Have clear purpose** - Document what specific functionality they validate
+- [ ] **Use project test data** - Real fixtures, not made-up data
+
+### What NOT to Create
+❌ **Don't create these types of tests:**
+- Temporary test files that won't be committed
+- Test files that test general concepts unrelated to your code changes
+- Example/demo tests that don't test actual repository functionality  
+- Generic utility tests when you're working on a specific feature
+- Tests for code that already has adequate test coverage
+- Tests that duplicate existing test functionality
+- "Practice" or "experimental" tests that aren't part of the actual codebase
+- One-off test files to validate a concept or approach
+
+### What TO Create
+✅ **DO create tests when:**
+- Implementing a new feature that needs permanent test coverage
+- Fixing a bug that existing tests didn't catch (add regression test to be committed)
+- Adding functionality to a component/module that lacks tests
+- Explicitly requested to add test coverage for specific code
+- Your code changes require test updates to maintain coverage
+
+### Test Relevance & Commit Check
+**Before creating any test, ask:**
+- [ ] Does this test directly validate the code I'm implementing?
+- [ ] Will this test be committed to the repository as permanent test coverage?
+- [ ] Is this testing actual repository functionality vs. general concepts?
+- [ ] Are there already existing tests that cover this functionality?
+- [ ] Was I asked to create tests for this specific code?
+- [ ] Will this test help catch real bugs in the codebase going forward?
+- [ ] Does this follow the project's existing test patterns and conventions?
+
 ### Why We Test This Way
 
 We adopt a **layered, contract-based testing model** to:
 - ✅ Build trust in UI/API changes through real behavior validation
-- 🐛 Catch defects early while developers are still in context
+- 🛡 Catch defects early while developers are still in context
 - 🚀 Reduce manual effort and testing time during releases
-- 📐 Improve test clarity and separation of concerns
+- 📖 Improve test clarity and separation of concerns
 - 👁 Ensure visual correctness of components and interfaces
 - 🎯 Prevent over-mocking that creates false confidence
 
+## Working with Existing Tests
+
+### Test Analysis First
+**Before implementing any feature, analyze existing tests:**
+
+```bash
+# Find existing tests for the area you're working on
+find . -name "*.test.*" -o -name "*.spec.*" | grep -i "component-name"
+grep -r "describe\|it\|test" . | grep -i "functionality-name"
+
+# Run existing tests to see what's expected
+npm test -- ComponentName.test.tsx
+npm test -- --testNamePattern="specific test"
+
+# Check test patterns in codebase
+ls -la **/*.test.* | head -10
+```
+
+### Using Existing Tests as Specifications
+When tests fail, they provide precise specifications for expected behavior:
+
+```bash
+# Run specific failing test with verbose output
+npm test -- TestFile.test.tsx -t "specific test name" --verbose
+
+# For debugging, run single test in watch mode (if available)
+npm test -- --watch TestFile.test.tsx
+```
+
+### Test Analysis Framework
+When working with existing tests:
+1. **Read the test code**: Understand exactly what it's testing
+2. **Examine test data**: What input does the test provide?
+3. **Check assertions**: What specific output does it expect?
+4. **Trace execution path**: Follow the code from input to assertion
+5. **Identify the gap**: Where does reality diverge from expectation?
+
+### Making Tests Pass Strategy
+1. **Understand what the test expects** - Read the test thoroughly
+2. **Implement to meet expectations** - Don't change tests unless absolutely necessary
+3. **Use test data as specification** - Tests show exactly what data structures are expected
+4. **Verify with related tests** - Ensure your changes don't break other tests
+
+## When to Create New Tests
+
+### Test Creation Guidelines
+**Create tests only when they directly relate to your implementation:**
+
+#### ✅ Valid Reasons to Create Tests:
+- [ ] **Feature implementation**: You're building new functionality that needs test coverage
+- [ ] **Bug fix**: Adding regression test for a bug that existing tests missed
+- [ ] **Explicit request**: User specifically asked for test coverage
+- [ ] **Coverage gap**: Your code changes expose areas lacking test coverage
+- [ ] **API changes**: You modified interfaces that need contract validation
+
+#### ❌ Invalid Reasons (Don't Create These):
+- [ ] **General testing practice** - Creating tests unrelated to your current work
+- [ ] **Example/demo tests** - Tests that demonstrate concepts but don't test real code
+- [ ] **Theoretical coverage** - Testing edge cases not relevant to current implementation
+- [ ] **Duplicating existing tests** - Adding tests for functionality already covered
+- [ ] **Testing external dependencies** - Testing third-party code instead of your code
+
+### Universal Testing Standards for New Tests
+**If you must create tests, follow these rules:**
+
+#### Pre-Testing Planning
+**Before coding tests, always list out all tests beforehand**
+
+- [ ] Plan test coverage and structure before implementation
+- [ ] Make sure tests aren't too large or granular
+- [ ] If testing for a view, it is ok to chain everything that should be in that view
+- [ ] Tests should be able to tell me exactly what has failed
+- [ ] Consider if the tests should live in other locations or in lower components
+- [ ] Determine if the test is best in current repo or should be recommended for upstream
+
+#### Avoiding Test Duplication
+**Don't duplicate scenarios**
+
+- [ ] Check if there are lower components the test should live in first
+- [ ] See if the test already exists in dependencies/submodules - if it does, consider that a duplicate
+- [ ] **Before creating new test files, always check for existing tests first:**
+  - Look for existing test files that cover the same code/class/component
+  - Check common test file patterns: `*.test.js`, `*.spec.js`, `__tests__/` folders
+  - Search for tests of the same file/class/function before suggesting new ones
+  - If existing tests are found, suggest adding to or modifying those instead
+  - Only create new test files when no relevant existing tests exist
+  - When adding to existing tests, maintain the same testing style and structure
+
 ## Core Testing Principles
 
-### 1. 📄 API Is the Contract
+### 1. 🔄 API Is the Contract
 
 Every API interaction has structured `request.json` and `expected_response.json` stored in fixtures.
 
@@ -294,18 +428,23 @@ it('creates chart and adds to dashboard', () => {
 - **Minimal mocking** catches integration issues early
 - **Layer-appropriate testing** reduces maintenance burden
 - **Contract-based testing** keeps API and UI tests synchronized
+- **Existing test analysis** provides clear specifications for implementation
 
 ### Common Testing Pitfalls
 - Over-mocking internal components creates false confidence
 - Hardcoding test data instead of using realistic fixtures
 - Testing implementation instead of behavior leads to brittle tests
 - Duplicating test logic across layers wastes effort
+- **Creating new tests instead of using existing tests as specifications**
+- **Creating throwaway tests that don't get committed to the repository**
 
 ### Test Quality Improvements
 - **Test-driven investigation** - failing tests reveal exact specifications
 - **Realistic data structures** from API fixtures prevent integration surprises
 - **User-focused testing** catches real usability issues
 - **Systematic test planning** ensures comprehensive coverage
+- **Existing test analysis** speeds up implementation and reduces bugs
+- **Production-ready test creation** ensures all tests add permanent value to the codebase
 
 ### Manual Testing When Automation Fails (Emerging Pattern)
 **Note**: Developing approaches for projects with limited test infrastructure
@@ -336,6 +475,103 @@ sed -n 's/.*>\(.*\)<\/div>/\1/p' /tmp/test-output.txt
 - Note limitations of manual vs automated testing
 - Specify areas that need future automated test coverage
 - Record manual test procedures for repeatability
+
+### DRY Principles in Testing
+
+When you have multiple similar tests with different inputs, use parameterized testing to reduce duplication while maintaining test clarity and isolation.
+
+#### When to Use Parameterized Tests
+- **Same function, different inputs**: Testing ID vs UUID, different data types
+- **Success and failure cases**: Same setup with different expected outcomes  
+- **Boundary conditions**: Testing min, max, edge cases with similar logic
+- **Cross-platform testing**: Same test logic across different environments
+
+#### Benefits of Parameterized Testing
+- **Reduces code duplication significantly**: Multiple test methods → single parameterized method
+- **Maintains test isolation**: Each parameter runs as separate test case
+- **Clear failure identification**: Tests get descriptive names like `test_function_0_numeric_id`
+- **Easy maintenance**: Adding new test cases requires only adding parameters
+- **Better coverage visualization**: Each scenario shows up separately in test reports
+
+#### Parameterized Testing Pattern
+
+```python
+from parameterized import parameterized
+
+@parameterized.expand([
+    ("test_scenario_name", input_value, expected_result),
+    ("numeric_id", "123", True),
+    ("uuid_string", "550e8400-e29b-41d4-a716-446655440000", True),
+    ("invalid_input", "not-a-number", False),
+])
+def test_function(self, test_name, input_value, expected):
+    """Test function with various input types."""
+    result = function_under_test(input_value)
+    assert result == expected
+```
+
+#### When NOT to Use Parameterized Tests
+- **Different test logic**: If test setup or assertions differ significantly
+- **Complex interdependencies**: When parameters affect each other in complex ways
+- **Single test case**: No point in parameterizing one scenario
+- **Different error handling**: When each case needs different exception handling
+
+### Test Data Contract Validation
+
+**Critical Rule**: Test data must exactly match the API contracts and type hints.
+
+#### Pre-Test Validation Checklist
+- [ ] **Check function signatures**: What types does the function actually expect?
+- [ ] **Review type hints**: Use them as the source of truth for expected inputs
+- [ ] **Verify attribute existence**: Don't assume optional attributes exist
+- [ ] **Match data formats**: Strings vs objects, lists vs single items, etc.
+
+#### Common Test Data Pitfalls
+1. **Object vs String Confusion**:
+   ```python
+   # BAD: Passing UUID object to string-expecting function
+   result = function_expecting_string(chart.uuid)  # UUID object
+   
+   # GOOD: Convert to string first
+   result = function_expecting_string(str(chart.uuid))  # String
+   ```
+
+2. **Silent Test Failures**:
+   ```python
+   # BAD: Test silently passes if uuid is None
+   if chart.uuid:
+       result = test_function(chart.uuid)
+       assert result is not None
+   
+   # GOOD: Explicit validation or skip
+   if chart.uuid is None:
+       pytest.skip("Chart has no UUID, cannot test UUID functionality")
+   result = test_function(str(chart.uuid))
+   assert result is not None
+   ```
+
+3. **Type Assumption Errors**:
+   ```python
+   # BAD: Assuming type coercion
+   assert function_expecting_int(user_id) == expected
+   
+   # GOOD: Explicit type handling
+   assert function_expecting_int(int(user_id)) == expected
+   ```
+
+#### Test Data Validation Pattern
+
+```python
+def test_function_with_validation(self):
+    """Test with explicit validation of test data."""
+    # Validate test data matches expectations
+    assert isinstance(test_input, str), f"Function expects string, got {type(test_input)}"
+    assert test_input is not None, "Test input cannot be None"
+    
+    # Test the actual functionality
+    result = function_under_test(test_input)
+    assert result == expected_output
+```
 
 ### Complex Component Testing Debugging (Emerging Pattern)
 **Note**: Based on debugging experience with virtual scrolling and state management

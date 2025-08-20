@@ -39,8 +39,12 @@
 ### Communication Rules
 - [ ] Be direct about errors and issues - no unnecessary apologies
 - [ ] Keep responses concise unless detail is specifically requested
-- [ ] Ask for clarification when requirements are unclear
+- [ ] Ask for clarifying questions when requirements are unclear
 - [ ] Request confirmation before making destructive changes
+- [ ] Be concise but thorough
+- [ ] Provide working code examples
+- [ ] Explain trade-offs when suggesting different approaches
+- [ ] Focus on practical, implementable solutions
 
 ### Recovery Protocols
 - [ ] Stop and assess before making any recovery attempts

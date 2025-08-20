@@ -285,16 +285,28 @@ git log -S "pattern" --oneline
 
 ### Dependency Investigation
 ```bash
-# Check package dependencies
+# Check package dependencies (Node.js)
 cat package.json | grep -A 5 -B 5 "dependency-name"
 npm list | grep dependency-name
 
+# Check package dependencies (Python)
+pip show package-name                           # Current installed version
+grep "package-name" setup.py requirements.txt  # Expected version
+pip list | grep package-name                    # Alternative check
+
 # Compare dependency versions between branches
-git show master:package.json | grep "library"
+git show master:package.json | grep "library"  # Node.js
 git show HEAD:package.json | grep "library"
+git show master:setup.py | grep "library"      # Python
+git show HEAD:setup.py | grep "library"
+
+# Test imports in isolation (Python)
+python -c "from module import ClassName; print('Import works')"
+python -c "import module; print([x for x in dir(module) if not x.startswith('_')])"
 
 # Check if packages are installed
-ls -la node_modules/package-name/
+ls -la node_modules/package-name/              # Node.js
+pip show package-name                           # Python detailed info
 ```
 
 ## Solution Analysis Framework
@@ -428,13 +440,158 @@ Always document key learnings in PROJECT.md:
 ## Lessons Learned
 
 ### Common Patterns
-<!-- Add insights discovered through experience -->
+- **Dependency masquerading as breaking changes**: Import errors often stem from wrong package versions, not removed functionality
+- **Version mismatch diagnosis**: Always check `pip show <package>` vs expected version before concluding API changes
+- **False correlation with recent commits**: Timeline correlation doesn't prove causation - verify the actual change impact
 
 ### Best Practices  
-<!-- Add investigation practices that consistently work well -->
+- **Package version verification first**: Before investigating "missing" imports, verify installed vs expected package versions
+- **Simple import isolation**: Test problematic imports in isolation to separate dependency from code issues
+- **Document correction process**: When initial analysis is wrong, document the correction timeline in PROJECT.md
+- **Evidence-based debugging**: Use concrete evidence (version numbers, import tests) rather than assumptions
 
 ### Pitfalls to Avoid
-<!-- Add investigation mistakes that have been made before -->
+- **Assuming correlation equals causation**: Recent commits near failure don't automatically cause the failure
+- **Jumping to "code was removed" conclusions**: Check if dependency versions changed before concluding functionality was removed
+- **Quick fixes over root cause**: Creating workarounds (local enums) instead of fixing underlying issues (dependency versions)
+- **Single hypothesis tunnel vision**: Test multiple theories rather than confirming first impression
 
 ### Process Improvements
-<!-- Add investigation workflow enhancements discovered over time -->
+- **Dependency debugging checklist**: Add standard commands (`pip show`, simple import tests) to investigation workflow
+- **Correction documentation pattern**: When analysis is wrong, mark timeline entries as "INCORRECT" and add corrected findings
+- **Multiple solution evaluation**: Always present 2-3 options (quick fix, proper fix, complete solution) with risk analysis
+- **Version verification step**: Make package version checking a standard first step for import-related failures
+
+### Multi-Layer API Breaking Changes (Universal Pattern)
+
+When debugging after major version updates, be aware that **multiple issues can be introduced simultaneously**:
+
+#### Investigation Strategy
+```bash
+# Don't stop at the first fix - version updates often have layered issues
+git show <breaking-commit> --stat              # Check scope of changes
+grep -r "changed_api_method" src/               # Find all usage patterns
+
+# Test incrementally after each fix
+pytest specific_failing_test.py -v             # Verify each fix isolates the problem
+```
+
+#### Common Multi-Layer Scenarios
+1. **Surface-level changes** (parameter types, method signatures) - Fix with parameter conversion
+2. **Implementation bugs** in the new API - Fix requires modifying the API implementation
+3. **Both issues simultaneously** - Requires multiple rounds of investigation
+
+#### Investigation Process
+1. **Fix obvious API usage issues** (parameter types, method signatures)
+2. **Test incrementally** - if still failing, investigate implementation of the changed API
+3. **Check both usage patterns AND implementation** of changed APIs
+4. **Fix implementation bugs** if found
+5. **Test again** to ensure both layers are resolved
+
+#### Documentation Requirements
+- **Document each layer separately** in PROJECT.md investigation timeline
+- **Mark which fixes address which layer** (usage vs implementation)
+- **Note if additional investigation rounds were required**
+
+**Key Learning**: Don't assume the first fix will resolve everything - major version updates can introduce both usage incompatibilities and implementation bugs that compound each other.
+
+### Test Failure Investigation Pattern
+
+When tests fail in CI but pass locally, or when new tests fail unexpectedly:
+
+#### Step 1: Analyze Test Data First
+**Before assuming code is broken, check if test data matches API expectations:**
+
+```bash
+# Check function signatures and type hints
+grep -A 5 "def function_name" path/to/file.py
+# Look for parameter types and return types
+
+# Check test data types
+python3 -c "
+import test_module
+print(type(test_data))
+print(hasattr(test_data, 'expected_attribute'))
+"
+```
+
+#### Step 2: Validate Test Inputs
+**Common test data mismatches:**
+- UUID objects vs UUID strings
+- Integer IDs vs string representations  
+- None/null vs empty string/list
+- Object attributes that may not exist
+
+#### Step 3: Investigation Priority
+1. **Test data validation** - Check types match function expectations
+2. **Environment differences** - Local vs CI setup variations
+3. **Recent changes impact** - But don't assume correlation = causation  
+4. **Production code issues** - Only after validating test data
+
+#### Test Data Investigation Commands
+```bash
+# Check object types in test
+python3 -c "
+from test_file import test_object
+print(f'Type: {type(test_object.attribute)}')
+print(f'Value: {test_object.attribute}')
+print(f'String repr: {str(test_object.attribute)}')
+"
+
+# Verify function expects strings
+grep -B 2 -A 5 "def function.*str" source_file.py
+```
+
+#### Documentation Pattern for Test Failures
+```markdown
+### Test Failure Analysis: [Test Name]
+
+#### Failure Symptoms
+- [Exact error message]
+- [When it occurs: CI only, locally, etc.]
+
+#### Root Cause Analysis
+1. **Test data validation**: [What types were passed vs expected]
+2. **API contract check**: [Function signature vs test inputs]  
+3. **Environment factors**: [Differences between local/CI]
+
+#### Resolution
+- [What was actually wrong: usually test data, not code]
+- [Changes made to fix the issue]
+
+#### Prevention  
+- [How to avoid this pattern in future tests]
+```
+
+### Test Data Contract Debugging
+
+#### Quick Validation Script
+```python
+def validate_test_data(function, test_input):
+    """Helper to validate test data matches function expectations."""
+    import inspect
+    
+    # Get function signature
+    sig = inspect.signature(function)
+    params = list(sig.parameters.items())
+    
+    if len(params) > 0:
+        param_name, param_info = params[0]  # First parameter
+        expected_type = param_info.annotation
+        actual_type = type(test_input)
+        
+        print(f"Function: {function.__name__}")
+        print(f"Parameter: {param_name}")  
+        print(f"Expected type: {expected_type}")
+        print(f"Actual type: {actual_type}")
+        print(f"Match: {actual_type == expected_type}")
+        
+        if hasattr(test_input, '__class__'):
+            print(f"Test input: {test_input}")
+        
+        return actual_type == expected_type
+    return True
+
+# Usage example:
+# validate_test_data(Slice.get, chart.uuid)  # Will show UUID vs str mismatch
+```
