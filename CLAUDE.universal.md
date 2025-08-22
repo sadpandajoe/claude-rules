@@ -1,192 +1,223 @@
-# Claude Code Universal Workflow Guidelines
+# Claude Universal Workflow Guidelines
 
-## Core Principles (MUST READ FIRST)
+## CRITICAL: Always Start Here
+1. **Read all CLAUDE.*.md files** in `~/opt/code/claude-rules/` before starting work
+2. **Create/update PROJECT.md immediately** using template from `~/opt/code/claude-files/PROJECT_TEMPLATE.md`
+3. **Document BEFORE acting** - Plan in PROJECT.md, then execute
+4. **Update PROJECT.md after ANY action** - Including thinking, planning, reading, executing
 
-### Essential Workflow - Golden Rule
-- [ ] **IMMEDIATELY create/update PROJECT.md for ANY work request** - Even "plans" and "analysis" are project work
-- [ ] **After reading workflow instructions, create PROJECT.md to acknowledge understanding** - Proves you're following the guidelines
-- [ ] **ALL project documentation goes in PROJECT.md** - Never create separate documentation files, fancy formatting, or external plans
-- [ ] **Never use TodoWrite for project work** - TodoWrite is for personal tasks only, not project documentation
-- [ ] **Document BEFORE any action** - Plan first, then document the plan, then implement
-- [ ] **Golden rule applies in ALL modes** - Planning mode, implementation mode, investigation mode - always use PROJECT.md
-- [ ] Always read/create PROJECT.md before starting any work
-- [ ] Document what you're doing before doing it (not after)
-- [ ] Update PROJECT.md after completing each major step
-- [ ] Never make code changes without planning and documenting first
+## Core Universal Principles
 
-### Investigation Rules
-- [ ] When investigating issues, document findings before proposing solutions
-- [ ] **Use historical analysis first** - git blame, commit comparison, and cross-branch investigation
-- [ ] **Understand full scope before making changes** - identify root cause before attempting fixes
-- [ ] **Prefer tested solutions over manual fixes** - look for existing solutions in other branches/commits
-- [ ] Verify dependencies exist before using them
-- [ ] Test incrementally - make small changes and verify
+### 🎯 Golden Rules (Apply to EVERY Project)
+- **PROJECT.md is the single source of truth** - All documentation goes there
+- **Evidence over assumptions** - Use version control history, test results, existing solutions
+- **Working solution before optimization** - Get it working, commit, then improve
+- **Incremental progress** - Small, verified changes over big risky ones
+- **Document decisions and reasoning** - Future maintainers need context
+- **TDD and YAGNI** - Test first, build only what's needed now
 
-### Implementation Standards
-- [ ] Plan all tests before writing any code
-- [ ] Study existing patterns before creating new ones
-- [ ] **Use evidence-based decisions** - research git history, existing solutions, and proven approaches
-- [ ] **Choose conservative solutions when possible** - tested fixes over custom implementations
-- [ ] Complete working solution before suggesting optimizations
-- [ ] Commit working state before any refactoring
+### 🔍 Investigation First
+- Document the problem completely before proposing solutions
+- **Always use git blame/bisect** to find introducing commits
+- Use version control history (`git blame`, `git log`, `git bisect`)
+- Find root cause, not just symptoms
+- Check if solution exists in other branches/commits
+- Verify dependencies exist before using them
+- **Prefer existing fixes over creating new ones**
 
-### Testing Principles
-- [ ] Use fixtures as source of truth - no hardcoded test data
-- [ ] Mock external boundaries only - test real internal behavior
-- [ ] Assign tests to appropriate layers - don't duplicate logic
-- [ ] Test user-observable behavior - not implementation details
+### 💻 Implementation Standards
+- Study existing patterns before creating new ones
+- Match project conventions (indentation, naming, structure)
+- **Add only files YOU modified** - Never use `git add -A` or `git add .`
+- Validate each change before proceeding
+- Commit working states frequently
+- Keep functions/files manageable (guideline: <20 lines/function, <300 lines/file)
 
-### Communication Rules
-- [ ] Be direct about errors and issues - no unnecessary apologies
-- [ ] Keep responses concise unless detail is specifically requested
-- [ ] Ask for clarifying questions when requirements are unclear
-- [ ] Request confirmation before making destructive changes
-- [ ] Be concise but thorough
-- [ ] Provide working code examples
-- [ ] Explain trade-offs when suggesting different approaches
-- [ ] Focus on practical, implementable solutions
+### 🧪 Testing Philosophy
+- Test behavior, not implementation
+- Use real/realistic test data (fixtures)
+- Mock only external boundaries
+- One test layer per concern (don't duplicate)
+- Manual testing when automation unavailable
 
-### Recovery Protocols
-- [ ] Stop and assess before making any recovery attempts
-- [ ] Use safe recovery options first (stash, checkout, reset)
-- [ ] Document what broke and how it was fixed
-- [ ] Create rollback points before major changes
+### 🚨 Recovery Principles
+- Stop and assess before any recovery attempt
+- Try safe recovery first (`git stash`, `git checkout`)
+- Document what broke and how it was fixed
+- Create rollback points before risky changes
 
-## Workflow Files - Read Before Starting
+### 🗣️ Communication Rules
+- **Be direct about errors** - No unnecessary apologies, state the issue clearly
+- **Show, don't just tell** - Include actual commands, outputs, and evidence
+- **Explain reasoning** - Why choosing one approach over another
+- **Full context in responses** - Include all relevant changes and findings
+- **Ask for clarification** - Don't assume when requirements unclear
+- **Request confirmation** - Before destructive changes or major decisions
+- **Focus on practical solutions** - Implementable over theoretical
+- **No hedging** - "This will" not "This should" when certain
 
-### 📋 CLAUDE.planning.md - Project Setup & Documentation
-**Key Focus:**
-- Always create/read PROJECT.md first
-- Document before acting, update after completing
-- Maintain session continuity through Development Log
-- Plan solutions with multiple options and trade-offs
+## Quick Navigation Guide
 
-### 🔍 CLAUDE.investigation.md - Problem Solving & Root Cause Analysis  
-**Key Focus:**
-- Document the problem before proposing solutions
-- Find the introducing commit/PR when possible
-- Use systematic debugging standards and evidence-based investigation
-- Follow structured investigation process with multiple solution options
+| Situation | Use This Guide | Key Focus |
+|-----------|---------------|-----------|
+| Starting new work | `CLAUDE.planning.md` | PROJECT.md setup, document before acting, solution planning with trade-offs |
+| Debugging issues | `CLAUDE.investigation.md` | Root cause analysis, git blame/bisect, evidence-based fixes |
+| Writing code | `CLAUDE.implementation.md` | TDD, YAGNI, match patterns, working before optimizing |
+| Creating tests | `CLAUDE.testing.md` | Behavior not implementation, fixture-driven, strategic mocking |
+| System broken | `CLAUDE.troubleshooting.md` | Safe recovery first, document what broke, prevent recurrence |
+| Cross-branch work | `CLAUDE.cherry-picking.md` | Verify dependencies, separate functional/structural, conservative |
+| Reviewing code | `CLAUDE.code-review.md` | Constructive feedback, security focus, best practices |
 
-### 💻 CLAUDE.implementation.md - Coding & Development Standards
-**Key Focus:**
-- Follow existing patterns before creating new ones
-- Complete working solution before suggesting optimizations  
-- Code quality standards and dependency validation
-- Pre-implementation planning and incremental development
+## Universal Commands (Language-Agnostic)
 
-### 🧪 CLAUDE.testing.md - Testing Strategy & Quality Standards
-**Key Focus:**
-- Contract-based testing with fixture-driven development
-- Strategic mocking (external boundaries only, test real behavior)
-- Layered testing approach with appropriate test assignment
-- Test real user behavior, avoid over-mocking anti-patterns
-
-### 🚨 CLAUDE.troubleshooting.md - Recovery & Emergency Procedures
-**Key Focus:**
-- Investigation vs recovery decision framework
-- Document recovery process and communicate status
-- Systematic post-recovery learning and prevention planning
-- Emergency procedures with escalation guidelines
-
-### 🍒 CLAUDE.cherry-picking.md - Cross-Branch Safety (Universal)
-**Key Focus:**
-- Understand full scope before cherry-picking
-- Verify imports exist in target branch
-- Separate functional from structural changes
-- Conservative resolution with documented decisions
-
-## Quick Reference
-
-### When to Use Each Guide
-- **Planning new work or project setup?** → CLAUDE.planning.md
-- **Debugging issues or investigating problems?** → CLAUDE.investigation.md  
-- **Writing code or implementing features?** → CLAUDE.implementation.md
-- **Planning tests or improving test quality?** → CLAUDE.testing.md
-- **Things broken and need recovery?** → CLAUDE.troubleshooting.md
-- **Cherry-picking between branches?** → CLAUDE.cherry-picking.md
-
-### Emergency Commands
 ```bash
-# Safe recovery
-git stash                      # Save current work safely
-git reset --hard HEAD          # Revert to last commit
-git status                     # Check current state
+# Investigation
+git status                          # Current state
+git log --oneline -10               # Recent history
+git blame -- <file>                 # Who changed what when
+git diff <branch1>..<branch2>       # Compare branches
+git log -S "search-term"            # Find when code was added/removed
 
-# Quick validation
-grep -E "<<<|===|>>>" **/*     # Check for merge conflicts
-git log --oneline -5           # Recent commit history
+# Safe Recovery  
+git stash                           # Save current work
+git checkout -- .                   # Revert working directory
+git reset --soft HEAD~1             # Undo commit, keep changes
+git reset --hard HEAD               # Nuclear option - lose all changes
 
-# Investigation basics
-git blame -- file.ext          # Find when lines were last modified
-git bisect start               # Systematic bug hunting
+# Validation
+grep -r "search-pattern" .          # Find in files
+find . -name "*.ext"                # Find files by extension
+ls -la <path>                       # Verify file/directory exists
 ```
 
-## Session Completion (When Ending Work)
+## PROJECT.md Workflow
 
-### Standard Cleanup
-- [ ] Ensure PROJECT.md reflects current state
-- [ ] Document any in-progress work clearly
-- [ ] Update Current Status to reflect actual progress
+### Every Session
+1. **Start**: Read PROJECT.md → Add timestamp to Development Log → Plan work
+2. **During**: Document before ANY action → Update after ANY action
+3. **End**: Update Current Status → Document blockers → Note next steps
 
-### Learning Capture & Process Improvement
-- [ ] Review the session for new insights or better approaches
-- [ ] **Document what worked well vs what could be improved** - capture success factors
-- [ ] **Identify effective investigation techniques** - git blame, cross-branch analysis, evidence-based decisions
-- [ ] Identify any workflow gaps or improvements discovered
-- [ ] Update relevant CLAUDE.*.md files with new learnings
+### Key Sections to Maintain
+- **Current Status**: What's active, next, blocked (keep current)
+- **Development Log**: Timestamped narrative of work (append only)
+- **Solutions**: Options under evaluation → Accepted → Failed
+- **Implementation Notes**: Technical decisions, gotchas, patterns
 
-### Learning Update Process
-1. Identify which workflow file the learning applies to:
-   - Project local → `CLAUDE.local.md`
-   - Core principles → `~/opt/code/claude-files/CLAUDE.universal.md`
-   - Planning insights → `~/opt/code/claude-files/CLAUDE.planning.md`
-   - Debugging discoveries → `~/opt/code/claude-files/CLAUDE.investigation.md`  
-   - Implementation improvements → `~/opt/code/claude-files/CLAUDE.implementation.md`
-   - Testing strategies → `~/opt/code/claude-files/CLAUDE.testing.md`
-   - Recovery procedures → `~/opt/code/claude-files/CLAUDE.troubleshooting.md`
-   - Cherry picking → `~/opt/code/claude-files/CLAUDE.cherry-picking.md`
-2. Add to appropriate section (e.g., "Common Patterns", "Lessons Learned", "Best Practices")
-3. Keep updates concise and actionable
-4. Remove outdated practices that no longer work
+## Decision Framework
 
-## Using Project-Specific Guidelines
+### When Facing Choices
+1. **Document multiple options** in Solutions section
+2. **Evaluate each**: Risk, effort, maintainability, reversibility
+3. **Choose based on evidence**: Existing solutions > custom fixes
+4. **Document reasoning** in Accepted Solution
+5. **Move failed attempts** to Failed Solutions with lessons learned
 
-### Each project should have its own `CLAUDE.local.md` that:
-1. **References universal guidelines first** - `~/opt/code/claude-files/`
-2. **Adds project-specific overrides** - technology stack, validation commands, patterns
-3. **Documents temporary notes** - project-specific context that doesn't belong in universal files
+### Risk Assessment Scale
+- **Low**: Proven solution, minimal changes, easy rollback
+- **Medium**: Some unknowns, moderate changes, needs testing
+- **High**: Many unknowns, broad changes, difficult rollback
 
-### Project CLAUDE.local.md Template
-Use the template at: `~/opt/code/claude-files/CLAUDE.local-template.md`
+## Language-Agnostic Patterns
 
-Example structure:
-```markdown
-# Read Universal Guidelines First  
-- ~/opt/code/claude-files/CLAUDE.universal.md
-- ~/opt/code/claude-files/CLAUDE.*.md
-
-# Project-Specific Core Principles
-- Technology stack overrides
-- Project-specific validation commands  
-- Framework-specific patterns
-
-# Project Intricacies
-- Architecture-specific quirks and patterns
-- Team collaboration details
-- Current project state and evolution
+### Investigation Pattern
+```
+1. Reproduce issue
+2. Check version control history  
+3. Compare working vs broken states
+4. Identify introducing change
+5. Understand why it broke
+6. Find existing fix or create minimal one
 ```
 
-## Lessons Learned
+### Implementation Pattern
+```
+1. Understand requirements
+2. Study existing code patterns
+3. Plan approach in PROJECT.md
+4. Implement incrementally
+5. Validate each step
+6. Commit working state
+7. Optimize if needed
+```
 
-### Common Recovery Patterns
-<!-- Add recovery strategies that have worked well -->
+### Testing Pattern
+```
+1. Identify what needs testing
+2. Choose appropriate test layer
+3. Use realistic test data
+4. Test behavior not implementation
+5. Mock only external dependencies
+6. Verify test actually catches issues
+```
 
-### Prevention Strategies
-<!-- Add practices that prevent common issues -->
+## Project-Specific Integration
 
-### Emergency Procedures
-<!-- Add quick fixes for recurring problems -->
+### Project CLAUDE.md
+Each project should have its own `CLAUDE.md` that includes:
+- Reference to universal guidelines (`~/opt/code/claude-rules/`)
+- Technology stack (language, framework, tools)
+- Project-specific commands (build, test, validate)
+- Project patterns and conventions
+- Known issues and gotchas
 
-### Tool-Specific Recovery
-<!-- Add recovery procedures for specific tools/frameworks -->
+### Override Hierarchy
+1. Universal principles (these files) - Always apply
+2. Project-specific CLAUDE.md - Adds project context
+3. PROJECT.md current state - Most immediate context
+
+## When to Update Universal Files
+
+### Update These Files When
+- **Pattern applies across multiple projects** - Not just current project
+- **Found clearer way to explain existing rule** - Improve clarity for future use
+- **Existing rule consistently causes problems** - Document exception or update rule
+- **Discovered new universal tool/technique** - Proven valuable across projects
+- **Rule is consistently ignored or impractical** - Reassess if rule should exist
+
+### How to Update Universal Files
+1. **Add to "Lessons Learned" section** of the appropriate file
+2. **Include context** - Why the change/addition is needed
+3. **Explain failures** - If modifying existing rule, explain why original didn't work
+4. **Keep language-agnostic** - Mark language-specific items clearly
+5. **Test across projects** - Ensure change doesn't break other workflows
+
+### What Belongs in Universal vs Project
+| Universal Files | Project CLAUDE.md |
+|----------------|-------------------|
+| Patterns that work everywhere | Project-specific commands |
+| Language-agnostic principles | Tech stack details |
+| Git workflows | Local development setup |
+| Communication standards | Team conventions |
+| General best practices | Domain-specific rules |
+
+## Best Practices Checklist
+
+### Before Starting Work
+- [ ] Read/create PROJECT.md
+- [ ] Understand current status
+- [ ] Plan approach
+- [ ] Document plan
+
+### During Work  
+- [ ] Small, verified changes
+- [ ] Match existing patterns
+- [ ] Update documentation
+- [ ] Commit working states
+
+### Before Completing
+- [ ] Validate changes work
+- [ ] Update PROJECT.md
+- [ ] Clean up temporary code
+- [ ] Document lessons learned
+
+## Lessons Learned Using These Guidelines
+<!-- Add experiences when guidelines needed adjustment or clarification -->
+<!-- Document when rules were intentionally broken and why -->
+<!-- Capture patterns that emerge across multiple projects -->
+<!-- Note which rules prove most/least valuable in practice -->
+
+## Remember
+- **These principles apply to ANY language, framework, or project type**
+- **When in doubt, document in PROJECT.md and proceed incrementally**
+- **Evidence-based decisions beat assumptions every time**
+- **Working code with documentation beats perfect code without**
