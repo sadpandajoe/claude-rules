@@ -1,180 +1,235 @@
-# Project Planning & Documentation Workflow
+# Universal Planning & Documentation Workflow
 
 ## Project Initialization
 
 ### New Project Setup
-1. [ ] Create PROJECT.md in repo root using the template below
-2. [ ] Fill out Overview, Goal, and Assumptions based on initial request
-3. [ ] Document initial understanding in Implementation Notes
-4. [ ] Set up Current Status with preliminary task breakdown
-5. [ ] Add first entry to Development Log with timestamp
+1. Create PROJECT.md in repository root
+2. Fill out Overview, Goal, and Assumptions from requirements
+3. Document initial understanding
+4. Set up Current Status with preliminary breakdown
+5. Add first Development Log entry with timestamp
 
 ### Existing Project Continuation
-1. [ ] Read PROJECT.md completely
-2. [ ] Review Development Log to understand what's been done
-3. [ ] Check Current Status to see what's in progress/blocked
-4. [ ] Add new session entry to Development Log with timestamp
+1. Read PROJECT.md completely
+2. Review Development Log for history
+3. Check Current Status for active/blocked work
+4. Add new session entry with timestamp
 
 ## PROJECT.md Template
 
-Use the template located at: `~/opt/code/claude-files/PROJECT_TEMPLATE.md`
-- Make a copy of the project template inside the repo
-- This will be the single source of truth for all actions and knowledge for the work
+Use the template at: `~/opt/code/claude-files/PROJECT_TEMPLATE.md`
+
+Key sections to maintain:
+- **Current Status**: What's active, next, blocked
+- **Development Log**: Timestamped narrative of work
+- **Solutions**: Options being evaluated (not yet tried)
+- **Accepted Solution**: ONLY when fully working and tested
+- **Failed Solutions**: Attempted solutions that didn't work
+- **Implementation Notes**: Technical decisions, gotchas
 
 ## Documentation Workflow
 
 ### Before Any Action
-**CRITICAL**: Document your plan BEFORE taking any action
-
-Update PROJECT.md with:
-- [ ] **What you plan to do and why** (in Development Log)
-- [ ] **Expected approach and steps** (before attempting)
-- [ ] **Anticipated outcome** (what you expect to happen)
+Document in PROJECT.md:
+- **What you plan to do** and why
+- **Expected approach** and steps
+- **Anticipated outcome**
+- **Risk assessment** if applicable
 
 ### After Completing Actions
 Update PROJECT.md with:
-- [ ] **What actually happened** (vs what was planned)
-- [ ] **Key findings or discoveries** (any surprises)
-- [ ] **Any changes to approach or understanding** (deviations from plan)
-- [ ] **Updated Current Status** (move items between Not Started/In Progress/Done/Blocked)
+- **What actually happened** vs planned
+- **Key findings or discoveries**
+- **Any approach changes** and why
+- **Updated Current Status**
 
-### This Applies To All Actions
-- Git operations (diff, status, log, etc.)
+### This Applies To ALL Activities
+- Version control operations
 - File analysis or reading
 - Code changes or creation
 - Testing or validation
 - Problem investigation
-- Manual accept requests
-- Any work-related activity
+- Any project-related work
 
-## Solution Planning Process
+## Solution Planning Framework
 
-### When Planning Solutions
-Document in PROJECT.md "Solutions" section:
-- **Multiple options** with pros/cons/risks for each
-- **Risk assessment** for each approach
-- **Impact analysis** on existing functionality
-- **Clear recommendation** with reasoning
+### Solution Workflow
+1. **Document options in Solutions section** - All possibilities, even if similar
+2. **Try an option** - Move to Development Log what you're attempting
+3. **If it fails** - Move to Failed Solutions with why it failed
+4. **If it works partially** - Keep refining, document progress
+5. **When FULLY working** - Move to Accepted Solution with final details
 
-### Solution Analysis Framework
-For each option, include:
-- Risk level assessment
-- Impact on existing functionality
-- Future maintenance implications
-- Resource requirements
-- Timeline considerations
-
-### Quick Fix vs Proper Fix Evaluation
-Always consider these solution categories:
-- **Option 1 (Quick Fix)**: Immediate workaround - low effort, may create technical debt
-- **Option 2 (Proper Fix)**: Address root cause - medium effort, sustainable solution  
-- **Option 3 (Complete Solution)**: Comprehensive fix - high effort, future-proof
-- **Key Learning**: Often Option 2 (proper fix) is better long-term even if more initial effort
-
-### Moving Solutions Between Categories
-- Start in "Solutions" during evaluation
-- Move chosen option to "Accepted Solution"
-- Move failed attempts to "Failed Solutions" with explanation
-- Update "Implementation Notes" with insights gained
-
-## Plan Mode Integration
-
-### When to Use Plan Mode
-- **Complex investigations** requiring systematic research
-- **Multi-step implementation** with significant risk
-- **Architecture analysis** before making changes
-- **Cross-branch work** requiring careful compatibility assessment
-
-### Plan Mode to Implementation Transition
-Clear indicators for transitioning from planning to execution:
-
-#### Investigation Tasks
-- **Continue planning while**: Root cause unclear, multiple hypotheses to test, solution approach uncertain
-- **Transition to implementation when**: Root cause identified, solution confirmed (e.g., fix exists in another branch), approach validated
-- **Document transition**: Update PROJECT.md with "Investigation Complete - Moving to Implementation"
-
-#### Implementation Tasks  
-- **Continue planning while**: Architecture decisions uncertain, multiple technical approaches possible, risk assessment incomplete
-- **Transition to implementation when**: Technical approach confirmed, dependencies validated, acceptance criteria clear
-- **Document transition**: Update Current Status from "Planning" to "Implementation"
-
-### Plan Mode Documentation Strategy
-- **Heavy documentation upfront**: More detailed analysis in PROJECT.md Solutions section
-- **Research-focused Development Log**: Document investigation findings, hypothesis testing, discovery process
-- **Thorough solution analysis**: Multiple options with detailed pros/cons before choosing approach
-
-### Current Status Format
-Use a simple progress summary instead of rigid checklists:
-
+### Solution Documentation
 ```markdown
-## Current Status
-**In Progress**: [Brief description of current work]
-**Next**: [What's planned next]
-**Blocked**: [Any blockers, or "None"]
+### Solutions (Not Yet Tried)
+#### Option 1: [Approach Name]
+- **Description**: [What this involves]
+- **Pros**: [Benefits]
+- **Cons**: [Drawbacks]
+- **Risk**: Low/Medium/High
+
+#### Option 2: [Alternative]
+[Same structure]
+
+[Add more options as discovered]
+
+### Accepted Solution
+[ONLY move here when tests pass, implementation complete, validation done]
+- **Final Approach**: [What actually worked]
+- **Implementation Details**: [How it was done]
+- **Validation**: [How we know it works]
+
+### Failed Solutions
+#### Attempt: [Name]
+- **What we tried**: [Description]
+- **Why it failed**: [Root cause]
+- **Lessons learned**: [What we discovered]
 ```
 
-### Status Update Rules
-- Update Current Status summary when major phases change
-- Use Development Log for detailed progress tracking
-- Document blockers immediately when encountered
-- Keep status summary concise - details go in Development Log
+## Planning Mode Guidelines
+
+### When to Use Planning Mode
+- **Complex investigations** requiring systematic research (use Opus)
+- **Multi-step implementations** with significant risk (use Opus)
+- **Architecture decisions** affecting multiple components
+- **Cross-cutting changes** spanning multiple areas
+
+**Note**: Planning mode should prefer Opus for complex reasoning and analysis
+
+### Planning vs Implementation Transition
+
+#### Clear Transition Indicators
+**Stay in Planning When**:
+- Root cause unclear
+- Multiple approaches possible
+- Risk assessment incomplete
+- Dependencies unverified
+
+**Move to Implementation When**:
+- Problem understood
+- Approach validated
+- Risks assessed and acceptable
+- Dependencies confirmed
+
+**Document Transition**:
+```markdown
+### Development Log
+[Time]: Investigation complete - root cause identified as [issue]
+[Time]: Moving to implementation with [chosen approach]
+```
 
 ## Session Continuity
 
-### Starting Any Session
-- [ ] Read PROJECT.md completely
-- [ ] Understand current project state
-- [ ] Add timestamped session start entry to Development Log
-- [ ] Review any blocked items to see if they can be unblocked
+### Session Start Checklist
+1. Read PROJECT.md completely
+2. Understand current state
+3. Add timestamped session entry
+4. Review blockers
+5. Plan session work
 
 ### Maintaining Context
-- All discoveries and decisions must be documented
-- Development Log should tell the complete story
-- Anyone should be able to pick up work by reading PROJECT.md
-- Never assume previous context will be remembered
+- Document all decisions immediately
+- Keep Development Log chronological
+- Anyone should understand state from PROJECT.md
+- Never assume context carries over
 
-## Template Universality
+### Session End Checklist
+1. Update Current Status
+2. Document any blockers
+3. Note clear next steps
+4. Capture session learnings
 
-This workflow applies to all development work:
-- New features
-- Bug fixes
-- Refactoring  
-- Infrastructure changes
-- Documentation updates
-- Code reviews
-- Testing
+## Decision Documentation
 
-The PROJECT.md template is flexible enough to accommodate any project type through the Goal and Implementation Notes sections.
+### Architecture Decisions
+```markdown
+## Decision: [Title]
 
-## Lessons Learned
+### Context
+[What situation requires this decision]
 
-### Workflow Hierarchy Effectiveness
-The instruction hierarchy has proven successful:
-1. **Universal guidelines** → Guide to appropriate specialized files
-2. **Specialized files** (Investigation, Cherry-picking) → Structured approach for specific tasks
-3. **Project-specific guidelines** → Technology and architecture context
-4. **Evidence-based investigation** → Direct path to root cause and tested solutions
+### Options Considered
+1. [Option with pros/cons]
+2. [Option with pros/cons]
 
-### Common Patterns
-- **PROJECT.md-first approach** maintains organization throughout complex tasks
-- **Historical analysis focus** (git blame, commit comparison) essential for debugging
-- **Conservative resolution guidance** helps choose tested solutions over manual patches
-- **Cross-branch comparison** instructions directly applicable to real scenarios
+### Decision
+[What was chosen]
 
-### Best Practices
-- **Plan mode for investigation** works well when root cause unclear
-- **Clear transition points** from research to implementation prevent confusion
-- **Evidence-based decisions** using git history and existing fixes
-- **Documentation during process** prevents context loss
+### Rationale
+[Why this was chosen]
 
-### Pitfalls to Avoid
-- **Jumping to solutions** without understanding root cause
-- **Manual changes** instead of using tested fixes from other branches
-- **Skipping documentation** during investigation process
-- **Unclear mode transitions** leaving team uncertain about current phase
+### Consequences
+[What this means going forward]
+```
 
-### Process Improvements
-- **Plan mode integration** clarifies when to research vs implement
-- **Transition documentation** makes phase changes explicit
-- **Success factor identification** helps replicate effective approaches
-- **Pitfall prevention** builds on real experience avoiding common mistakes
+### Risk Documentation
+```markdown
+## Risk: [Title]
+
+### Description
+[What could go wrong]
+
+### Probability
+[Low/Medium/High]
+
+### Impact
+[Low/Medium/High]
+
+### Mitigation
+[How we reduce risk]
+
+### Contingency
+[What to do if it happens]
+```
+
+## Best Practices
+
+### Documentation Quality
+- **Write for clarity** - Simple, direct language
+- **Be specific** - Concrete over abstract
+- **Include context** - Why matters as much as what
+- **Stay current** - Update as things change
+
+### Planning Effectiveness
+- **Start broad, narrow down** - Overview before details
+- **Consider alternatives** - Multiple options prevent tunnel vision
+- **Assess risks early** - Identify problems before they occur
+- **Define success** - Clear criteria for completion
+
+### Workflow Efficiency
+- **Document once, reference many** - PROJECT.md as single source
+- **Timestamp everything** - Chronological clarity
+- **Separate concerns** - Different sections for different purposes
+- **Keep it maintainable** - Regular cleanup of outdated info
+
+## Common Patterns
+
+### Investigation Planning
+1. Document the problem clearly
+2. List hypotheses to test
+3. Plan verification approach
+4. Execute systematically
+5. Document findings
+6. Draw conclusions
+
+### Implementation Planning
+1. Define requirements clearly
+2. Identify dependencies
+3. Plan incremental steps
+4. Define validation approach
+5. Document rollback plan
+6. Execute with checkpoints
+
+### Recovery Planning
+1. Assess current state
+2. Identify safe state
+3. Plan path to safety
+4. Document steps taken
+5. Verify recovery
+6. Document lessons
+
+## Lessons Learned Using This Guide
+<!-- Document when these planning guidelines needed adjustment -->
+<!-- Capture cases where solution workflow didn't match reality -->
+<!-- Note patterns in how solutions actually evolve -->

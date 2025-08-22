@@ -1,333 +1,334 @@
-# Implementation & Code Development Workflow
+# Universal Implementation & Code Development Workflow
 
-## Pre-Implementation Planning
+## 🎯 Implementation Golden Rules
+- [ ] **Understand codebase and related codebases thoroughly** before writing code
+- [ ] **Plan all tests before implementation** - TDD approach
+- [ ] **Study and follow existing patterns** - Consistency over creativity
+- [ ] **Update/extend existing code before creating new** - Modify functions vs new ones
+- [ ] **Complete working solution before optimization** - Functionality first
+- [ ] **Use conservative, proven approaches** when possible
+- [ ] **Commit working states before refactoring** - Safe rollback points
+- [ ] **Keep code simple and maintainable** - Functions ≤20 lines, files ≤300 lines
+- [ ] **NEVER modify protected/generated directories** - vendor, node_modules, build
+- [ ] **NEVER use `git add -A` or `git add .`** - Add only files YOU modified
+- [ ] **YAGNI** - Build only what's needed now, not future possibilities
 
-### Before Starting Any Work
-- [ ] Review all project documentation (PRDs, README, architecture docs, existing tasks)
-- [ ] Clarify any unclear requirements before proceeding  
-- [ ] Define goals, success criteria, and definition of done
-- [ ] Document the plan in PROJECT.md before starting implementation
-- [ ] Study existing codebase patterns and conventions
+## Pre-Implementation Checklist
 
-## Code Quality Standards
+### Before Writing Any Code
+- [ ] **Deep understanding of codebase** - How components interact, data flows
+- [ ] **Understand related/dependent codebases** - External services, libraries
+- [ ] Read project documentation (README, docs, comments)
+- [ ] Understand requirements completely (ask if unclear)
+- [ ] Study existing codebase patterns
+- [ ] Plan approach in PROJECT.md
+- [ ] Identify dependencies and verify availability
+- [ ] **Look for existing code to update/extend** before creating new
 
-### Code Architecture Guidelines
-- **File Organization**: Keep files ≤ 300 lines for maintainability
-- **Function Design**: Keep functions ≤ 20 lines when practical  
-- **Control Flow**: Use early returns, avoid deep nesting (≤2 levels)
-- **Error Handling**: Handle errors gracefully, never use silent catches
-- **DRY Principle**: Consolidate similar components, don't duplicate logic
-- **Separation of Concerns**: Don't mix UI and business logic
-- **Modular Design**: Design components for testability and reusability
+### Pattern Discovery Commands
+```bash
+# Study existing patterns
+grep -r "similar-feature" .          # Find similar implementations
+find . -name "*similar*" -type f     # Find related files
+ls -la src/ lib/ app/                # Understand structure
 
-### Code Quality DO/DON'T Reference
+# Check conventions
+head -20 <similar-file>              # See file organization
+grep -A5 "function\|class\|def" <file>  # See naming patterns
 
+# Understand dependencies  
+[Language-specific: package.json, go.mod, requirements.txt, pom.xml]
+```
+
+## Code Quality Standards (Universal)
+
+### Structure Guidelines
+- **Functions**: ≤20 lines when practical (readability > rigid rules)
+- **Files**: ≤300 lines for maintainability
+- **Nesting**: ≤2 levels deep (use early returns)
+- **Names**: Descriptive > clever (future you will thank you)
+
+### Universal Best Practices
 | ✅ DO | ❌ DON'T |
 |-------|---------|
-| Write clean, readable code with descriptive variable names | Use unclear abbreviations or names |
-| Follow consistent indentation and formatting | Mix different formatting styles |
-| Include type definitions when using typed languages | Skip type safety where available |
-| Prefer explicit over implicit when it improves clarity | Write ambiguous or unclear code |
-| Use meaningful commit messages following conventional format | Write vague or unhelpful commit messages |
-| Always explain reasoning behind code suggestions | Provide code without context |
-| Show multiple approaches when relevant with pros/cons | Present only one option without alternatives |
-| Include basic error handling in examples | Ignore error handling in code examples |
-| Provide both code and explanation of what it does | Give code without explaining purpose |
-| Follow modular design principles | Mix UI and business logic |
-| Use early returns (≤2 nesting levels) | Create deeply nested blocks |
-| Handle errors gracefully with context | Use silent catches or generic errors |
-| Refactor with clear purpose and reasoning | Refactor without clear objectives |
-| Design for testability from the start | Hard-code dependencies |
-| Modify existing code directly when possible | Create temporary or duplicate versions |
-
-### Following Existing Patterns
-
-#### Before Making Any Changes
-```bash
-# Study existing codebase patterns
-grep -r "similar-pattern" src/
-find . -name "*SimilarComponent*" -type f
-
-# Check component interfaces and conventions
-grep -A 10 "interface\|type\|class" src/components/ComponentName/
-cat src/components/SimilarComponent/index.* | head -20
-
-# Examine file organization patterns
-ls -la src/components/ src/utils/ src/services/
-```
-
-#### Pattern Matching Guidelines
-- **Match existing indentation** and formatting exactly
-- **Follow existing import styles** and organization patterns
-- **Use existing utility functions** over creating new ones
-- **Prefer editing existing files** over creating new ones when possible
-- **Use consistent naming conventions** with the rest of the codebase
-- **Follow established architectural patterns** in the project
-
-### Dependency Management
-
-#### Validate Before Using
-```bash
-# Verify imports/modules exist before using them
-ls -la path/to/expected/module
-find . -name "*ModuleName*" -type f
-
-# Check if packages/dependencies are available
-grep "package-name" package.json         # Node.js projects
-import module_name                       # Python (test in REPL)
-go list -m module-name                   # Go projects
-
-# Verify component/API availability
-grep -A 5 "propName\|methodName" src/components/*/types.*
-```
-
-#### Dependency Protection Rules
-- **NEVER modify read-only dependencies** (submodules, vendor directories)
-- **Check if file path is within protected directory** before suggesting changes
-- **Treat external dependencies as immutable** 
-- **For protected code changes**, recommend upstream modifications
-- **Never stage or commit changes** to protected/generated content
+| Follow existing patterns | Create new patterns unnecessarily |
+| Use early returns | Deep nesting (>2 levels) |
+| Handle errors explicitly | Silent catches or ignored errors |
+| Write self-documenting code | Over-comment obvious code |
+| Validate inputs | Assume inputs are valid |
+| Create small, focused commits | Large, multi-purpose commits |
+| Test as you go | Leave testing until end |
+| Add files individually | Use `git add -A` or `git add .` |
 
 ## Implementation Workflow
 
-### Working Solution First Rule
-
-**Critical**: Always complete and commit a working solution before suggesting any refactors or optimizations
-
-```bash
-# Complete the working solution
-git add .
-git commit -m "feat: implement [feature] - working solution
-
-- Core functionality implemented  
-- Tests passing
-- Basic requirements met
-
-Ready for optimization/refactoring if needed"
-```
-
-**Why this matters**:
-- Creates a safe rollback point if optimizations break things
-- Ensures functional requirements are met first
-- Provides working baseline for comparison
-- Reduces risk when making improvements
-
-#### After Working Solution is Committed
-
-Only then consider:
-- Code optimizations and performance improvements
-- Refactoring for cleaner code structure
-- Additional features or enhancements
-- Architectural improvements
-
-Each optimization should also be committed separately for easy rollback.
-
-### During Implementation
-
-#### Incremental Development
-- [ ] Make small, testable changes
-- [ ] Validate each significant change before proceeding
-- [ ] Commit working states frequently with clear messages
-- [ ] Update PROJECT.md Development Log with progress and discoveries
-
-#### Code Integration
-- [ ] Follow existing architectural patterns consistently
-- [ ] Use established utility functions and helpers
-- [ ] Maintain consistent error handling approaches
-- [ ] Preserve existing component interfaces when possible
-- [ ] Test integration points between new and existing code
-
-### File Organization Standards
-
-#### When Creating New Files
-```bash
-# Study existing project structure
-find . -type d -name "*" | head -20        # Directory organization
-ls -la src/ lib/ app/ | head -10           # Common source directories  
-find . -name "*.*" | head -20              # File naming patterns
-
-# Identify naming conventions from existing files
-ls -la */                                  # Directory naming style
-find . -name "*Component*" -o -name "*Service*" -o -name "*Utils*" | head -10
-
-# Check file extension patterns
-find . -name "*.*" | sed 's/.*\.//' | sort | uniq -c | sort -nr | head -10
-```
-
-#### File Organization Guidelines
-- **Follow existing directory structure** - don't create new top-level directories without reason
-- **Match naming conventions** - study existing file names for patterns
-- **Use consistent file extensions** - match what the project already uses
-- **Group related functionality** - put files where similar files already exist
-
-#### When Modifying Existing Files
-- [ ] Maintain existing import order and grouping
-- [ ] Follow established function organization within files
-- [ ] Keep consistent indentation and spacing
-- [ ] Preserve existing comment styles and documentation patterns
-
-## Code Validation
-
-### Standard Validation Steps
-```bash
-# Check if project has validation scripts
-cat package.json | grep -A 10 "scripts"   # Node.js projects
-cat Makefile | grep test                  # Make-based projects
-ls -la tox.ini pytest.ini                # Python projects
-
-# Run available validation commands
-[lint-command]                            # Code linting (if available)
-[type-check-command]                      # Type checking (if available)  
-[test-command]                            # Run test suite (if available)
-
-# Manual checks when tools unavailable
-grep -E "<<<|===|>>>" **/*.* # Check for merge conflicts
-find . -name "*.ext" | xargs grep "console.log\|debugger\|print\|fmt.Print"
-```
-
-#### Final Validation Checklist
-- [ ] All tests pass (if test suite available)
-- [ ] No linting errors (if linter available)
-- [ ] Type checking passes (if type system used)
-- [ ] No merge conflict markers remain
-- [ ] No debug code or logging statements left in
-- [ ] All imports resolve correctly
-- [ ] Code follows existing patterns and conventions
-
-### Manual Testing Guidelines
-
-When automated tests aren't available:
-- [ ] Test happy path functionality thoroughly
-- [ ] Verify error conditions behave correctly
-- [ ] Check edge cases and boundary conditions
-- [ ] Validate user interaction flows (for UI changes)
-- [ ] Test in different environments if applicable
-- [ ] Document test steps for future reference
-
-## Error Handling Strategy
-
-### Consistent Error Handling Patterns
-```javascript
-// Example: Graceful error handling with context
-try {
-  const result = await riskyOperation();
-  return result;
-} catch (error) {
-  console.error('Operation failed:', error.message, { context: additionalInfo });
-  // Handle gracefully - don't let errors crash the application
-  return fallbackValue || null;
-}
-```
-
-### Error Handling Guidelines
-- **Never use silent catches** - always log or handle errors
-- **Provide meaningful error messages** with context
-- **Use appropriate fallback strategies** for different error types
-- **Log stack traces** for debugging in development
-- **Handle errors at appropriate levels** - don't catch too early or too late
-
-## Documentation and Communication
-
-### Code Documentation Standards
-- **Comments**: Only for complex business logic, never for obvious code
-- **README Updates**: Keep project documentation current with changes
-- **API Documentation**: Update when interfaces or contracts change
-- **Migration Guides**: Document breaking changes and upgrade paths
-
-### Implementation Communication
-- **Explain reasoning** behind code suggestions and architectural decisions
-- **Show multiple approaches** when relevant with pros/cons
-- **Include error handling** in examples and recommendations
-- **Provide full context** of changes being made
-- **Focus on practical, implementable solutions**
-
-### Commit Documentation
+### Step 1: Test-Driven Development (TDD)
 ```markdown
-## Commit Message Template
+## TDD Cycle
+1. **RED** - Write failing test for new functionality
+2. **GREEN** - Write minimal code to make test pass
+3. **REFACTOR** - Improve code while keeping tests green
 
-[type]: Brief description of what changed
+## Development Log Example
+[Time]: Writing test for [feature]
+[Time]: Test failing as expected - implementing
+[Time]: Test passing with minimal implementation
+[Time]: Refactoring for clarity - tests still green
+```
+
+### Step 2: Match Existing Patterns
+```bash
+# Before creating new file - can we add to existing?
+grep -r "similar-functionality" .
+find . -name "*related*" -type f
+
+# Before creating new function - can we extend existing?
+grep -A10 "function\|def\|class" <file> | grep similar
+# Consider: Can existing function be parameterized?
+# Consider: Can we add to existing function?
+
+# Before adding function
+grep -A10 "function\|def\|class" <similar-file>  # See conventions
+grep "export\|public\|private" <file>  # Understand visibility patterns
+
+# Before imports/dependencies
+grep "import\|require\|include\|use" <similar-file>  # Match import style
+ls -la <expected-module-path>        # Verify module exists
+```
+
+### Step 3: Incremental Development
+
+#### YAGNI Principle
+- **Build only what's needed NOW** - Not what might be needed
+- **No speculative features** - Wait for actual requirements
+- **Simple > Complex** - Start simple, complexify only when proven necessary
+- **Delete unused code** - Don't keep "just in case" code
+
+#### The Working Solution First Rule
+```markdown
+## Development Log
+[Time]: Starting implementation of [feature]
+[Time]: Basic structure complete - testing
+[Time]: Core functionality working - committing before optimization
+[Time]: Committed working solution - now optimizing
+```
+
+#### Implementation Progression
+1. **Scaffold** - Basic structure, interfaces, stubs
+2. **Core Logic** - Main functionality, happy path
+3. **Error Handling** - Edge cases, validation
+4. **Testing** - Verify it works
+5. **Commit** - Save working state
+6. **Optimize** - Only after working + committed
+
+### Step 4: Validation Strategy
+
+#### Universal Validation Checks
+```bash
+# Code quality
+grep -r "TODO\|FIXME\|XXX" .         # Find incomplete work
+grep -r "console\|print\|debug" .    # Find debug code
+
+# Structure issues  
+find . -name "*.tmp" -o -name "*.bak"  # Find temporary files
+grep -E "^[[:space:]]*$" <file> | wc -l  # Count blank lines
+
+# Common problems
+grep -E "<<<|===|>>>" .              # Merge conflicts
+```
+
+#### Language-Specific Validation
+```bash
+# Add project-specific validation commands in project CLAUDE.md
+# Examples:
+# - JavaScript: npm run lint
+# - Python: flake8, black --check
+# - Go: go fmt, go vet
+# - Java: mvn compile
+```
+
+## Dependency Management
+
+### Before Using Any Dependency
+```bash
+# Verify it exists
+ls -la <path/to/dependency>
+find . -name "*dependency-name*"
+
+# Check if already used in project
+grep -r "dependency-name" . --include="*.ext"
+
+# Verify version compatibility
+[Language-specific: check dependency file]
+```
+
+### Protected Directories Check
+```bash
+# NEVER modify these
+ls -la .git/                         # Git internals
+ls -la node_modules/                 # Dependencies
+ls -la vendor/                       # Third-party code
+ls -la build/ dist/ out/             # Generated files
+
+# Check before modifying
+git ls-files <file>                  # Is it tracked?
+git submodule status                 # Is it a submodule?
+```
+
+### Import/Module Best Practices
+- **Match existing import style** (relative vs absolute)
+- **Group imports** like existing files
+- **Order imports** consistently
+- **Avoid circular dependencies**
+
+## Error Handling Patterns
+
+### Universal Error Handling
+```
+# Pseudocode - adapt to your language
+
+TRY operation
+CATCH error
+  LOG error with context
+  HANDLE gracefully
+  RETURN safe default OR
+  PROPAGATE with context
+END
+```
+
+### Error Handling Checklist
+- [ ] All errors caught or propagated intentionally
+- [ ] Error messages include context
+- [ ] Graceful degradation where appropriate
+- [ ] No silent failures
+- [ ] Appropriate error types/codes
+
+## Code Organization
+
+### File Organization Rules
+1. **Follow existing structure** - Don't reorganize without reason
+2. **Related code together** - High cohesion
+3. **Clear naming** - File name describes content
+4. **Consistent patterns** - Similar files organized similarly
+
+### When Creating New Files
+```bash
+# Study existing organization
+tree -d -L 2 .                      # See directory structure
+ls -la src/                          # Check naming patterns
+find . -type f -name "*.ext" | head -20  # See file conventions
+
+# Choose location
+# - Near similar functionality
+# - In appropriate directory
+# - Following naming convention
+```
+
+## Commit Strategy
+
+### Safe Staging Rules
+- **NEVER use `git add -A` or `git add .`** - Adds unintended files
+- **Add files individually** - `git add <file1> <file2>`
+- **Use `git add -p` for partial staging** - Review each change
+- **Check `git status` before committing** - Verify only intended files
+- **If you didn't modify it, don't stage it** - Even if it appears changed
+
+### Commit Best Practices
+```bash
+# Before committing
+git diff                             # Review changes
+git status                           # Check what's staged
+
+# Remove debug code
+git diff | grep "console\|debug\|print"
+
+# CRITICAL: Add only files YOU modified
+git add <specific-file>              # Add individual files
+git add -p                           # Stage selectively with review
+# NEVER use git add -A or git add .  # Can add unintended files
+
+# Commit incrementally
+git commit -m "type: description"   # Clear message
+```
+
+### Commit Message Format
+```
+type: brief description
 
 - Specific change 1
-- Specific change 2  
-- Why this approach was chosen
+- Specific change 2
+- Why this approach (if not obvious)
 
-[Include reasoning for non-obvious decisions]
+[Fixes #issue] [References #issue]
 ```
 
-## Advanced Implementation Patterns
+Types: feat, fix, docs, style, refactor, test, chore
 
-### Component Integration Patterns
-- **Interface Design**: Define clear, well-typed interfaces
-- **State Management**: Use existing state patterns in codebase
-- **Event Handling**: Follow established event naming conventions
-- **Styling**: Use existing CSS/styling approaches consistently
+## Testing During Implementation
 
-### Performance Considerations
-- **Optimize after working solution** - functionality first, performance second (prevents optimization loops)
-- **Profile before optimizing** - measure actual bottlenecks
-- **Consider maintainability** - don't sacrifice readability for minor gains
-- **Document performance decisions** - explain trade-offs made
+### Test-As-You-Go Strategy
+1. **Unit** - Test individual functions as written
+2. **Integration** - Test component interactions
+3. **Manual** - Verify user-facing behavior
+4. **Edge Cases** - Test boundaries and errors
 
-## Lessons Learned
-
-### Implementation Patterns That Work
-- **Following existing patterns** reduces integration issues and speeds development
-- **Incremental validation** catches problems early in development cycle
-- **Dependency validation** before implementation prevents import errors
-
-### Common Implementation Pitfalls
-- Creating new patterns instead of studying existing codebase conventions
-- Skipping dependency verification leads to runtime import failures
-- Making large changes without incremental testing
-
-### Code Quality Improvements
-- **Early returns pattern** significantly improves code readability
-- **File size limits** (≤300 lines) encourage better code organization
-- **Function size limits** (≤20 lines) force clearer logic separation
-- **Error handling consistency** prevents silent failures
-
-### Complex State Management (Emerging Pattern)
-**Note**: Based on recent debugging experience, needs more validation across projects
-
-#### State Update Tracking
-When debugging complex component state:
+### Quick Testing Patterns
 ```bash
-# Map all state setters in a component
-grep -n "setState\|set[A-Z]" ComponentName.tsx
+# Manual testing approach
+# 1. Add temporary test code
+# 2. Run and verify
+# 3. Remove test code before commit
 
-# Check effect dependencies  
-grep -A 10 "useEffect\|useMemo\|useCallback" ComponentName.tsx
+# Find test files
+find . -name "*test*" -o -name "*spec*"
+
+# Run tests if available
+[Language-specific test command]
 ```
 
-#### React Hooks Debugging Template
-```javascript
-// Debug helper - log all state changes
-const setStateWithDebug = useCallback((newValue) => {
-  console.log('Setting state from:', state, 'to:', newValue);
-  setState(newValue);
-}, [state]);
+## Refactoring Guidelines
 
-// Check effect dependencies
-useEffect(() => {
-  console.log('Effect triggered with:', dependency1, dependency2);
-}, [dependency1, dependency2]); // Ensure all referenced vars are here
-```
+### When to Refactor
+- **After working solution committed** - Never before
+- **When patterns emerge** - Rule of three
+- **Before adding complexity** - Clean base
+- **When understanding improves** - Better approach clear
 
-#### Component Integration Patterns
-- **Helper function approach**: Create specific helpers for complex logic rather than inline
-- **State derivation**: Use memoized computed values instead of duplicating logic  
-- **Timing isolation**: Separate immediate updates from derived updates
+### Safe Refactoring Process
+1. Ensure tests pass (or manual verification complete)
+2. Commit current working state
+3. Make single refactoring change
+4. Verify still works
+5. Commit refactoring separately
 
-### Pre-Implementation Validation Strategy (Emerging Pattern)
-**Note**: Developing approach for projects with unreliable tooling
+## Documentation Standards
 
-#### Before Starting Complex Changes
-- [ ] Verify project validation tools work (`npm test`, `npm run lint`, etc.)
-- [ ] If tools don't work, establish manual validation approach
-- [ ] Document validation limitations in PROJECT.md
-- [ ] Plan for reduced validation confidence in risk assessment
+### Code Documentation
+- **Document WHY, not WHAT** - Code shows what
+- **Complex business logic** - Explain the reasoning
+- **Non-obvious decisions** - Why this approach
+- **External dependencies** - Why needed
+- **Workarounds** - Why and temporary nature
 
-#### Validation Tool Failure Handling
-- **Infrastructure vs code issues**: Distinguish between environmental problems and code problems
-- **Fallback validation methods**: Manual syntax checking, import verification, visual inspection
-- **Risk tolerance adjustment**: More conservative changes when tooling unavailable
+### Documentation Locations
+- **PROJECT.md** - Implementation decisions, approaches
+- **Code comments** - Why, not what
+- **Commit messages** - What changed and why
+- **README** - How to use/build/test
+
+## Quick Reference Card
+
+| Task | Before Starting | During | After |
+|------|----------------|---------|--------|
+| New feature | Study patterns, write test | TDD cycle, incremental | Validate & commit |
+| Bug fix | Understand root cause | Minimal change | Test fix thoroughly |
+| Refactoring | Commit working state | Single purpose changes | Verify still works |
+| New file | Check existing structure | Follow conventions | Update imports/exports |
+| Dependencies | Verify availability | Match usage patterns | Document if new |
+| Staging | Check what you modified | Add files individually | Verify with git status |
+
+## Lessons Learned Using This Guide
+<!-- Document when creating new was better than updating existing -->
+<!-- Capture patterns in how to extend vs replace code -->
+<!-- Note when YAGNI principle was violated and why -->
+<!-- Record implementation patterns that proved valuable -->
