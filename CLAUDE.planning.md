@@ -17,7 +17,7 @@
 
 ## PROJECT.md Template
 
-Use the template at: `~/opt/code/claude-files/PROJECT_TEMPLATE.md`
+Use the template at: `~/opt/code/claude-rules/PROJECT_TEMPLATE.md`
 
 Key sections to maintain:
 - **Current Status**: What's active, next, blocked

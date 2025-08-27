@@ -2,7 +2,7 @@
 
 ## CRITICAL: Always Start Here
 1. **Read all CLAUDE.*.md files** in `~/opt/code/claude-rules/` before starting work
-2. **Create/update PROJECT.md immediately** using template from `~/opt/code/claude-files/PROJECT_TEMPLATE.md`
+2. **Create/update PROJECT.md immediately** using template from `~/opt/code/claude-rules/PROJECT_TEMPLATE.md`
 3. **Document BEFORE acting** - Plan in PROJECT.md, then execute
 4. **Update PROJECT.md after ANY action** - Including thinking, planning, reading, executing
 
