@@ -84,7 +84,7 @@ claude-rules/
 ### Core Workflow
 | Command | Purpose |
 |---------|---------|
-| `/init` | Start session - load rules, check PROJECT.md |
+| `/start` | Start session - load rules, check PROJECT.md |
 | `/plan` | Create implementation plan → triggers `/review-plan` |
 | `/implement` | Write code with TDD → triggers `/review` |
 | `/test` | Write and organize tests |
