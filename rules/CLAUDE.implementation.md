@@ -286,20 +286,139 @@ find . -name "*test*" -o -name "*spec*"
 [Language-specific test command]
 ```
 
-## Refactoring Guidelines
+---
+
+## Refactoring Workflow
+
+### 🎯 Refactoring Golden Rules
+- [ ] **Have passing tests BEFORE starting** - Safety net required
+- [ ] **Commit working state first** - Rollback point
+- [ ] **One change at a time** - Atomic refactors
+- [ ] **Tests pass after EACH change** - Continuous validation
+- [ ] **No new functionality** - Pure structure change
+- [ ] **Document the WHY** - Future maintainers need context
 
 ### When to Refactor
-- **After working solution committed** - Never before
-- **When patterns emerge** - Rule of three
-- **Before adding complexity** - Clean base
-- **When understanding improves** - Better approach clear
 
-### Safe Refactoring Process
-1. Ensure tests pass (or manual verification complete)
-2. Commit current working state
-3. Make single refactoring change
-4. Verify still works
-5. Commit refactoring separately
+| ✅ Good Time | ❌ Bad Time |
+|--------------|-------------|
+| Tests passing, code working | Tests failing |
+| Before adding new feature | During bug fix |
+| Clear improvement identified | Speculative "might help" |
+| Time allocated for it | Under deadline pressure |
+| Pattern emerged (rule of 3) | First instance |
+
+### Refactoring Process
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   PREPARATION                                    │
+├─────────────────────────────────────────────────────────────────┤
+│ 1. Document goal in PROJECT.md                                   │
+│    └─ Why refactor? What improves? Success criteria?             │
+│ 2. Identify test coverage of affected code                       │
+│ 3. Add tests if coverage insufficient                            │
+│ 4. Ensure ALL tests pass                                         │
+│ 5. Commit current state: "chore: pre-refactor snapshot"          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   EXECUTION (repeat for each change)             │
+├─────────────────────────────────────────────────────────────────┤
+│ 6. Plan single atomic change                                     │
+│ 7. Make the change                                               │
+│ 8. Run tests                                                     │
+│    └─ FAIL? Revert and try smaller change                        │
+│ 9. Commit: "refactor: [specific change]"                         │
+│ 10. Update PROJECT.md progress                                   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   VALIDATION                                     │
+├─────────────────────────────────────────────────────────────────┤
+│ 11. Full test suite                                              │
+│ 12. Manual testing of affected features                          │
+│ 13. Compare behavior before/after                                │
+│ 14. Code review (or Codex MCP review)                            │
+│ 15. Document architectural changes                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Safe Refactoring Techniques
+
+#### Extract Method/Function
+```bash
+# Before: Long function with embedded logic
+# After: Smaller functions with clear names
+
+# Validation:
+# - Same inputs produce same outputs
+# - Tests still pass
+# - No change to public API
+```
+
+#### Rename (Variable, Function, Class)
+```bash
+# Find all usages first
+grep -r "old_name" . --include="*.ext"
+
+# Rename systematically
+# - IDE rename refactor (safest)
+# - OR: careful find/replace
+
+# Verify no missed references
+grep -r "old_name" . --include="*.ext"  # Should return nothing
+```
+
+#### Move (Function, Class, File)
+```bash
+# Document current location and all imports
+grep -r "import.*module" . --include="*.ext"
+
+# Move file
+# Update all imports
+# Run tests
+# Verify no broken imports
+```
+
+#### Extract Class/Module
+```bash
+# When a class/module does too much
+# 1. Identify cohesive subset of functionality
+# 2. Create new class/module
+# 3. Move methods one at a time
+# 4. Run tests after each move
+# 5. Update callers to use new location
+```
+
+### Refactoring Anti-Patterns
+
+| ❌ Don't | ✅ Do Instead |
+|----------|---------------|
+| Refactor and add features together | Separate commits |
+| Big bang refactor | Incremental changes |
+| Refactor without tests | Add tests first |
+| Refactor under pressure | Wait for appropriate time |
+| Change behavior while refactoring | Pure structure changes only |
+| Skip the commit after each change | Commit atomically |
+
+### Delegation to Codex MCP
+
+Mechanical refactors can be delegated:
+
+| ✅ Delegate | ❌ Keep in Claude Code |
+|-------------|----------------------|
+| Rename across files | Architectural restructuring |
+| Extract simple function | Extract with design decisions |
+| Update import paths | Decide what to move where |
+| Apply consistent formatting | Decide on conventions |
+| Convert syntax patterns | Logic changes |
+
+**See**: `CLAUDE.orchestration.md` for delegation framework
+
+---
 
 ## Documentation Standards
 
@@ -332,3 +451,4 @@ find . -name "*test*" -o -name "*spec*"
 <!-- Capture patterns in how to extend vs replace code -->
 <!-- Note when YAGNI principle was violated and why -->
 <!-- Record implementation patterns that proved valuable -->
+<!-- Document refactoring successes and failures -->
