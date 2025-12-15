@@ -48,6 +48,16 @@ Version control, file analysis, code changes, testing, investigation
 - **Risk**: Low/Medium/High
 ```
 
+## Plan Mode
+
+When in plan mode, Claude should:
+- **Read and update PROJECT.md** - This is expected and encouraged
+- **Explore codebase** - Understand existing patterns and constraints
+- **Document findings** - Add to PROJECT.md as you learn
+- **Iterate on the plan** - Refine based on discoveries
+
+Plan mode is for active planning work, not just reading.
+
 ## Planning vs Implementation
 
 ### Stay in Planning When

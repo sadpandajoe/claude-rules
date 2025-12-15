@@ -8,3 +8,4 @@
 @/Users/joeli/opt/code/claude-rules/rules/refactor.md
 @/Users/joeli/opt/code/claude-rules/rules/testing.md
 @/Users/joeli/opt/code/claude-rules/rules/troubleshooting.md
+@/Users/joeli/opt/code/claude-rules/PROJECT_TEMPLATE.md

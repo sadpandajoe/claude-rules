@@ -1,4 +1,4 @@
-# /init - Initialize Session
+# /start - Initialize Session
 
 Start a new work session. Run this first.
 

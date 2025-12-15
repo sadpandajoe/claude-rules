@@ -87,12 +87,12 @@ step "Generating CLAUDE.md with correct paths..."
 rule_count=$(ls "$REPO_DIR/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
 info "Generated CLAUDE.md with $rule_count rules from: $REPO_DIR/rules/"
 
-# Step 2: Symlink configuration files
+# Step 2: Symlink universal configuration files
 step "Symlinking configuration files..."
 
+# Only symlink universal configs (CLAUDE.md)
+# settings.json and mcp-global.json are personal - users manage their own
 create_symlink "$REPO_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-create_symlink "$REPO_DIR/config/settings.json" "$CLAUDE_DIR/settings.json"
-create_symlink "$REPO_DIR/config/mcp-global.json" "$CLAUDE_DIR/mcp-global.json"
 
 # Step 3: Symlink commands directory
 step "Symlinking commands directory..."
@@ -120,8 +120,6 @@ verify_link() {
 }
 
 verify_link "$CLAUDE_DIR/CLAUDE.md"
-verify_link "$CLAUDE_DIR/settings.json"
-verify_link "$CLAUDE_DIR/mcp-global.json"
 verify_link "$CLAUDE_DIR/commands"
 
 echo ""
