@@ -1,7 +1,7 @@
 # Claude Universal Workflow Guidelines
 
 ## CRITICAL: Always Start Here
-1. **Read `CLAUDE.orchestration.md`** - Understand tool roles (Claude Code vs Codex MCP)
+1. **Read `CLAUDE.orchestration.md`** - Understand tool roles (Claude Code vs Codex CLI)
 2. **Identify your workflow** - New feature? Bug fix? Code review? (see Workflow Selection)
 3. **Create/update PROJECT.md** - Using `PROJECT_TEMPLATE.md`
 4. **Document BEFORE acting** - Plan in PROJECT.md, then execute
@@ -12,7 +12,7 @@
 | Tool | Role | Use For |
 |------|------|---------|
 | **Claude Code** | Tech Lead | Planning, investigation, complex reasoning, verification, commits |
-| **Codex MCP** | Fast Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
+| **Codex CLI** | Fast Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
 
 **Full details**: See `CLAUDE.orchestration.md`
 
@@ -185,7 +185,7 @@ git reset --soft HEAD~1             # Undo commit, keep changes
 
 ## Remember
 - **These principles apply to ANY language, framework, or project**
-- **Claude Code is the tech lead; Codex MCP is fast implementation**
+- **Claude Code is the tech lead; Codex CLI is fast implementation**
 - **When in doubt, document in PROJECT.md and proceed incrementally**
 - **Evidence-based decisions beat assumptions every time**
 - **Working code with documentation beats perfect code without**

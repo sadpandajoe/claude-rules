@@ -1,4 +1,4 @@
-# Claude Code + Codex MCP Orchestration
+# Claude Code + Codex CLI Orchestration
 
 ## 🎯 Orchestration Golden Rules
 - [ ] **Claude Code owns planning and verification**
@@ -12,7 +12,7 @@
 | Tool | Role | Strengths |
 |------|------|-----------|
 | **Claude Code** | Tech Lead | Planning, investigation, complex reasoning, verification, commits |
-| **Codex MCP** | Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
+| **Codex CLI** | Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
 
 ## Delegation Framework
 
@@ -32,9 +32,9 @@
 Planning/investigation/architecture? → Claude Code
 Multi-file or cross-cutting?         → Claude Code  
 Security-sensitive?                  → Claude Code
-Single-file with clear spec?         → Codex MCP
-Mechanical transformation?           → Codex MCP
-Need fresh perspective?              → Codex MCP
+Single-file with clear spec?         → Codex CLI
+Mechanical transformation?           → Codex CLI
+Need fresh perspective?              → Codex CLI
 ```
 
 ## Task Specification
@@ -105,7 +105,7 @@ All workflows follow this pattern:
 10. [CC] Update PROJECT.md
 ```
 
-**Legend**: [CC] = Claude Code, [CX] = Codex MCP
+**Legend**: [CC] = Claude Code, [CX] = Codex CLI
 
 ## When Delegation Fails
 

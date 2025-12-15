@@ -1,0 +1,10 @@
+@/Users/joeli/opt/code/claude-rules/rules/universal.md
+@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+@/Users/joeli/opt/code/claude-rules/rules/implementation.md
+@/Users/joeli/opt/code/claude-rules/rules/investigation.md
+@/Users/joeli/opt/code/claude-rules/rules/orchestration.md
+@/Users/joeli/opt/code/claude-rules/rules/planning.md
+@/Users/joeli/opt/code/claude-rules/rules/refactor.md
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+@/Users/joeli/opt/code/claude-rules/rules/troubleshooting.md

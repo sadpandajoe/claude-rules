@@ -79,7 +79,7 @@ grep -r "import.*module" . --include="*.ext"
 | Change behavior | Pure structure only |
 | Skip commits between changes | Commit each change |
 
-## Delegation to Codex MCP
+## Delegation to Codex CLI
 
 | ✅ Delegate | ❌ Keep in Claude Code |
 |-------------|----------------------|
