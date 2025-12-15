@@ -71,51 +71,55 @@ Do not proceed until rules are read and understood.
    ```
 
 3. **Check Score**
-   
-   - **Score ≥ 8/10**: Plan approved ✅
-   - **Score < 8/10**: Continue to step 5
+
+   - **Score ≥ 8/10**: Plan approved ✅ → Go to step 6
+   - **Score < 8/10**: Continue to step 4
 
 4. **Claude Improves Plan** (if < 8/10)
-   
-   Address feedback by priority:
-   ```markdown
-   ### Review Round [N] - Improvements
-   
-   #### Addressing: [Dimension with lowest score]
-   - Issue: [What Codex flagged]
-   - Improvement: [What we're adding/changing]
-   
-   [Updated plan section]
-   ```
 
-5. **Update Plan File**
-   
-   Write improvements to PROJECT.md (or specified file).
+   **IMPORTANT**: Do NOT write feedback/review comments into PROJECT.md.
+   Instead, directly improve the actual plan content:
 
-6. **Re-Review** (Loop)
-   
-   Return to step 3 with updated plan.
-   
+   - If Clarity is low → Rewrite Goal/Overview to be clearer
+   - If Completeness is low → Add missing sections
+   - If Risk Assessment is low → Add Risks section with mitigations
+   - If Testing Strategy is low → Add concrete test approach
+   - If Implementation Path is low → Add sequenced steps
+
+   Think through improvements, then edit the actual plan sections.
+
+5. **Re-Review** (Loop)
+
+   Return to step 2 with the improved plan.
+
    Continue until:
    - Score ≥ 8/10, OR
    - Max 5 rounds reached
 
+6. **Write Approved Plan to PROJECT.md**
+
+   Once score ≥ 8/10, write the final improved plan to PROJECT.md.
+
+   The plan content should be clean - no review feedback, just the plan itself.
+
 7. **Final Report**
    ```markdown
    ## Plan Review Complete
-   
+
    ### Rounds: [N]
    | Round | Score | Key Improvements |
    |-------|-------|------------------|
    | 1 | 5.5 | Missing risk assessment |
    | 2 | 6.8 | Added testing strategy |
    | 3 | 8.2 | Clarified implementation steps |
-   
+
    ### Final Score: X.X/10 ✅
-   
-   ### Plan Status
-   - Ready for implementation
-   - Run `/implement` to begin
+
+   ### Plan Written To
+   - PROJECT.md updated with approved plan
+
+   ### Next Steps
+   - Run `/implement` to begin implementation
    ```
 
 ## Stagnation Detection
