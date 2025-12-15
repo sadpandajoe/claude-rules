@@ -32,42 +32,34 @@ Do not proceed until rules are read and understood.
 
 2. **Codex Review**
    ```
-   codex exec --sandbox read-only "Review this implementation plan.
-   
+   codex exec --sandbox read-only "Review this implementation plan thoroughly.
+
    PLAN:
    ---
    [insert plan content]
    ---
-   
-   Score each dimension (1-10):
-   
-   | Dimension | What to Evaluate |
-   |-----------|------------------|
-   | **Clarity** | Goal clear? Success criteria defined? |
-   | **Completeness** | All sections filled? Assumptions documented? |
-   | **Feasibility** | Technically sound? Dependencies identified? |
-   | **Risk Assessment** | Risks identified? Mitigation strategies? |
-   | **Implementation Path** | Clear steps? Sequenced? Blockers identified? |
-   | **Testing Strategy** | Validation approach? Edge cases? |
-   | **Trade-offs** | Multiple options? Pros/cons documented? |
-   | **Actionability** | Can implementation start immediately? |
-   
-   For each dimension:
-   - Score (1-10)
-   - Specific issues
-   - Concrete improvement suggestions
-   
-   Format:
-   ## Scores
-   | Dimension | Score | Issues | Suggestions |
-   
+
+   First, list ALL findings - don't hold back:
+
+   ## Findings
+   For each issue found:
+   - [High/Medium/Low] Specific issue with file/section reference
+   - Include missing details, gaps, risks, inconsistencies
+   - Be specific about what's wrong and why it matters
+
+   ## Open Questions
+   List any ambiguities or decisions that need clarification.
+
+   ## Summary Score
+   Rate the plan 1-10 considering:
+   - Clarity, Completeness, Feasibility
+   - Risk Assessment, Implementation Path
+   - Testing Strategy, Actionability
+
+   **Overall: X/10**
+
    ## Top 3 Priorities
-   1. [Most important fix]
-   2. [Second priority]
-   3. [Third priority]
-   
-   ## Overall
-   **Score: X.X/10**"
+   The most critical items to fix before implementation."
    ```
 
 3. **Check Score**
