@@ -3,6 +3,7 @@
 ## 🎯 Orchestration Golden Rules
 - [ ] **Claude Code owns planning and verification**
 - [ ] **Delegate bounded, well-specified tasks** to Codex
+- [ ] **Verify RCA with Codex** before designing solutions
 - [ ] **Verify before accepting** delegated work
 - [ ] **PROJECT.md is shared truth**
 - [ ] **Right tool for right job**
@@ -92,9 +93,9 @@ Before accepting delegated work:
 | Workflow | Lead Tool | Codex Role | Primary Files |
 |----------|-----------|------------|---------------|
 | **New Feature** | Claude Code | Review plans, review code | planning → implementation → testing |
-| **Bug Fix** | Claude Code | Sanity check RCA, review fix | investigation → implementation |
+| **Bug Fix** | Claude Code | **Verify RCA (required)**, review fix | investigation → implementation |
 | **Code Review** | Claude Code | Independent review | code-review |
-| **Root Cause** | Claude Code | Alternative analysis | investigation → troubleshooting |
+| **Root Cause** | Claude Code | **Verify RCA (required)** | investigation → troubleshooting |
 | **Refactoring** | Claude Code | Mechanical transforms | refactor |
 | **Cherry-Pick** | Claude Code | Review assessment | cherry-picking |
 
@@ -104,7 +105,7 @@ All workflows follow this pattern:
 ```
 1. [CC] Plan in PROJECT.md
 2. [CC] Investigate/analyze
-3. [CX] Review analysis (optional)
+3. [CX] Verify RCA (REQUIRED for bug fixes/investigations)
 4. [CC] Design solution
 5. [CX] Review solution
 6. [CC|CX] Implement (based on complexity)
