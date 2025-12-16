@@ -2,6 +2,9 @@
 
 Code review using Codex, iterating until score ≥ 8/10.
 
+> **Note**: Claude Code invokes Codex CLI via the **Bash tool**.
+> Run `codex exec ...` commands through Bash, not as a native tool.
+
 ## Prerequisites
 
 **Read these rules first:**
@@ -51,7 +54,9 @@ Do not proceed until rules are read and understood.
    ```
 
 3. **Codex Review**
-   ```
+
+   Use Bash to invoke Codex CLI:
+   ```bash
    codex exec --sandbox read-only "Review these code changes.
    
    CHANGED FILES:

@@ -71,6 +71,7 @@ claude-rules/
     ├── refactor-tests.md   # Move tests to correct layers
     ├── review.md           # Code review (iterate to 8/10)
     ├── review-plan.md      # Plan review (iterate to 8/10)
+    ├── review-pr.md        # Review GitHub PRs
     ├── review-feedback.md  # Process PR feedback
     ├── suggest-tests.md    # Generate test cases
     ├── explain.md          # Explain code
@@ -96,6 +97,7 @@ claude-rules/
 |---------|---------|
 | `/review` | Code review - Codex reviews, Claude fixes, iterate until 8/10 |
 | `/review-plan` | Plan review - Codex reviews, Claude improves, iterate until 8/10 |
+| `/review-pr` | Review third-party GitHub PRs with scoring framework |
 | `/review-feedback` | Process PR feedback - Claude+Codex consensus on validity |
 
 ### Codex Tools
@@ -138,6 +140,14 @@ Codex reviews with **full context** but only **comments on changed code**:
 /review-plan ./docs/PLAN.md # Review specific file
 ```
 
+### GitHub PR Reviews
+```bash
+/review-pr 123              # Review PR by number
+/review-pr https://github.com/owner/repo/pull/123  # Review by URL
+```
+
+Claude reviews with scoring framework, then Codex provides independent review (required per orchestration rules).
+
 ### PR Feedback Analysis
 ```bash
 /review-feedback            # Analyze PR comments
@@ -165,7 +175,7 @@ Claude and Codex independently evaluate each feedback item:
 | `rules/testing.md` | `/test`, `/suggest-tests`, `/refactor-tests` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick` |
-| `rules/code-review.md` | `/review`, `/review-feedback` |
+| `rules/code-review.md` | `/review`, `/review-pr`, `/review-feedback` |
 
 ## Updating
 
