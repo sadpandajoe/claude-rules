@@ -14,6 +14,15 @@
 | **Claude Code** | Tech Lead | Planning, investigation, complex reasoning, verification, commits |
 | **Codex CLI** | Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
 
+### How Claude Code Invokes Codex
+
+Claude Code runs Codex CLI via the **Bash tool**:
+```bash
+codex exec --sandbox read-only "Your prompt here..."
+```
+
+Codex CLI is a separate shell command, NOT a native Claude Code tool.
+
 ## Delegation Framework
 
 ### When to Delegate to Codex
