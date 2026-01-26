@@ -38,6 +38,14 @@ claude
 | `~/.claude/settings.json` | Claude Code settings |
 | `~/.claude/mcp-global.json` | MCP server configuration |
 
+### Claude Code 2.1.x Features Used
+| Feature | Purpose |
+|---------|---------|
+| Task subagents | Explore, Plan, general-purpose for specialized work |
+| Task tracking | TaskCreate/Update/List for progress visibility (optional) |
+| Plan mode | EnterPlanMode/ExitPlanMode for structured planning |
+| Native tools | Read, Grep, Glob instead of bash equivalents |
+
 ## Repository Structure
 
 ```
@@ -219,12 +227,11 @@ The `install.sh` script automatically backs up existing configs to:
 User: /plan
 
 Claude Code:
-1. Reads commands/plan.md
-2. Sees Prerequisites: rules/universal.md, rules/planning.md
-3. Reads those rules
-4. Executes planning workflow
-5. Calls Codex via `codex exec` for review
-6. Iterates until plan scores 8/10
+1. Rules auto-loaded via CLAUDE.md @-includes
+2. Reads commands/plan.md for workflow steps
+3. Executes planning workflow
+4. Calls Codex via `codex exec` for review
+5. Iterates until plan scores 8/10
 ```
 
 **Claude Code** = Tech Lead (planning, complex reasoning, fixes)

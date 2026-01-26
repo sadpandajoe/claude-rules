@@ -2,17 +2,6 @@
 
 Review implementation plan using Codex, iterating until score ≥ 8/10.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/planning.md` - What makes a good plan
-3. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Usage
 ```
 /review-plan                    # Review PROJECT.md (default)
@@ -22,13 +11,8 @@ Do not proceed until rules are read and understood.
 ## Steps
 
 1. **Load Plan**
-   ```bash
-   # Default: PROJECT.md
-   cat PROJECT.md
-   
-   # Or specified file
-   cat <path>
-   ```
+
+   Use the `Read` tool to load the plan file (PROJECT.md by default, or specified path).
 
 2. **Codex Review**
    ```

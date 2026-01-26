@@ -10,6 +10,9 @@
 
 ## Investigation Process
 
+> **Tip**: For codebase exploration, consider using the Task tool with Explore subagent
+> for efficient searching before manual investigation.
+
 ### 1. Document First
 ```markdown
 ## Investigation: [Issue]

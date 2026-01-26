@@ -2,16 +2,6 @@
 
 Move completed phases from PROJECT.md to PROJECT_ARCHIVE.md.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/planning.md` - PROJECT.md structure
-
-Do not proceed until rules are read and understood.
-
----
-
 ## When to Archive
 
 **Good times:**
@@ -40,9 +30,8 @@ Do not proceed until rules are read and understood.
    - Closed milestone
 
 2. **Read Current PROJECT.md**
-   ```bash
-   cat PROJECT.md
-   ```
+
+   Use the `Read` tool to view PROJECT.md contents.
 
 3. **Determine Sections to Archive**
    

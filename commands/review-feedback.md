@@ -2,17 +2,6 @@
 
 Analyze PR feedback, determine validity, and plan fixes.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/code-review.md` - Review criteria
-3. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Usage
 ```
 /review-feedback                    # Prompt for PR link/number

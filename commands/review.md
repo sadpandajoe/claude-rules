@@ -5,17 +5,6 @@ Code review using Codex, iterating until score ≥ 8/10.
 > **Note**: Claude Code invokes Codex CLI via the **Bash tool**.
 > Run `codex exec ...` commands through Bash, not as a native tool.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/code-review.md` - Review criteria and scoring
-3. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Usage
 ```
 /review                     # Review uncommitted changes (default)

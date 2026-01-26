@@ -2,16 +2,6 @@
 
 Debug issues and find root causes.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/investigation.md` - Investigation-specific rules
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Document the Problem**

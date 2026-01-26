@@ -2,16 +2,6 @@
 
 Start a new work session. Run this first.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles (always)
-2. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Check for PROJECT.md**

@@ -2,16 +2,6 @@
 
 Improve code structure without changing behavior.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/refactor.md` - Refactoring-specific rules
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Pre-Refactor Checklist**

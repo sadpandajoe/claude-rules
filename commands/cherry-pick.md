@@ -2,16 +2,6 @@
 
 Cherry-pick commits between branches safely.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/cherry-picking.md` - Cherry-pick-specific rules
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Identify What to Cherry-Pick**

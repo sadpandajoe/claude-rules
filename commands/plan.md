@@ -2,19 +2,9 @@
 
 Create or refine an implementation plan.
 
-## Prerequisites
-
-**Read these rules first (in order):**
-1. `rules/universal.md` - Core principles
-2. `rules/planning.md` - Planning-specific rules
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
-2. **Setup PROJECT.md**
+1. **Setup PROJECT.md**
    - If new: Create from `PROJECT_TEMPLATE.md`
    - If exists: Read and understand current state
 
