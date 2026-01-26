@@ -2,17 +2,6 @@
 
 Write code using TDD approach.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/implementation.md` - Implementation-specific rules
-3. `rules/testing.md` - TDD and test rules
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Pre-Implementation Check**

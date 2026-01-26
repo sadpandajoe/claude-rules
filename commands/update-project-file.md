@@ -2,22 +2,11 @@
 
 Sync PROJECT.md with current progress.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/planning.md` - PROJECT.md structure
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Read Current PROJECT.md**
-   ```bash
-   cat PROJECT.md
-   ```
+
+   Use the `Read` tool to view PROJECT.md contents.
 
 2. **Check Recent Activity**
    ```bash

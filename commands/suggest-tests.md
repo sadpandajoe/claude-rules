@@ -2,17 +2,6 @@
 
 Have Codex suggest test cases for code.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/testing.md` - Testing philosophy (for evaluating suggestions)
-3. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Usage
 ```
 /suggest-tests                      # Tests for uncommitted changes
@@ -23,16 +12,11 @@ Do not proceed until rules are read and understood.
 ## Steps
 
 1. **Determine Scope**
-   ```bash
-   # Default: uncommitted changes
-   git diff --name-only
-   
-   # Specific file
-   cat <file>
-   
-   # Specific function
-   grep -A 50 "function <name>\|def <name>\|<name> =" <file>
-   ```
+
+   Use native tools to gather code:
+   - **Uncommitted changes**: Use `git diff --name-only` via Bash
+   - **Specific file**: Use `Read` tool
+   - **Specific function**: Use `Grep` tool with pattern and context
 
 2. **Codex Generate Tests**
    ```

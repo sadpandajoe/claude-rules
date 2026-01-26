@@ -2,17 +2,6 @@
 
 Reorganize tests to appropriate testing layers.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/testing.md` - Testing layers and philosophy
-3. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Steps
 
 1. **Analyze Current Test Structure**

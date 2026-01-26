@@ -2,16 +2,6 @@
 
 Have Codex explain code sections.
 
-## Prerequisites
-
-**Read these rules first:**
-1. `rules/universal.md` - Core principles
-2. `rules/orchestration.md` - Claude + Codex workflows
-
-Do not proceed until rules are read and understood.
-
----
-
 ## Usage
 ```
 /explain <file>                     # Explain entire file
@@ -23,19 +13,12 @@ Do not proceed until rules are read and understood.
 ## Steps
 
 1. **Determine Scope**
-   ```bash
-   # Entire file
-   cat <file>
-   
-   # Specific function
-   grep -A 100 "function <name>\|def <name>\|<name> =" <file>
-   
-   # Line range
-   sed -n '<start>,<end>p' <file>
-   
-   # Recent changes
-   git diff
-   ```
+
+   Use native tools to gather code:
+   - **Entire file**: Use `Read` tool
+   - **Specific function**: Use `Grep` tool with pattern `function <name>|def <name>`
+   - **Line range**: Use `Read` tool with `offset` and `limit` parameters
+   - **Recent changes**: Use `git diff` via Bash
 
 2. **Codex Explain**
    ```

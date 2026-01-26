@@ -24,6 +24,51 @@ codex exec --sandbox read-only "Your prompt here..."
 
 Codex CLI is a separate shell command, NOT a native Claude Code tool.
 
+## Native Claude Code Features (2.1.x)
+
+### Task Tool Subagents
+
+Claude Code can spawn specialized subagents via the Task tool:
+
+| Subagent | Role | Use For |
+|----------|------|---------|
+| **Explore** | Codebase explorer | Finding files, searching code, understanding structure |
+| **Plan** | Architect | Designing implementation approaches |
+| **general-purpose** | Autonomous worker | Multi-step tasks, research, complex searches |
+
+**When to use subagents vs Codex CLI:**
+- **Subagents**: Internal Claude Code work (exploration, planning, research)
+- **Codex CLI**: Independent review/analysis (fresh perspective, multi-AI validation)
+
+### Task Tracking Tools (Optional)
+
+For complex multi-step work, native task tracking is available:
+
+| Tool | Purpose |
+|------|---------|
+| `TaskCreate` | Create a tracked task with description |
+| `TaskUpdate` | Update status (pending → in_progress → completed) |
+| `TaskList` | View all tasks and their status |
+| `TaskGet` | Get full task details |
+
+**When to use**:
+- Complex features with 3+ distinct steps
+- Work that benefits from visible progress tracking
+- Supplement to PROJECT.md, not replacement
+
+### Plan Mode
+
+Claude Code has native plan mode for non-trivial implementation tasks:
+
+- `EnterPlanMode` - Start structured planning with user approval workflow
+- `ExitPlanMode` - Present plan for user approval
+
+**Use plan mode when**:
+- Multiple valid approaches exist
+- Architectural decisions required
+- Multi-file changes planned
+- User preferences matter
+
 ## Delegation Framework
 
 ### When to Delegate to Codex
@@ -39,12 +84,15 @@ Codex CLI is a separate shell command, NOT a native Claude Code tool.
 
 ### Decision Tree
 ```
+Exploration/understanding codebase?  → Task (Explore subagent)
+Planning/architecture design?        → EnterPlanMode or Task (Plan subagent)
+Multi-step autonomous research?      → Task (general-purpose subagent)
 Planning/investigation/architecture? → Claude Code
-Multi-file or cross-cutting?         → Claude Code  
+Multi-file or cross-cutting?         → Claude Code
 Security-sensitive?                  → Claude Code
 Single-file with clear spec?         → Codex CLI
 Mechanical transformation?           → Codex CLI
-Need fresh perspective?              → Codex CLI
+Need fresh perspective/validation?   → Codex CLI
 ```
 
 ## Task Specification

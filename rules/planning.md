@@ -50,11 +50,17 @@ Version control, file analysis, code changes, testing, investigation
 
 ## Plan Mode
 
-When in plan mode, Claude should:
+### Options
+- **Manual planning**: Use PROJECT.md workflow (documented below)
+- **Native plan mode**: Use `EnterPlanMode` for structured planning with user approval workflow
+
+### When in Plan Mode
+Claude should:
 - **Read and update PROJECT.md** - This is expected and encouraged
 - **Explore codebase** - Understand existing patterns and constraints
 - **Document findings** - Add to PROJECT.md as you learn
 - **Iterate on the plan** - Refine based on discoveries
+- **Exit with `ExitPlanMode`** - Present plan for user approval
 
 Plan mode is for active planning work, not just reading.
 
