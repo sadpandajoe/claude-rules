@@ -1,118 +1,56 @@
-# Testing Strategy
+# Testing Principles
 
-## 🎯 Testing Golden Rules
-- [ ] **Test behavior, not implementation**
-- [ ] **Use fixtures** - No hardcoded test data
-- [ ] **Mock ONLY external boundaries** - APIs, databases, file systems
-- [ ] **Avoid testing your mocks** - Test real logic
+## Golden Rules
+- [ ] **Test behavior, not implementation** — tests survive refactors
+- [ ] **Use fixtures** — no hardcoded test data
+- [ ] **Mock ONLY external boundaries** — APIs, databases, file systems, network, time
 - [ ] **One assertion concept per test**
 - [ ] **Fix failing tests immediately**
 - [ ] **Delete tests for deleted features**
+- [ ] **Follow project conventions** — test structure, naming, organization
 
 ## Testing Layers
 
-| Layer | Purpose | When | Speed |
-|-------|---------|------|-------|
-| **Unit** | Functions/methods | Pure logic | ⚡⚡⚡ |
-| **Integration** | Component interactions | API/DB calls | ⚡⚡ |
-| **E2E** | Full workflows | Multi-system | ⚡ |
-| **Manual** | Exploratory | Automation unavailable | 🐌 |
-
-### Decision Tree
-```
-Pure logic/calculation?     → Unit test
-Calls external services?    → Integration + mock boundary
-Spans multiple systems?     → E2E test
-Automation unavailable?     → Manual test (document steps)
-```
-
-## Fixtures
-
-```
-tests/fixtures/
-  feature/
-    input/scenario.json
-    expected/scenario.json
-```
-
-### Fixture Rules
-- All test data from fixtures
-- Realistic data (from actual responses)
-- Shared across test layers
-- Updated with API changes
+| Layer | When | Mock? |
+|-------|------|-------|
+| **Unit** | Pure logic/calculation | No |
+| **Integration** | Crosses external boundary | Mock the boundary |
+| **E2E** | Full user workflow | No (real system) |
 
 ## What to Mock
 
-| ✅ Mock | ❌ Don't Mock |
-|---------|--------------|
+| Mock | Don't Mock |
+|------|------------|
 | External APIs | Internal functions |
 | Database calls | Business logic |
 | File system | Calculations |
-| Network | State management |
-| Time/dates | Data transforms |
+| Network | Data transforms |
+| Time/dates | State management |
 
-## Test Structure
+## Over-Mocking Signals
 
-```
-DESCRIBE "Feature"
-  BEFORE EACH: Setup fixtures, mock externals only
-  
-  TEST "should [behavior] when [condition]"
-    GIVEN valid input
-    WHEN action performed
-    THEN verify outcome
-```
+You're mocking too much when:
+- Mock setup is longer than the test itself
+- Removing the code under test doesn't break the test
+- Test just verifies mock return values pass through unchanged
+- You're mocking internal functions, not just boundaries
+- Multiple layers of mocks needed to test one function
+- Mocking things that are fast and deterministic (pure functions, transforms)
 
-## Anti-Pattern: Testing Mocks
-
-```
-❌ BAD: Just tests mock returns value
-  mock.returns({name: "John"})
-  result = getUser()
-  assert result.name === "John"
-
-✅ GOOD: Tests real transformation
-  mock.returns({first: "John", last: "Doe"})
-  result = getFullName()
-  assert result === "John Doe"
-```
-
-**Rule**: If removing code under test doesn't break test, you're testing mocks.
-
-## Coverage Strategy
-
-1. **Happy path** - Normal flow
-2. **Error cases** - Invalid input, failures
-3. **Edge cases** - Boundaries, empty, null
-4. **Integration points** - Where components meet
+When you see these → reduce mocks, use real implementations.
 
 ## Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
+| Issue | Cause | Fix |
+|-------|-------|-----|
 | Flaky | Timing/async | Proper waits |
 | False positive | Over-mocking | Test real code |
 | Breaks on refactor | Testing implementation | Test behavior |
-| Slow suite | Too many E2E | Lower layers |
-| Hard to maintain | Hardcoded data | Use fixtures |
+| Slow suite | Too many E2E | Push to lower layers |
 
-## Manual Testing
-
-When automation unavailable:
-```markdown
-### Test: [Feature]
-1. Setup: [Prerequisites]
-2. Steps: [Actions]
-3. Expected: [Result]
-4. Actual: [What happened]
-5. Status: Pass/Fail
-```
-
-## Quality Checklist
-- [ ] Name describes what's tested
-- [ ] Uses fixtures
-- [ ] Mocks only externals
-- [ ] Tests behavior
-- [ ] Single concept per test
-- [ ] Runs independently
-- [ ] Clear failure messages
+## Related Commands
+- `/generate-tests` — Write automated test code
+- `/suggest-tests` — Suggest what to test
+- `/refactor-tests` — Move tests to correct layers
+- `/qa-discover` — Find bugs through code analysis
+- `/qa-test` — Run test plans against live environments

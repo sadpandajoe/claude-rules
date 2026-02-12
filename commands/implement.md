@@ -1,6 +1,7 @@
 # /implement - Implementation Workflow
 
-Write code using TDD approach.
+> **When**: Ready to implement a planned change.
+> **Produces**: Committed, tested code following project conventions.
 
 ## Steps
 

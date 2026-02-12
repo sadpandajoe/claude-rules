@@ -1,6 +1,7 @@
 # /refactor - Refactoring Workflow
 
-Improve code structure without changing behavior.
+> **When**: Code needs restructuring without behavior changes.
+> **Produces**: Refactored code with all tests still passing.
 
 ## Steps
 

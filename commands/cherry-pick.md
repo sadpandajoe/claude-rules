@@ -1,11 +1,16 @@
-# /cherry-pick - Cross-Branch Work
+# /cherry-pick - Cherry-Pick Between Branches
 
-Cherry-pick commits between branches safely.
+> **When**: Moving specific changes (bug fixes, isolated features) across branches.
+> **Produces**: Clean cherry-pick -x with decisions documented in PROJECT.md.
 
 ## Steps
 
+0. **Validate Bug/Issue Exists in Target Branch**
+   Before cherry-picking a fix, confirm the issue is present in the target branch.
+   Use `/review-issue` for thorough cross-branch verification.
+
 1. **Identify What to Cherry-Pick**
-   
+
    Ask user:
    - Source commit(s)?
    - Target branch?
@@ -61,8 +66,9 @@ Cherry-pick commits between branches safely.
 
 6. **Execute Cherry-Pick**
    ```bash
-   git cherry-pick <commit-hash>
+   git cherry-pick -x <commit-hash>
    ```
+   Always use `-x` to preserve the source commit reference in the message.
 
 7. **Handle Conflicts** (if any)
    

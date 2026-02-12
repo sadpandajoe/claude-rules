@@ -1,6 +1,7 @@
 # /review-plan - Plan Review (Iterate to 8/10)
 
-Review implementation plan using Codex, iterating until score ≥ 8/10.
+> **When**: A plan exists and needs quality review before implementing.
+> **Produces**: Iterated plan scoring 8/10+.
 
 ## Usage
 ```

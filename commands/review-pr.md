@@ -1,6 +1,7 @@
 # /review-pr - Review GitHub Pull Request
 
-Review a third-party PR using scoring framework and Codex verification.
+> **When**: Asked to review a GitHub PR.
+> **Produces**: Scored review with actionable feedback.
 
 > **Note**: Claude Code invokes Codex CLI via the **Bash tool**.
 > Run `codex exec ...` commands through Bash, not as a native tool.

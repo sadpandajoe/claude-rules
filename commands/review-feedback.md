@@ -1,6 +1,7 @@
 # /review-feedback - Process PR Feedback
 
-Analyze PR feedback, determine validity, and plan fixes.
+> **When**: A PR has review comments that need to be addressed.
+> **Produces**: Addressed feedback with commits.
 
 ## Usage
 ```

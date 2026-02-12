@@ -1,6 +1,7 @@
 # /plan - Planning Workflow
 
-Create or refine an implementation plan.
+> **When**: Facing a non-trivial task that needs a plan before coding.
+> **Produces**: Documented implementation plan in PROJECT.md.
 
 ## Steps
 

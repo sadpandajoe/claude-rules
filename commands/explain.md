@@ -1,6 +1,7 @@
 # /explain - Explain Code (Codex)
 
-Have Codex explain code sections.
+> **When**: You need to understand unfamiliar code.
+> **Produces**: Explanation of what the code does and why.
 
 ## Usage
 ```

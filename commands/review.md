@@ -1,6 +1,7 @@
 # /review - Code Review (Iterate to 8/10)
 
-Code review using Codex, iterating until score ≥ 8/10.
+> **When**: Your implementation is ready for quality review.
+> **Produces**: Iterated code scoring 8/10+.
 
 > **Note**: Claude Code invokes Codex CLI via the **Bash tool**.
 > Run `codex exec ...` commands through Bash, not as a native tool.

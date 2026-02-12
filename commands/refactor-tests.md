@@ -1,6 +1,7 @@
 # /refactor-tests - Move Tests to Correct Layers
 
-Reorganize tests to appropriate testing layers.
+> **When**: Tests are in the wrong layer (e.g., integration tests that should be unit).
+> **Produces**: Reorganized test files at correct testing layers.
 
 ## Steps
 

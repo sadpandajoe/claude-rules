@@ -1,6 +1,7 @@
 # /investigate - Investigation & Root Cause
 
-Debug issues and find root causes.
+> **When**: Something is broken and you need to find why.
+> **Produces**: Root cause analysis documented in PROJECT.md.
 
 ## Steps
 

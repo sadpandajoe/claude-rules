@@ -1,6 +1,7 @@
 # /suggest-tests - Generate Test Cases (Codex)
 
-Have Codex suggest test cases for code.
+> **When**: Analyzing code to identify what needs testing.
+> **Produces**: Prioritized test case list with coverage notes.
 
 ## Usage
 ```

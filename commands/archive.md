@@ -1,6 +1,7 @@
 # /archive - Archive Completed Work
 
-Move completed phases from PROJECT.md to PROJECT_ARCHIVE.md.
+> **When**: A project/feature is done and needs to be preserved.
+> **Produces**: Archived PROJECT.md and metadata.
 
 ## When to Archive
 

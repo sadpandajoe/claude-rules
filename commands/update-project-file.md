@@ -1,6 +1,7 @@
 # /update-project-file - Update PROJECT.md
 
-Sync PROJECT.md with current progress.
+> **When**: PROJECT.md needs refreshing with current state.
+> **Produces**: Updated PROJECT.md sections.
 
 ## Steps
 

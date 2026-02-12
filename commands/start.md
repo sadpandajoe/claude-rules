@@ -1,6 +1,7 @@
 # /start - Initialize Session
 
-Start a new work session. Run this first.
+> **When**: Beginning any work session.
+> **Produces**: Loaded PROJECT.md context and session entry.
 
 ## Steps
 
