@@ -1,5 +1,7 @@
 # /review-feedback - Process PR Feedback
 
+@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+
 > **When**: A PR has review comments that need to be addressed.
 > **Produces**: Addressed feedback with commits.
 

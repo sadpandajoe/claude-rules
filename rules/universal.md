@@ -47,6 +47,7 @@
 | `implementation.md` | Code development, TDD, patterns |
 | `testing.md` | Test strategy, mocking, over-mocking signals |
 | `troubleshooting.md` | Emergency recovery |
+| `resource-management.md` | Docker limits, test worker scaling |
 | `cherry-picking.md` | Cross-branch work |
 | `code-review.md` | Review guidelines, scoring |
 | `refactor.md` | Restructuring without behavior changes |

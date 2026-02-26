@@ -1,5 +1,7 @@
 # /refactor - Refactoring Workflow
 
+@/Users/joeli/opt/code/claude-rules/rules/refactor.md
+
 > **When**: Code needs restructuring without behavior changes.
 > **Produces**: Refactored code with all tests still passing.
 
