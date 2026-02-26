@@ -1,5 +1,7 @@
 # /update-project-file - Update PROJECT.md
 
+@/Users/joeli/opt/code/claude-rules/rules/planning.md
+
 > **When**: PROJECT.md needs refreshing with current state.
 > **Produces**: Updated PROJECT.md sections.
 

@@ -1,5 +1,7 @@
 # /qa-test - Execute QA Test Plan & File Bugs
 
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+
 > **When**: You have use cases (from /qa-discover or PROJECT.md) and a running
 >   environment to test against.
 > **Produces**: Bug tickets in issue tracker with repro steps, screenshots/video,
@@ -53,12 +55,54 @@
 ## Evidence Organization
 ```
 qa-evidence/
+  videos/
+    sc-NNNNN-description.webm
   UC-143/
     screenshot.png
     console-log.txt
-  UC-145/
-    screenshot.png
 ```
+
+### Video Recording via Playwright
+Record video evidence by creating a new browser context with `recordVideo` enabled.
+Copy cookies from the main session to avoid re-login. Close the context to finalize the video.
+Name videos descriptively: `sc-NNNNN-short-description.webm`
+
+## QA Verification Comment Format
+
+When posting QA results on a story, use **one clean comment** per story:
+
+```markdown
+## QA Verification — PASS ✅
+
+**Tested on**: <staging-url> (staging)
+**Date**: <YYYY-MM-DD>
+**Tester**: Playwright automation (<email>)
+
+### Repro steps followed:
+1. <exact step matching what the video shows>
+2. <step 2>
+...
+
+### Result:
+**Bug appears fixed.** <description of observed behavior>
+
+### Evidence:
+[filename.webm](<shortcut-media-url-from-uploaded-file>)
+```
+
+### Rules:
+- **Repro steps MUST match what the video actually shows** — never describe steps that aren't visible in the recording
+- One comment, one video — no multi-comment update chains
+- Embed the video link in Evidence using the Shortcut media URL from the upload
+- For FAIL: replace header with `## QA Verification — FAIL ❌` and describe what went wrong
+
+## Story State Transitions
+
+When a bug passes QA:
+1. Upload video evidence to the story
+2. Post QA verification comment (format above)
+3. Set custom fields: **QA Assigned** and **Card Status** = "Passed QA"
+4. Move story to **Validate/QA** workflow state
 
 ## Bug Filing Checklist
 - [ ] Title is specific (not "filter broken" but "filter fields hidden until clicked when editing existing alert")
@@ -73,3 +117,6 @@ qa-evidence/
 - Group related use cases to minimize navigation
 - If browser automation unavailable, document manual repro steps
 - For intermittent failures, note frequency and any patterns
+- **Verify element selectors before recording** — use the main browser session to snapshot the DOM and identify correct selectors, then record with the verified selectors
+- **Icons in antd are `span[role="img"]`** not `<img>` — accessibility snapshots may show `img` but the actual DOM uses antd span icons
+- **Avoid generic selectors like `.last()`** — they grab page elements instead of component-scoped elements

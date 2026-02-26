@@ -1,5 +1,7 @@
 # /suggest-tests - Generate Test Cases (Codex)
 
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+
 > **When**: Analyzing code to identify what needs testing.
 > **Produces**: Prioritized test case list with coverage notes.
 

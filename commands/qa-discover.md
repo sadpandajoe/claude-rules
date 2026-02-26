@@ -1,5 +1,7 @@
 # /qa-discover - Discover Bugs via Code Analysis
 
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+
 > **When**: Exploring a feature area to find potential bugs, edge cases,
 >   missing validations, and asymmetries before or instead of manual testing.
 > **Produces**: Categorized use case matrix in PROJECT.md with severity/confidence ratings.

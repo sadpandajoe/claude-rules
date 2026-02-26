@@ -1,5 +1,7 @@
 # /generate-tests - Write Automated Test Code
 
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+
 > **When**: Creating or restructuring automated test files (unit, integration, e2e).
 > **Produces**: Test code following project conventions with proper fixtures and mocking.
 

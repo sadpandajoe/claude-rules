@@ -1,5 +1,8 @@
 # /review-issue - Verify Bug Across Branches
 
+@/Users/joeli/opt/code/claude-rules/rules/investigation.md
+@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+
 > **When**: You have a bug report and need to know if it exists in your
 >   current branch, master, or both — and find the fixing commit if applicable.
 > **Produces**: Branch status matrix. If fixed elsewhere, the fixing commit

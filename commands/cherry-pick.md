@@ -1,5 +1,7 @@
 # /cherry-pick - Cherry-Pick Between Branches
 
+@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+
 > **When**: Moving specific changes (bug fixes, isolated features) across branches.
 > **Produces**: Clean cherry-pick -x with decisions documented in PROJECT.md.
 

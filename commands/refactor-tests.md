@@ -1,5 +1,8 @@
 # /refactor-tests - Move Tests to Correct Layers
 
+@/Users/joeli/opt/code/claude-rules/rules/testing.md
+@/Users/joeli/opt/code/claude-rules/rules/refactor.md
+
 > **When**: Tests are in the wrong layer (e.g., integration tests that should be unit).
 > **Produces**: Reorganized test files at correct testing layers.
 

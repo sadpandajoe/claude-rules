@@ -1,11 +1,13 @@
 # /start - Initialize Session
 
+@/Users/joeli/opt/code/claude-rules/PROJECT_TEMPLATE.md
+
 > **When**: Beginning any work session.
 > **Produces**: Loaded PROJECT.md context and session entry.
 
 ## Steps
 
-1. **Check for PROJECT.md**
+1. **Check for PROJECT.md in current working directory**
    ```bash
    ls -la PROJECT.md
    ```

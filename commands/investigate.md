@@ -1,5 +1,7 @@
 # /investigate - Investigation & Root Cause
 
+@/Users/joeli/opt/code/claude-rules/rules/investigation.md
+
 > **When**: Something is broken and you need to find why.
 > **Produces**: Root cause analysis documented in PROJECT.md.
 

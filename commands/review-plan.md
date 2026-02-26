@@ -1,5 +1,7 @@
 # /review-plan - Plan Review (Iterate to 8/10)
 
+@/Users/joeli/opt/code/claude-rules/rules/planning.md
+
 > **When**: A plan exists and needs quality review before implementing.
 > **Produces**: Iterated plan scoring 8/10+.
 

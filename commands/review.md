@@ -1,5 +1,7 @@
 # /review - Code Review (Iterate to 8/10)
 
+@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+
 > **When**: Your implementation is ready for quality review.
 > **Produces**: Iterated code scoring 8/10+.
 
