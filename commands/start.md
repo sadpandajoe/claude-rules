@@ -7,13 +7,17 @@
 
 ## Steps
 
-1. **Check for PROJECT.md in current working directory**
-   ```bash
-   ls -la PROJECT.md
-   ```
-   
-   - If exists: Read completely
-   - If not: Ask if user wants to create one using `PROJECT_TEMPLATE.md`
+1. **Find PROJECT.md**
+
+   Search these locations in order (stop at first match):
+   1. Current working directory: `PROJECT.md`
+   2. Git repo root: `$(git rev-parse --show-toplevel)/PROJECT.md`
+   3. Additional working directories from the environment
+
+   The file may be a real file or a **symlink** — both are valid. Read it normally either way.
+
+   - If found: Read completely
+   - If not found anywhere: Ask if user wants to create one using `PROJECT_TEMPLATE.md`
 
 2. **Verify Environment**
    ```bash

@@ -67,6 +67,15 @@ Record video evidence by creating a new browser context with `recordVideo` enabl
 Copy cookies from the main session to avoid re-login. Close the context to finalize the video.
 Name videos descriptively: `sc-NNNNN-short-description.webm`
 
+### Embedding Videos in Shortcut Comments
+Shortcut only renders inline video/media when you use a markdown link pointing to a **Shortcut media URL** (not a local filename). Follow this exact sequence:
+
+1. **Upload** the video file to the story using `stories-upload-file`
+2. **Fetch** the story with `full: true` to get the uploaded file's `url` field
+3. **Use** the media URL in the comment: `[descriptive-name.webm](https://media.app.shortcut.com/api/attachments/files/...)`
+
+A plain filename like `video.webm` will NOT render — it must be a markdown link with the Shortcut media URL.
+
 ## QA Verification Comment Format
 
 When posting QA results on a story, use **one clean comment** per story:
@@ -99,10 +108,11 @@ When posting QA results on a story, use **one clean comment** per story:
 ## Story State Transitions
 
 When a bug passes QA:
-1. Upload video evidence to the story
-2. Post QA verification comment (format above)
-3. Set custom fields: **QA Assigned** and **Card Status** = "Passed QA"
-4. Move story to **Validate/QA** workflow state
+1. Upload video evidence to the story (`stories-upload-file`)
+2. Fetch story with `full: true` to get the uploaded file's media URL from the `files` array
+3. Post QA verification comment with inline video link using the media URL
+4. Set custom fields: **QA Assigned** and **Card Status** = "Passed QA"
+5. Move story to **Validate/QA** workflow state
 
 ## Bug Filing Checklist
 - [ ] Title is specific (not "filter broken" but "filter fields hidden until clicked when editing existing alert")
