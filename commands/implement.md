@@ -8,7 +8,7 @@
 ## Steps
 
 1. **Pre-Implementation Check**
-   - [ ] Plan exists and scored 8/10? (run `/plan` first if not)
+   - [ ] Plan exists in PROJECT.md? (run `/create-plan` first if not)
    - [ ] Codebase understood?
    - [ ] Existing patterns studied?
    - [ ] Dependencies verified?
@@ -69,13 +69,11 @@
    git commit -m "feat: [description]"
    ```
 
-6. **Trigger Code Review**
-   After implementation complete:
+6. **Handoff**
    ```
-   "Implementation complete. Running /review to validate..."
+   Implementation complete.
+   Run /review to validate, then create a PR.
    ```
-   
-   Automatically run `/review` to iterate until 8/10.
 
 ## Commit Message Format
 ```
@@ -92,4 +90,4 @@ Types: feat, fix, docs, style, refactor, test, chore
 - Working solution first, then optimize
 - Commit working states before refactoring
 - Test as you go, not at the end
-- Code review must pass 8/10 before done
+- Do NOT auto-trigger review — let user decide when to run `/review`
