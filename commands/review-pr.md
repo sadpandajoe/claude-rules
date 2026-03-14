@@ -2,19 +2,13 @@
 
 @/Users/joeli/opt/code/claude-rules/rules/code-review.md
 
-> **When**: Asked to review a GitHub PR.
-> **Produces**: Scored review with actionable feedback.
-
-> **Note**: Claude Code invokes Codex CLI via the **Bash tool**.
-> Run `codex exec ...` commands through Bash, not as a native tool.
+> **When**: Asked to review someone else's GitHub PR.
+> **Produces**: Scored review with actionable feedback, optionally posted to GitHub.
 
 ## Usage
 ```
 /review-pr <pr-number-or-url>
 ```
-
-## Arguments
-- `$ARGUMENTS` - PR number (e.g., `123`) or full URL (e.g., `https://github.com/owner/repo/pull/123`)
 
 ## Steps
 
@@ -26,20 +20,19 @@
    # Get the diff
    gh pr diff $ARGUMENTS
 
-   # Get list of changed files
+   # Get list of changed files with full content for context
    gh pr view $ARGUMENTS --json files -q '.files[].path'
    ```
 
+   Read the full content of changed files — review comments on changed lines, but understand the surrounding context.
+
 2. **Initial Assessment**
 
-   Review the PR for:
    - Purpose: What problem does this solve?
    - Scope: Is it focused or sprawling?
    - Risk: What could break?
 
 3. **Score Using Framework**
-
-   Evaluate per `rules/code-review.md`:
 
    | Component | Score | Notes |
    |-----------|-------|-------|
@@ -51,27 +44,20 @@
 
 4. **Tag Issues by Severity**
 
-   For each issue found:
+   For each issue:
    - `[major]` - Must fix before merge (bugs, security, missing tests)
    - `[minor]` - Should fix (naming, DRY, partial docs)
    - `[nitpick]` - Optional (style, micro-optimizations)
 
-5. **Codex Independent Review** (REQUIRED per orchestration rules)
+   **Line number accuracy**: Use `gh api` to get diff hunks with positions. Map each issue to the correct diff line, not the file line number. This matters for posting review comments.
 
    ```bash
-   codex exec --sandbox read-only "Review this PR diff for bugs, security issues, and style problems. Score 1-10 and list issues by severity [major]/[minor]/[nitpick]:
-
-   $(gh pr diff $ARGUMENTS)"
+   # Get diff with positions for accurate line commenting
+   gh api repos/{owner}/{repo}/pulls/{number}/files --paginate
    ```
 
-6. **Consolidate Findings**
+5. **Present Review to User**
 
-   Merge Claude and Codex findings:
-   - Deduplicate issues
-   - Reconcile scoring differences
-   - Note any disagreements
-
-7. **Final Report**
    ```markdown
    ## PR Review: #[number] - [title]
 
@@ -91,25 +77,44 @@
    ### Issues
 
    #### [major]
-   - file:line - description
+   - `file.py:42` — description
 
    #### [minor]
-   - file:line - description
+   - `file.py:87` — description
 
    #### [nitpick]
-   - file:line - description
-
-   ### Codex Review
-   [Summary of Codex findings, especially any Claude missed]
+   - `file.py:15` — description
 
    ### Recommendation
    **Approve** / **Request Changes** / **Comment**
+   [Reasoning]
+   ```
 
-   [Reasoning for recommendation]
+6. **Ask User: Post to GitHub?**
+
+   Options:
+   - **Post full review** — submit as GitHub review with inline comments
+   - **Post summary only** — single review comment with the summary
+   - **Don't post** — just show locally
+
+   If posting inline comments:
+   ```bash
+   # Submit review with inline comments
+   gh api repos/{owner}/{repo}/pulls/{number}/reviews \
+     -f event="REQUEST_CHANGES" \
+     -f body="Review summary" \
+     -f 'comments[]={ "path": "file.py", "line": 42, "body": "[major] description" }'
+   ```
+
+   If posting summary only:
+   ```bash
+   gh pr review $ARGUMENTS --request-changes --body "review body"
+   # or --approve or --comment
    ```
 
 ## Notes
-- Always get Codex independent review before finalizing
-- All `[major]` issues must be addressed before approving
-- Score ≥ 8/10 needed for approval recommendation
-- Include file:line references for actionable feedback
+- Read full files for context, only comment on changed lines
+- All `[major]` issues must be addressed before recommending approval
+- Score >= 8/10 needed for approval recommendation
+- Always ask before posting to GitHub
+- Use diff positions (not file line numbers) when posting inline comments
