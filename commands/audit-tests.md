@@ -1,4 +1,4 @@
-# /qa-discover - Discover Bugs via Code Analysis
+# /audit-tests - Audit Test Coverage and Discover Bugs
 
 @/Users/joeli/opt/code/claude-rules/rules/testing.md
 
