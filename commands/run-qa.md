@@ -1,4 +1,4 @@
-# /qa-test - Execute QA Test Plan & File Bugs
+# /run-qa - Execute QA Test Plan & File Bugs
 
 @/Users/joeli/opt/code/claude-rules/rules/testing.md
 
@@ -8,7 +8,7 @@
 >   and logs. Updated use case matrix with PASS/FAIL status.
 
 ## Prerequisites
-- Use cases documented in PROJECT.md (run /qa-discover first if needed)
+- Use cases documented in PROJECT.md (run /audit-tests first if needed)
 - Running environment (local Docker, staging, ephemeral)
 - Browser automation MCP connected (for UI testing)
 - Issue tracker MCP connected (for bug filing)

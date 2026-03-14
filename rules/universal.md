@@ -15,7 +15,7 @@
 | Building something new | New Feature | `/create-plan` → `/review-plan` → `/finalize-plan` → `/create-tests` → `/implement` |
 | Something's broken | Bug Fix | `/investigate` → `/create-plan` → `/review-plan` → `/create-tests` → `/implement` |
 | Exploring for bugs | Test Audit | `/audit-tests` |
-| Testing against live env | QA Testing | `/qa-test` |
+| Testing against live env | QA Testing | `/run-qa` |
 | Is this bug fixed somewhere? | Issue Review | `/review-issue` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/create-plan` → same as new feature |
