@@ -32,4 +32,4 @@
 ## Related Commands
 - `/review-pr` — Review someone's PR
 - `/review-plan` — Domain expert plan review
-- `/review-feedback` — Process PR feedback
+- `/address-feedback` — Address PR review feedback
