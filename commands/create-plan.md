@@ -57,9 +57,27 @@
    ## Recommended Approach
    [Which option and why]
 
-   ## Implementation Steps
-   1. [Phase 1]
-   2. [Phase 2]
+   ## Implementation Phases
+
+   Break work into small, independently deployable PRs.
+   Each phase should be shippable on its own — no phase should
+   leave the system in a broken state.
+
+   ### Phase 1: [Name]
+   - **PR scope**: [What this PR contains]
+   - **Migrations**: [If needed — never a standalone migration PR]
+   - **Deployable**: Yes — [why this works independently]
+   - **Steps**:
+     1. [Step]
+     2. [Step]
+
+   ### Phase 2: [Name]
+   - **PR scope**: [What this PR contains]
+   - **Depends on**: Phase 1
+   - **Deployable**: Yes
+   - **Steps**:
+     1. [Step]
+     2. [Step]
 
    ## Testing Strategy
    [How we'll validate]
@@ -75,6 +93,13 @@
    Plan written to PROJECT.md.
    Run /review-plan when ready to get domain expert feedback.
    ```
+
+## Phase Decomposition Rules
+- Every phase must be independently deployable — no "deploy phases 1-3 together"
+- Migrations are never standalone PRs — bundle with the code that uses them
+- If a later phase needs another migration, add to it then — don't front-load all migrations
+- Prefer vertical slices (one feature end-to-end) over horizontal layers (all models, then all APIs, then all UI)
+- Each phase's PR should be small enough to review in one sitting
 
 ## Notes
 - Document multiple options with trade-offs

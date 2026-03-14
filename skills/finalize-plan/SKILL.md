@@ -19,6 +19,11 @@ Analyze with fresh eyes:
 - **Implementability** — could a developer pick this up and build it without guessing?
 - **Completeness** — are there obvious gaps that would block implementation?
 - **Scope clarity** — is it clear what's in scope and what's not?
+- **Phase decomposition** — is the work broken into small, independently deployable PRs? Flag if:
+  - A single phase is too large to review in one sitting
+  - Migrations are in a standalone phase without the code that uses them
+  - Phases are horizontal layers (all models → all APIs → all UI) instead of vertical slices
+  - Any phase would leave the system in a broken state if deployed alone
 
 ## What Makes This Different
 
