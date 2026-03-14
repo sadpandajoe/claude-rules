@@ -12,8 +12,8 @@
 
 | Situation | Workflow | Command |
 |-----------|----------|---------|
-| Building something new | New Feature | `/plan` → `/implement` |
-| Something's broken | Bug Fix | `/investigate` → `/implement` |
+| Building something new | New Feature | `/create-plan` → `/review-plan` → `/finalize-plan` → `/create-tests` → `/implement` |
+| Something's broken | Bug Fix | `/investigate` → `/create-tests` → `/implement` |
 | Exploring for bugs | QA Discovery | `/qa-discover` |
 | Testing against live env | QA Testing | `/qa-test` |
 | Is this bug fixed somewhere? | Issue Review | `/review-issue` |
