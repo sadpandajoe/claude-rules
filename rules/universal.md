@@ -19,7 +19,8 @@
 | Is this bug fixed somewhere? | Issue Review | `/review-issue` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/refactor` |
-| Cross-branch work | Cherry-Pick | `/review-issue` → `/cherry-pick` |
+| Cross-branch work (single) | Cherry-Pick | `/review-issue` → `/cherry-pick` |
+| Cross-branch work (batch) | Cherry-Pick | `/cherry-plan` → `/cherry-pick` each |
 | System in bad state | Recovery | See troubleshooting rules |
 
 ## Communication Rules
