@@ -30,7 +30,6 @@
 - Scope creep (unrelated fixes)
 
 ## Related Commands
-- `/review` — Review own code (iterate to 8/10)
 - `/review-pr` — Review someone's PR
-- `/review-plan` — Review plan quality
-- `/review-feedback` — Process PR feedback
+- `/review-plan` — Domain expert plan review
+- `/address-feedback` — Address PR review feedback

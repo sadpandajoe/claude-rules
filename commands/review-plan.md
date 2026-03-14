@@ -1,13 +1,16 @@
-# /review-plan - Plan Review (Iterate to 8/10)
+# /review-plan - Domain Expert Plan Review
 
 @/Users/joeli/opt/code/claude-rules/rules/planning.md
 
-> **When**: A plan exists and needs quality review before implementing.
-> **Produces**: Iterated plan scoring 8/10+.
+> **When**: A plan exists in PROJECT.md and needs expert review before implementation.
+> **Produces**: Synthesized multi-perspective feedback, iterated plan scoring 8/10+.
 
 ## Usage
 ```
-/review-plan                    # Review PROJECT.md (default)
+/review-plan                    # Auto-detect relevant reviewers
+/review-plan --frontend         # Force include frontend reviewer
+/review-plan --backend          # Force include backend reviewer
+/review-plan --all              # Run all reviewers
 /review-plan ./docs/PLAN.md     # Review specific file
 ```
 
@@ -15,108 +18,100 @@
 
 1. **Load Plan**
 
-   Use the `Read` tool to load the plan file (PROJECT.md by default, or specified path).
+   Read PROJECT.md (or specified path). If no plan exists, stop and suggest `/create-plan`.
 
-2. **Codex Review**
+2. **Detect Applicable Reviewers**
+
+   **Always eligible** (spawn these every time):
+   - `skills/review-architecture/SKILL.md`
+   - `skills/review-implementation/SKILL.md`
+   - `skills/review-testplan/SKILL.md`
+
+   **Auto-detected** by scanning plan content for keywords:
+   - **Frontend**: UI, React, component, CSS, styled, theme, modal, form, page, layout, UX, accessibility, a11y → `skills/review-frontend/SKILL.md`
+   - **Backend**: API, endpoint, database, model, migration, SQL, query, auth, middleware, REST, GraphQL, schema → `skills/review-backend/SKILL.md`
+
+   **Override via flags**: `--frontend`, `--backend`, `--all`
+
+3. **Spawn Parallel Reviewers**
+
+   For each applicable reviewer:
+   1. Read the skill's `SKILL.md` for its review instructions
+   2. Spawn a Task subagent (subagent_type: "general-purpose") passing:
+      - The full plan content
+      - The skill's review instructions
+      - Instruction to output in the skill's specified format
+
+   **Spawn all reviewers in parallel** using multiple Task tool calls in a single message.
+
+4. **Synthesize Feedback**
+
+   Collect all reviewer results and present a unified report:
+
+   ```markdown
+   ## Plan Review Results
+
+   ### Reviewer Scores
+   | Reviewer | Score | Key Concern |
+   |----------|-------|-------------|
+   | Architecture | X/10 | [Top issue] |
+   | Implementation | X/10 | [Top issue] |
+   | Testing | X/10 | [Top issue] |
+   | Frontend | X/10 | [Top issue] |
+   | Backend | X/10 | [Top issue] |
+
+   ### Consensus Issues (flagged by 2+ reviewers)
+   These are highest priority — multiple perspectives agree:
+   - [Issue + which reviewers flagged it]
+
+   ### All Issues by Priority
+   #### High
+   - [Issue] — [Reviewer]
+   #### Medium
+   - [Issue] — [Reviewer]
+   #### Low
+   - [Issue] — [Reviewer]
+
+   ### Reviewer Conflicts
+   Where reviewers disagree, with Claude's resolution:
+   - [Conflict description + resolution]
    ```
-   codex exec --sandbox read-only "Review this implementation plan thoroughly.
 
-   PLAN:
-   ---
-   [insert plan content]
-   ---
+5. **User Decision**
 
-   First, list ALL findings - don't hold back:
+   Present options:
+   - **Iterate**: Claude improves the plan (consensus first, then High, then Medium), updates PROJECT.md, re-runs review
+   - **Finalize**: Plan is good enough → suggest `/finalize-plan`
+   - **Accept**: Skip finalization, go straight to `/implement`
+   - **Manual**: User will address feedback themselves
 
-   ## Findings
-   For each issue found:
-   - [High/Medium/Low] Specific issue with file/section reference
-   - Include missing details, gaps, risks, inconsistencies
-   - Be specific about what's wrong and why it matters
+6. **Iteration Loop** (if user chooses "Iterate")
 
-   ## Open Questions
-   List any ambiguities or decisions that need clarification.
-
-   ## Summary Score
-   Rate the plan 1-10 considering:
-   - Clarity, Completeness, Feasibility
-   - Risk Assessment, Implementation Path
-   - Testing Strategy, Actionability
-
-   **Overall: X/10**
-
-   ## Top 3 Priorities
-   The most critical items to fix before implementation."
-   ```
-
-3. **Check Score**
-
-   - **Score ≥ 8/10**: Plan approved ✅ → Go to step 6
-   - **Score < 8/10**: Continue to step 4
-
-4. **Claude Improves Plan** (if < 8/10)
-
-   **IMPORTANT**: Do NOT write feedback/review comments into PROJECT.md.
-   Instead, directly improve the actual plan content:
-
-   - If Clarity is low → Rewrite Goal/Overview to be clearer
-   - If Completeness is low → Add missing sections
-   - If Risk Assessment is low → Add Risks section with mitigations
-   - If Testing Strategy is low → Add concrete test approach
-   - If Implementation Path is low → Add sequenced steps
-
-   Think through improvements, then edit the actual plan sections.
-
-5. **Re-Review** (Loop)
-
-   Return to step 2 with the improved plan.
-
-   Continue until:
-   - Score ≥ 8/10, OR
-   - Max 5 rounds reached
-
-6. **Write Approved Plan to PROJECT.md**
-
-   Once score ≥ 8/10, write the final improved plan to PROJECT.md.
-
-   The plan content should be clean - no review feedback, just the plan itself.
+   1. Claude improves plan content directly in PROJECT.md (not as comments)
+      - Address consensus issues first
+      - Then High priority issues
+      - Then Medium if time permits
+   2. Re-run from step 2 with improved plan
+   3. Max **3 rounds**, then suggest `/finalize-plan`
 
 7. **Final Report**
    ```markdown
-   ## Plan Review Complete
+   ## Review Complete
 
    ### Rounds: [N]
-   | Round | Score | Key Improvements |
-   |-------|-------|------------------|
+   | Round | Avg Score | Key Improvements |
+   |-------|-----------|------------------|
    | 1 | 5.5 | Missing risk assessment |
-   | 2 | 6.8 | Added testing strategy |
-   | 3 | 8.2 | Clarified implementation steps |
-
-   ### Final Score: X.X/10 ✅
-
-   ### Plan Written To
-   - PROJECT.md updated with approved plan
+   | 2 | 7.8 | Added testing strategy |
 
    ### Next Steps
-   - Run `/implement` to begin implementation
+   - Run `/finalize-plan` for fresh-eyes final check
+   - Or `/implement` to begin implementation
    ```
-
-## Stagnation Detection
-
-If score unchanged for 2 rounds:
-```markdown
-## Review Stagnating
-
-Score stuck at X.X/10 for 2 rounds.
-
-Options:
-1. Continue with different approach
-2. Accept current plan
-3. Rethink fundamentally
-```
 
 ## Notes
 - Defaults to PROJECT.md
-- Iterates until 8/10 or max 5 rounds
-- Claude improves, Codex reviews
-- Plan must pass before implementation starts
+- All reviewers run in parallel for speed
+- Consensus issues (2+ reviewers) get highest priority
+- Claude improves plan content directly — never writes review comments into PROJECT.md
+- Max 3 iteration rounds, then suggest finalization

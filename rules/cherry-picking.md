@@ -3,6 +3,7 @@
 ## Golden Rules
 - [ ] **Understand before changing** — analyze full scope
 - [ ] **Always use `cherry-pick -x`** — preserves source commit reference
+- [ ] **Always use `cherry-pick --continue` to commit** — never `git commit` directly after resolving conflicts. `--continue` preserves original author, cherry-pick metadata, and the `(cherry picked from commit ...)` trailer.
 - [ ] **Validate bug exists in target branch** — before cherry-picking a fix, confirm it's present
 - [ ] **Preserve working functionality**
 - [ ] **Adapt rather than force** — work with target architecture
@@ -46,5 +47,6 @@ Will forcing this break existing?
 | Structure | Can extract logic? | Functional only | Force structure |
 
 ## Related Commands
-- `/cherry-pick` — Execute cherry-pick workflow
+- `/cherry-pick` — Cherry-pick a single PR/SHA with conflict resolution
+- `/cherry-plan` — Plan order for multiple cherry-picks
 - `/review-issue` — Verify if bug exists across branches before cherry-picking

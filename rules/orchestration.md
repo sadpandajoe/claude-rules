@@ -14,6 +14,7 @@
 | **Claude Code** | Tech Lead | Planning, investigation, complex reasoning, verification, commits |
 | **Codex CLI** | Implementer | Bounded tasks, code review, boilerplate, mechanical transforms |
 | **Subagents** | Internal workers | Exploration, planning, research (via Task tool) |
+| **Skill Subagents** | Domain reviewers | Architecture, implementation, testing, frontend, backend perspectives via Task tool |
 
 ## Delegation Decision
 
@@ -36,6 +37,8 @@
 | Retry failures blindly | Understand and simplify |
 
 ## Related Commands
-- `/plan` — Design implementation approach
+- `/create-plan` — Design implementation approach
+- `/review-plan` — Domain expert plan review (parallel skill subagents)
+- `/finalize-plan` — Fresh-eyes final signoff
 - `/implement` — Write code (TDD)
 - `/explain` — Explain unfamiliar code
