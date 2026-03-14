@@ -3,8 +3,8 @@
 @/Users/joeli/opt/code/claude-rules/rules/investigation.md
 @/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
 
-> **When**: You have a bug report and need to know if it exists in your
->   current branch, master, or both — and find the fixing commit if applicable.
+> **When**: You have a bug report (or stale ticket) and need to know if it still exists,
+>   was already fixed, or needs cherry-picking.
 > **Produces**: Branch status matrix. If fixed elsewhere, the fixing commit
 >   hash ready for `/cherry-pick`.
 
@@ -50,7 +50,7 @@
 6. **Recommend Next Step**
    - If cherry-pick needed: provide commit hash, recommend `/cherry-pick`
    - If unfixed everywhere: recommend `/investigate`
-   - If already fixed: close the issue
+   - If already fixed everywhere: recommend closing the issue as stale/resolved
 
 7. **Update PROJECT.md**
    - Document findings in Development Log
