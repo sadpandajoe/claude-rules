@@ -18,7 +18,7 @@
 | Testing against live env | QA Testing | `/qa-test` |
 | Is this bug fixed somewhere? | Issue Review | `/review-issue` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
-| Improving existing code | Refactoring | `/refactor` |
+| Improving existing code | Refactoring | `/create-plan` → same as new feature |
 | Cross-branch work (single) | Cherry-Pick | `/review-issue` → `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/cherry-plan` → `/cherry-pick` each |
 | System in bad state | Recovery | See troubleshooting rules |
@@ -51,4 +51,4 @@
 | `resource-management.md` | Docker limits, test worker scaling |
 | `cherry-picking.md` | Cross-branch work |
 | `code-review.md` | Review guidelines, scoring |
-| `refactor.md` | Restructuring without behavior changes |
+

@@ -97,4 +97,4 @@
 - Multiple concerns per test
 
 ## Related Commands
-- `/refactor-tests` — Move tests to correct layers
+- `/review-plan` — Reviews test strategy during plan phase via review-testplan skill
