@@ -17,6 +17,9 @@ Analyze:
 - Dependency availability — do required libraries/APIs exist?
 - Consistency with existing codebase patterns and conventions
 - Incremental delivery — can the plan be implemented in shippable increments?
+- Phase decomposition — is each phase a small, independently deployable PR?
+- Standalone migration PRs — migrations must be bundled with the code that uses them
+- Vertical slices — prefer end-to-end feature slices over horizontal layers (all models → all APIs → all UI)
 - Migration concerns — backward compatibility, data migration, rollback
 - Risk of each step — what could go wrong?
 
