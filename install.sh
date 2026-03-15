@@ -99,6 +99,11 @@ step "Symlinking commands directory..."
 
 create_symlink "$REPO_DIR/commands" "$CLAUDE_DIR/commands"
 
+# Step 3b: Symlink skills directory
+step "Symlinking skills directory..."
+
+create_symlink "$REPO_DIR/skills" "$CLAUDE_DIR/skills"
+
 # Step 4: Verify installation
 step "Verifying installation..."
 
@@ -121,6 +126,7 @@ verify_link() {
 
 verify_link "$CLAUDE_DIR/CLAUDE.md"
 verify_link "$CLAUDE_DIR/commands"
+verify_link "$CLAUDE_DIR/skills"
 
 echo ""
 
@@ -139,9 +145,15 @@ echo "  Installation Complete!"
 echo "========================================"
 echo ""
 COMMAND_COUNT=$(ls "$REPO_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(find "$REPO_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
 ls "$REPO_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
     echo "  /$cmd"
+done
+echo ""
+info "Available skills ($SKILL_COUNT):"
+find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | xargs -I {} basename {} | sort | while read skill; do
+    echo "  $skill"
 done
 echo ""
 info "To start using Claude Code with your new config:"

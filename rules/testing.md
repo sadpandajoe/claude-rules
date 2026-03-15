@@ -49,8 +49,6 @@ When you see these → reduce mocks, use real implementations.
 | Slow suite | Too many E2E | Push to lower layers |
 
 ## Related Commands
-- `/generate-tests` — Write automated test code
-- `/suggest-tests` — Suggest what to test
-- `/refactor-tests` — Move tests to correct layers
+- `/create-tests` — Create and improve tests (invokes review-tests skill)
 - `/qa-discover` — Find bugs through code analysis
 - `/qa-test` — Run test plans against live environments

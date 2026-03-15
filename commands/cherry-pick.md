@@ -1,151 +1,119 @@
-# /cherry-pick - Cherry-Pick Between Branches
+# /cherry-pick - Cherry-Pick a Single Change
 
 @/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
 
-> **When**: Moving specific changes (bug fixes, isolated features) across branches.
-> **Produces**: Clean cherry-pick -x with decisions documented in PROJECT.md.
+> **When**: Moving a specific change (bug fix, isolated feature) to another branch.
+> **Produces**: Clean cherry-pick with conflicts resolved, documented in PROJECT.md.
+
+## Usage
+```
+/cherry-pick <pr-url>                   # Cherry-pick from a PR
+/cherry-pick <sha>                      # Cherry-pick a specific commit
+/cherry-pick <sha> --target <branch>    # Cherry-pick to specific branch
+```
 
 ## Steps
 
-0. **Validate Bug/Issue Exists in Target Branch**
-   Before cherry-picking a fix, confirm the issue is present in the target branch.
-   Use `/review-issue` for thorough cross-branch verification.
+1. **Identify the Change**
 
-1. **Identify What to Cherry-Pick**
+   From PR URL: use `gh pr view` to get merge commit and files changed.
+   From SHA: use `git show --stat` to understand the commit.
 
-   Ask user:
-   - Source commit(s)?
-   - Target branch?
-   - Why cherry-picking vs merge?
-
-2. **Pre-Analysis**
    ```bash
-   # Understand the commit
-   git show <commit-hash>
    git show --stat <commit-hash>
-   
-   # Context
    git log --oneline <commit>~5..<commit>+5
    ```
 
-3. **Dependency Check**
+2. **Pre-Analysis**
+
+   Check compatibility with target branch:
    ```bash
    # Compare dependencies
    git diff <target>..<source> -- package.json requirements.txt go.mod
-   
+
    # Check if modules exist in target
    git ls-tree <target> -- <path/to/module>
-   
+
    # Compare imports
    git show <source>:<file> | grep "import\|require"
    git show <target>:<file> | grep "import\|require"
    ```
 
-4. **Risk Assessment**
-   ```markdown
-   ## Cherry-Pick Assessment
-   
-   ### Commit: `<hash>`
-   
-   ### Classification
+   Classification:
    - [ ] Functional (logic, algorithms) → Usually safe
    - [ ] Structural (architecture) → Usually reject
    - [ ] Dependencies → Verify exist
-   
-   ### Compatibility
-   - [ ] Dependencies exist in target
-   - [ ] Import paths valid
-   - [ ] APIs compatible
-   
-   ### Risk: [Low/Medium/High]
-   ```
 
-5. **Create Safety Branch**
+3. **Execute Cherry-Pick**
    ```bash
    git checkout <target-branch>
-   git checkout -b cherry-pick-<feature>-backup
-   ```
-
-6. **Execute Cherry-Pick**
-   ```bash
    git cherry-pick -x <commit-hash>
    ```
-   Always use `-x` to preserve the source commit reference in the message.
+   Always use `-x` to preserve the source commit reference.
 
-7. **Handle Conflicts** (if any)
-   
-   For each conflict:
+4. **Handle Conflicts**
+
+   If conflicts occur, determine the cause:
+
+   **Option A: Resolvable conflicts**
+   Spawn Task subagents in parallel to resolve each conflicting file:
+   - Pass the file's conflict diff, target branch context, and source intent
+   - Each agent resolves its file and explains the resolution
+
+   After resolving:
    ```bash
-   # Check what's conflicting
-   git status
-   git diff
+   git add <resolved-files>
+   git cherry-pick --continue
    ```
-   
+
+   **Option B: Missing prerequisite**
+   If the conflict is caused by a missing prior change:
+   - Identify the prerequisite commit(s) using `git log` and `git blame`
+   - Present to user: "This cherry-pick depends on `<sha>` — cherry-pick that first?"
+   - If yes, recurse: cherry-pick the prerequisite first, then retry
+
    Decision framework:
-   - **Import conflict**: Module exists? Keep target if not
-   - **Structure conflict**: Extract functional only
+   - **Import conflict**: Module exists in target? If not → find prerequisite or reject
+   - **Structure conflict**: Extract functional changes only
    - **API conflict**: Adapt to target's API
-   
-   ```bash
-   # Keep target version (safe)
-   git checkout --ours <file>
-   
-   # Or resolve manually, then:
-   git add <file>
-   ```
 
-8. **Validation**
+5. **Validate**
    ```bash
    # No conflict markers
    grep -rE "<<<|===|>>>" .
-   
+
    # Builds
    [language-specific build]
-   
+
    # Tests pass
    [language-specific tests]
    ```
 
-9. **Document**
-    ```markdown
-    ## Cherry-Pick: [Feature]
-    
-    ### Source
-    - **Commit**: `<hash>`
-    - **Branch**: <source>
-    
-    ### Accepted
-    - [What was taken]
-    
-    ### Adapted
-    - [What was modified]
-    
-    ### Rejected
-    - [What was excluded and why]
-    ```
+6. **Document**
+   ```markdown
+   ## Cherry-Pick: [Feature]
 
-10. **Commit**
-    ```bash
-    git commit -m "chore: cherry-pick <feature> from <source>
-    
-    - Accepted: [what]
-    - Adapted: [what]
-    - Rejected: [what]
-    
-    Original commit: <hash>"
-    ```
+   ### Source
+   - **Commit**: `<hash>`
+   - **Branch**: <source>
+   - **PR**: #[number]
 
-## Accept vs Reject
+   ### Accepted
+   - [What was taken]
 
-| ✅ Accept | ❌ Reject |
-|-----------|----------|
-| Bug fixes | Architecture changes |
-| Isolated features | Unverified imports |
-| Algorithm improvements | Breaking API changes |
-| Data additions | Build system changes |
+   ### Adapted
+   - [What was modified and why]
+
+   ### Rejected
+   - [What was excluded and why]
+
+   ### Prerequisites
+   - [Any commits cherry-picked first to enable this one]
+   ```
 
 ## Notes
-- Verify dependencies exist first
-- Prefer functional over structural
+- Always use `cherry-pick -x` to preserve source reference
+- Always use `cherry-pick --continue` after resolving conflicts (preserves author + metadata)
+- Prefer functional over structural changes
 - When in doubt, reject
-- Document everything
+- For multiple PRs, use `/cherry-plan` first to determine order

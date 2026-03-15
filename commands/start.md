@@ -40,11 +40,11 @@
    ```
    
    Suggest relevant commands based on context:
+   - New feature → `/create-plan`
    - Debugging/issues → `/investigate`
-   - New feature → `/plan`
+   - Writing tests → `/create-tests`
    - Writing code → `/implement`
-   - Writing tests → `/test`
-   - Code review → `/review`
+   - Cherry-picking → `/cherry-plan` or `/cherry-pick`
 
 ## Notes
 - This command loads context only
