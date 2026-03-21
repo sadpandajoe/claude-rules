@@ -19,14 +19,22 @@
    - If found: Read completely
    - If not found anywhere: Ask if user wants to create one using `PROJECT_TEMPLATE.md`
 
-2. **Verify Environment**
-   ```bash
-   git status
-   git branch
-   git log --oneline -3
-   ```
+2. **Check for Continuation Checkpoint**
 
-3. **Add Session Entry** (if PROJECT.md exists)
+   If PROJECT.md contains a `## Continuation Checkpoint` section:
+   - Read the checkpoint state (completed commands, next command, scores, context)
+   - Add a session entry noting this is a continuation:
+     ```markdown
+     ### [Timestamp] - Session Resumed
+     - Branch: [current branch]
+     - Resuming from: [checkpoint timestamp]
+     - Next: [next command from checkpoint]
+     ```
+   - **Automatically invoke the next command** from the checkpoint. Do not prompt the user.
+
+3. **Normal Session** (no checkpoint)
+
+   Add session entry:
    ```markdown
    ### [Timestamp] - Session Start
    - Branch: [current branch]
@@ -34,11 +42,10 @@
    - Goal: [ask user]
    ```
 
-4. **Ready Prompt**
    ```
    "Session initialized. What would you like to work on?"
    ```
-   
+
    Suggest relevant commands based on context:
    - New feature → `/create-plan`
    - Debugging/issues → `/investigate`
@@ -49,4 +56,5 @@
 ## Notes
 - This command loads context only
 - Specific workflows load their own rules as needed
+- If a continuation checkpoint exists, resumes automatically — no prompt
 - Always start here for a new session

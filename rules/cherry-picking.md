@@ -4,6 +4,7 @@
 - [ ] **Understand before changing** — analyze full scope
 - [ ] **Always use `cherry-pick -x`** — preserves source commit reference
 - [ ] **Always use `cherry-pick --continue` to commit** — never `git commit` directly after resolving conflicts. `--continue` preserves original author, cherry-pick metadata, and the `(cherry picked from commit ...)` trailer.
+- [ ] **Verify `.git/CHERRY_PICK_HEAD` exists before `--continue`** — if it doesn't, the cherry-pick state was lost (e.g., aborted or already committed). Running `--continue` without it will error or operate on stale state.
 - [ ] **Validate bug exists in target branch** — before cherry-picking a fix, confirm it's present
 - [ ] **Preserve working functionality**
 - [ ] **Adapt rather than force** — work with target architecture

@@ -28,12 +28,29 @@
 
 3. **Present Findings**
 
-   Show the expert's full report to the user:
+   Show the expert's full report to the user, plus the iteration history:
+
+   ```markdown
+   ## Plan Finalization
+
+   ### Iteration History
+
+   | Round | Score | Key Changes |
+   |-------|-------|-------------|
+   | 1 | X/10 | [What was changed and why] |
+   | 2 | X/10 | [What was changed and why] |
+   | ... | ... | ... |
+   | Final | X/10 | [Final state summary] |
+
+   ### Fresh-Eyes Assessment
    - Summary
    - Score (1-10)
    - Blocking Issues
    - Risks
-   - Go/No-Go Recommendation
+
+   ### Go/No-Go
+   [Recommendation with reasoning]
+   ```
 
 4. **Decision**
 
@@ -44,4 +61,5 @@
 - The fresh expert has NO context from prior reviews — this is intentional
 - Cold read catches groupthink and iteration bias
 - Single pass, no iteration loop — this is a final gate
-- Full flow: `/create-plan` → `/review-plan` → `/finalize-plan` → `/implement`
+- Iteration history provides context on how the plan evolved
+- Full flow: `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement`

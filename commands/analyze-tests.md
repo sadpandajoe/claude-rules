@@ -1,4 +1,4 @@
-# /audit-tests - Audit Test Coverage and Discover Bugs
+# /analyze-tests - Analyze Test Coverage and Discover Bugs
 
 @/Users/joeli/opt/code/claude-rules/rules/testing.md
 
