@@ -7,14 +7,16 @@
 - **Incremental progress** — small, verified changes over big risky ones
 - **Document decisions and reasoning** — future maintainers need context
 - **TDD and YAGNI** — test first, build only what's needed now
+- **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
+- **Checkpoint when context is deep** — at chain boundaries and loop iterations, if context is above ~70%, save state and continue in a fresh conversation (see Context Management below)
 
 ## Workflow Selection
 
 | Situation | Workflow | Command |
 |-----------|----------|---------|
-| Building something new | New Feature | `/create-plan` → `/review-plan` → `/finalize-plan` → `/create-tests` → `/implement` |
-| Something's broken | Bug Fix | `/investigate` → `/create-plan` → `/review-plan` → `/create-tests` → `/implement` |
-| Exploring for bugs | Test Audit | `/audit-tests` |
+| Building something new | New Feature | `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
+| Something's broken | Bug Fix | `/investigate` → auto: `/create-plan` → `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
+| Exploring for bugs | Test Analysis | `/analyze-tests` |
 | Testing against live env | QA Testing | `/run-qa` |
 | Is this bug fixed somewhere? | Issue Review | `/review-issue` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
@@ -22,6 +24,48 @@
 | Cross-branch work (single) | Cherry-Pick | `/review-issue` → `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/cherry-plan` → `/cherry-pick` each |
 | System in bad state | Recovery | See troubleshooting rules |
+| CI build failed | CI Diagnosis | `/diagnose-ci` |
+| Pre-commit quality pass | Self Review | `/review-code` |
+| PR has review comments | PR Feedback | `/address-feedback` |
+
+**GATE** = user reviews and manually triggers next step.
+
+## Context Management
+
+At every **chain boundary** or **loop iteration**, check context depth:
+
+- **Below ~70%**: Continue automatically. Don't pause.
+- **At or above ~70%**: Save state and continue in a fresh conversation. Don't ask — just do it.
+
+Chain boundaries: `/investigate` → `/create-plan`, `/create-plan` → `/review-plan`, `/review-plan` → `/finalize-plan`, etc.
+Loop iterations: each `/review-plan` round, each `/review-code` round.
+Sub-invocations: when `/implement` calls `/review-code`.
+
+### Save & Continue Protocol
+
+When context is ≥ 70%:
+1. Write a **continuation checkpoint** to PROJECT.md:
+   ```markdown
+   ## Continuation Checkpoint — [timestamp]
+   ### Current Command Chain
+   - Started: [first command]
+   - Completed: [commands finished so far]
+   - Next: [command to resume with, including any arguments/context]
+   ### State
+   - [Key decisions made]
+   - [Current scores/results if in review loop]
+   - [Files modified so far]
+   - [Any pending issues or blockers]
+   ```
+2. Commit any uncommitted work
+3. Run `/clear` to reset conversation context
+4. Run `/start` to reload PROJECT.md and pick up the checkpoint
+5. Continue with the next command/iteration in the chain automatically
+
+The user should not need to do anything — this is a seamless context refresh.
+
+### Why This Matters
+Auto-compaction silently drops earlier context, which can cause Claude to lose track of decisions, review scores, or chain state mid-workflow. Checkpointing preserves full fidelity.
 
 ## Communication Rules
 - **Be direct about errors** — no unnecessary apologies

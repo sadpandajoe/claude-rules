@@ -92,11 +92,11 @@
 
    Write the validated RCA to PROJECT.md.
 
-9. **Handoff**
-   ```
-   Root cause documented in PROJECT.md.
-   Run /create-plan to plan the fix.
-   ```
+9. **Auto-Chain: Create Plan**
+
+   After validated RCA is documented in PROJECT.md, automatically invoke `/create-plan`:
+   - Pass the RCA context (root cause, evidence, introducing commit)
+   - `/create-plan` will use this as the foundation for the fix plan
 
 ## Notes
 - Always use git history first

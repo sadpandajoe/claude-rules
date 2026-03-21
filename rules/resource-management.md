@@ -33,3 +33,19 @@
 **For pytest**: Use `-n` with pytest-xdist following the same worker guidelines, or omit for sequential runs.
 
 **For Playwright**: Workers are configured in `playwright.config.ts` — check `workers` setting before running.
+
+## Worktree Management
+
+When working in git worktrees (e.g., `EnterWorktree` or `isolation: "worktree"` agents):
+
+**Shared state pitfalls** — worktrees share `.git` but NOT:
+- `node_modules/` — must install separately in each worktree
+- Build outputs (`dist/`, `.next/`, `__pycache__/`) — must rebuild
+- `.env` files — may need copying from main worktree
+
+**Before running tests or builds in a worktree:**
+1. Check if `node_modules/` exists — if not, run `npm install` (or equivalent)
+2. Check if build outputs are present — if not, rebuild
+3. Copy `.env` / `.env.local` from main worktree if needed
+
+**Cleanup**: Worktrees created by agents are auto-cleaned if no changes were made. If changes exist, the worktree path and branch are returned — merge or delete manually.

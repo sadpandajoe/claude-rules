@@ -32,4 +32,5 @@
 ## Related Commands
 - `/review-pr` — Review someone's PR
 - `/review-plan` — Domain expert plan review
+- `/review-code` — Auto-fix local uncommitted changes
 - `/address-feedback` — Address PR review feedback

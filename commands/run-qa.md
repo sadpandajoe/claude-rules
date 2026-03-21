@@ -8,7 +8,7 @@
 >   and logs. Updated use case matrix with PASS/FAIL status.
 
 ## Prerequisites
-- Use cases documented in PROJECT.md (run /audit-tests first if needed)
+- Use cases documented in PROJECT.md (run /analyze-tests first if needed)
 - Running environment (local Docker, staging, ephemeral)
 - Browser automation MCP connected (for UI testing)
 - Issue tracker MCP connected (for bug filing)

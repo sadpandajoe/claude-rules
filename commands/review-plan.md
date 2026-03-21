@@ -77,24 +77,20 @@
    - [Conflict description + resolution]
    ```
 
-5. **User Decision**
+5. **Iteration Loop**
 
-   Present options:
-   - **Iterate**: Claude improves the plan (consensus first, then High, then Medium), updates PROJECT.md, re-runs review
-   - **Finalize**: Plan is good enough → suggest `/finalize-plan`
-   - **Accept**: Skip finalization, go straight to `/implement`
-   - **Manual**: User will address feedback themselves
-
-6. **Iteration Loop** (if user chooses "Iterate")
+   Automatically iterate — no user prompt between rounds:
 
    1. Claude improves plan content directly in PROJECT.md (not as comments)
       - Address consensus issues first
       - Then High priority issues
-      - Then Medium if time permits
+      - Then Medium priority issues
    2. Re-run from step 2 with improved plan
-   3. Max **3 rounds**, then suggest `/finalize-plan`
+   3. **Continue iterating until ALL reviewers score >= 8/10. No fixed round limit.**
 
-7. **Final Report**
+   If iteration stalls (same issues persist across 2 consecutive rounds), stop and surface the blocking issues to the user.
+
+6. **Final Report**
    ```markdown
    ## Review Complete
 
@@ -103,10 +99,10 @@
    |-------|-----------|------------------|
    | 1 | 5.5 | Missing risk assessment |
    | 2 | 7.8 | Added testing strategy |
+   | 3 | 8.4 | Addressed phase decomposition |
 
-   ### Next Steps
-   - Run `/finalize-plan` for fresh-eyes final check
-   - Or `/implement` to begin implementation
+   ### Status
+   All reviewers >= 8/10. Plan ready for finalization.
    ```
 
 ## Notes
@@ -114,4 +110,5 @@
 - All reviewers run in parallel for speed
 - Consensus issues (2+ reviewers) get highest priority
 - Claude improves plan content directly — never writes review comments into PROJECT.md
-- Max 3 iteration rounds, then suggest finalization
+- No fixed round limit — iterate until all reviewers score >= 8/10
+- Stall detection: if the same issues persist across 2 consecutive rounds, stop and ask the user

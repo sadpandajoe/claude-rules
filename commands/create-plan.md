@@ -101,8 +101,26 @@
 - Prefer vertical slices (one feature end-to-end) over horizontal layers (all models, then all APIs, then all UI)
 - Each phase's PR should be small enough to review in one sitting
 
+## Auto-Chain
+
+After the plan is written to PROJECT.md, automatically continue:
+
+1. **Invoke `/review-plan`** — run multi-round expert review
+   - Iterate until ALL reviewers score >= 8/10
+   - No round limit — keep iterating until threshold is met
+   - Each round: apply feedback, re-run reviewers
+
+2. **Invoke `/finalize-plan`** — fresh-eyes final review
+   - Cold-read Go/No-Go assessment
+   - **Enhanced output**: Include an iteration summary showing:
+     - Starting score → final score
+     - What changed in each review round and why
+     - Key decisions made during iteration
+
+3. **STOP** — present the finalized plan to the user
+   - User reviews and decides whether to proceed to `/implement`
+
 ## Notes
 - Document multiple options with trade-offs
 - Plan should be actionable — ready to implement
-- Do NOT auto-trigger review — let user decide when to review
-- Full flow: `/create-plan` → `/review-plan` → `/finalize-plan` → `/implement`
+- Full flow: `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement`
