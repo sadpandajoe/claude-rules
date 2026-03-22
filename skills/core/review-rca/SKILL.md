@@ -6,6 +6,7 @@ description: Review root cause analysis and proposed fix before implementation.
 # Review RCA
 
 Review the root cause analysis and proposed solution before implementation.
+This is a shared validator, not a persona-owned workflow.
 
 If PROJECT.md exists, read it first.
 

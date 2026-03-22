@@ -1,11 +1,10 @@
----
-name: diagnose-ci
-description: Known CI failure patterns, classification rules, and fix strategies for automated CI diagnosis.
----
+# Classify CI Failure
 
-# CI Failure Diagnosis
+Use this phase after CI logs or artifacts have been gathered.
 
-You are diagnosing a CI failure. Match the failure against known patterns below, then classify your confidence and propose a fix.
+## Goal
+
+Identify the failing step, match it to a known pattern when possible, and produce a root-cause hypothesis plus a narrow proposed fix.
 
 ## Known Failure Patterns
 
@@ -25,23 +24,30 @@ You are diagnosing a CI failure. Match the failure against known patterns below,
 
 ## Analysis Steps
 
-1. **Read the full error output** — not just the first line
-2. **Identify the failing step** — build, test, lint, deploy?
-3. **Match against known patterns** above
-4. **If no match**: read the source files referenced in the error, check recent commits for relevant changes
-5. **Classify confidence**: HIGH (exact match), MEDIUM (likely match), LOW (novel)
+1. Read the full error output, not just the first line.
+2. Identify the actual failing step: build, test, lint, install, or workflow/config.
+3. Split multi-job failures into separate failure units and de-duplicate repeated stack traces.
+4. Match each failure against the known patterns above.
+5. If no pattern matches, read the referenced files and recent commits before classifying it as novel.
+
+Use numeric confidence with these defaults:
+- `8-10` = `HIGH`
+- `5-7` = `MEDIUM`
+- `1-4` = `LOW`
 
 ## Output Format
 
-For each failure:
+For each failure, end with this block:
 
 ```markdown
 ### Failure: [step name]
 
 **Error**: [key error message]
 **Pattern**: [matched pattern name, or "Novel"]
-**Confidence**: HIGH / MEDIUM / LOW
+**Confidence**: X/10 (`HIGH` / `MEDIUM` / `LOW`)
 **Root Cause**: [explanation]
 **Proposed Fix**: [specific fix with commands/code changes]
 **Verification**: [how to verify the fix locally]
 ```
+
+Use `skills/shared/action-gate.md` after producing this output to decide whether to proceed automatically.

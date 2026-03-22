@@ -47,4 +47,5 @@
 - `/implement` — Write code (TDD workflow)
 - `/create-plan` — Design implementation approach
 - `/create-tests` — Write automated test code
+- `/fix-ci` — Diagnose CI failures, apply safe fixes, and stop before commit
 - `/review-code` — Wrapper around built-in `/review` for local fix + verify loops

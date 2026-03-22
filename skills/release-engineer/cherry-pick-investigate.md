@@ -35,20 +35,10 @@ Run these tracks in parallel when possible:
 
 ## Risk Assessment
 
-Always end with this block:
+Use `skills/shared/action-gate.md` for the final proceed/stop decision.
 
-```markdown
-## Risk Assessment
-
-Risk: LOW / MED / HIGH
-Confidence: X/10
-Decision Required: YES / NO
-
-Recommendation:
-- Proceed
-- Ask for approval
-- Escalate to planning
-```
+Always end with the shared execution gate block.
+For cherry-pick work, set `Verification Strength` based on whether routine target-side validation is localized (`STRONG` / `PARTIAL`) or would require non-routine rebuild or environment refresh (`WEAK`).
 
 ## Rating Rules
 
@@ -67,15 +57,11 @@ Set `Decision Required: YES` if any of the following are true:
 - the change touches architecture, schema, or cross-cutting wiring
 - the right target branch or scope is ambiguous
 
-## Auto-Proceed Rule
+## Cherry-Pick-Specific Auto-Proceed Exceptions
 
-Proceed without asking the user only when:
+Even if the shared action gate would otherwise allow automatic action, stop and surface the decision instead when:
 
-- `Risk: LOW`
-- `Confidence: 8/10` or higher
-- `Decision Required: NO`
-- no destructive cleanup or multi-commit sequencing choice is needed
-
-Otherwise stop and surface the decision clearly.
+- destructive cleanup is needed
+- a multi-commit sequencing choice is still unresolved
 
 When this phase overrides the batch plan, update the execution table rather than carrying two competing assessments.

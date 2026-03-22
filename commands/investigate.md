@@ -4,7 +4,7 @@
 @/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: Something is broken and you need to find why.
-> **Produces**: Root cause analysis documented in PROJECT.md, validated by review-rca skill.
+> **Produces**: Root cause analysis documented in PROJECT.md, validated by the shared review-rca skill.
 
 ## Usage
 ```
@@ -106,7 +106,7 @@
 
 7. **Validate RCA**
 
-   Spawn a Task subagent (subagent_type: "general-purpose") with `skills/review-rca/SKILL.md` instructions to validate:
+   Spawn a Task subagent (subagent_type: "general-purpose") with `skills/core/review-rca/SKILL.md` instructions to validate:
    - Is the root cause plausible?
    - Could alternative root causes exist?
    - Is the evidence sufficient?

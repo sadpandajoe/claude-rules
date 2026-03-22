@@ -81,7 +81,7 @@ ai-toolkit/
     ├── create-tests.md     # Create automated tests
     ├── analyze-tests.md    # Find gaps and likely bugs
     ├── run-qa.md           # Execute QA plan
-    ├── diagnose-ci.md      # Diagnose CI failures
+    ├── fix-ci.md           # Diagnose and safely fix CI failures
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
     ├── review-issue.md     # Check if a bug is already fixed elsewhere
@@ -111,8 +111,8 @@ ai-toolkit/
 | `/create-tests` | Create or improve automated tests |
 | `/analyze-tests` | Analyze coverage gaps, likely bugs, and missing scenarios |
 | `/run-qa` | Execute QA use cases against a live environment |
-| `/diagnose-ci` | Diagnose CI failures and propose or apply fixes |
-| `/review-code` | Wrapper around built-in `/review` for local autofix and verification |
+| `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
+| `/review-code` | Public wrapper over the developer review/fix loop |
 
 ### Review & Branch Workflows
 | Command | Purpose |
@@ -183,7 +183,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
 | `rules/planning.md` | `/create-plan`, `/review-plan`, `/finalize-plan`, `/update-project-file` |
 | `rules/investigation.md` | `/investigate`, `/review-issue` |
-| `rules/implementation.md` | `/implement`, `/diagnose-ci` |
+| `rules/implementation.md` | `/implement`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/analyze-tests`, `/run-qa` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick` |

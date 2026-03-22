@@ -24,7 +24,7 @@
 | Cross-branch work (single) | Cherry-Pick | `/review-issue` → `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/review-issue` → `/cherry-pick <multiple> [--plan-only]` |
 | System in bad state | Recovery | See troubleshooting rules |
-| CI build failed | CI Diagnosis | `/diagnose-ci` |
+| CI build failed | CI Remediation | `/fix-ci` |
 | Pre-commit quality pass | Self Review | `/review-code` |
 | PR has review comments | PR Feedback | `/address-feedback` |
 | Program health snapshot | PGM Report | `/create-status-report` |
@@ -41,7 +41,7 @@ At every **chain boundary** or **loop iteration**, check context depth:
 
 Chain boundaries: `/investigate` → `/create-plan`, `/create-plan` → `/review-plan`, `/review-plan` → `/finalize-plan`, etc.
 Loop iterations: each `/review-plan` round, each `/review-code` round.
-Sub-invocations: when `/implement` calls `/review-code`.
+Sub-invocations: when `/implement` or `/fix-ci` calls `/review-code`.
 
 ### Save & Continue Protocol
 
