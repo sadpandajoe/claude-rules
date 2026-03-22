@@ -1,4 +1,4 @@
-# /create-report — Live Program Health Report
+# /create-status-report — Live Program Health Report
 
 @/Users/joeli/opt/code/ai-toolkit/rules/universal.md
 @/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
@@ -10,16 +10,33 @@
 ## Pre-flight
 
 This command is data-heavy — agents return large synthesized results. Before starting, follow the **Context Management** protocol from `rules/universal.md`:
-1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/create-report` arguments), commit, then `/clear` → `/start` to resume
+1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/create-status-report` arguments), commit, then `/clear` → `/start` to resume
 2. If context is below ~70% but above ~50%, check whether the report data + follow-up conversation will fit — if tight, checkpoint and clear
 3. Then proceed with Step 1
+
+Use this checkpoint shape:
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /create-status-report [arguments]
+- Phase: load-context / gather-data / synthesize / format / present
+- Resume target: [current agent batch, synthesis step, or formatting step]
+- Completed items: [data sources already gathered or sections already synthesized]
+### State
+- Team filter: [team or all]
+- Epic filter: [epic or none]
+- Audience: [audience or default]
+- Pending blockers: [if any]
+```
 
 ## Usage
 
 ```
-/create-report                         # All teams
-/create-report "Producks"              # One team
-/create-report --epic "auth migration" # One epic across teams
+/create-status-report                         # All teams
+/create-status-report "Producks"              # One team
+/create-status-report --epic "auth migration" # One epic across teams
+/create-status-report --audience executive    # Format directly for a specific audience
 ```
 
 ## Steps
@@ -127,16 +144,24 @@ Per team:
 
 ### 4. Present & Follow Up
 
-Present the report. Suggest follow-up actions:
+Present the report.
 
-- "Summarize this for execs" → uses `pgm-comms` skill with `executive` audience
+If `--audience <mode>` is provided, format the final output for that audience using:
+
+@/Users/joeli/opt/code/ai-toolkit/skills/pgm/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/pgm/comms.md
+
+Otherwise, present the default detailed report and suggest follow-up actions:
+
+- "Summarize this for execs" → use the internal PGM formatting skill with `executive` audience
 - "What are the biggest risks?" → deeper analysis from report data
-- "Write a status update" → uses `pgm-comms` with appropriate audience
+- "Write a status update" → use the internal PGM formatting skill with the requested audience
 - "Focus on [team/epic]" → filter and expand that section
 
 ## Notes
 
 - This is a **live snapshot** — data is current as of query time, not historical
-- For historical metrics and trends, use `/velocity-report` instead
+- For historical metrics and trends, use `/create-velocity-report` instead
 - The report identifies risks from signals but doesn't prescribe solutions — that's a conversation
 - If Shortcut API is unavailable, fall back to Shortcut MCP tools (slower, permission prompts)
+- If a `/clear` is needed mid-run, write the continuation checkpoint in the format above before resuming through `/start`

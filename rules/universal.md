@@ -27,8 +27,8 @@
 | CI build failed | CI Diagnosis | `/diagnose-ci` |
 | Pre-commit quality pass | Self Review | `/review-code` |
 | PR has review comments | PR Feedback | `/address-feedback` |
-| Program health snapshot | PGM Report | `/create-report` |
-| Monthly velocity metrics | Velocity | `/velocity-report` |
+| Program health snapshot | PGM Report | `/create-status-report` |
+| Monthly velocity metrics | Velocity | `/create-velocity-report` |
 
 **GATE** = user reviews and manually triggers next step.
 

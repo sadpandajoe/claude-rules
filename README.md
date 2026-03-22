@@ -126,6 +126,8 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
+| `/create-status-report` | Create a live program health report, optionally formatted for a target audience |
+| `/create-velocity-report` | Create a historical velocity report, optionally formatted for a target audience |
 
 ## Multi-AI Review System
 

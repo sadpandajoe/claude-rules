@@ -88,27 +88,23 @@ echo ""
 # Step 1: Generate CLAUDE.md with correct paths
 step "Generating CLAUDE.md with correct paths..."
 
-# Dynamically include all rules from rules/ directory
-# universal.md first, then alphabetically
+# Keep CLAUDE.md intentionally thin. Workflow-specific rules load on demand
+# from commands and skills.
 {
-    # Universal first (core principles)
     if [[ -f "$REPO_DIR/rules/universal.md" ]]; then
         echo "@$REPO_DIR/rules/universal.md"
     fi
-    # Then all other rules alphabetically (excluding README.md)
-    for rule in "$REPO_DIR/rules/"*.md; do
-        if [[ -f "$rule" && "$(basename "$rule")" != "universal.md" && "$(basename "$rule")" != "README.md" ]]; then
-            echo "@$rule"
-        fi
-    done
-    # Add PROJECT_TEMPLATE.md reference
-    if [[ -f "$REPO_DIR/PROJECT_TEMPLATE.md" ]]; then
-        echo "@$REPO_DIR/PROJECT_TEMPLATE.md"
+    if [[ -f "$REPO_DIR/rules/resource-management.md" ]]; then
+        echo "@$REPO_DIR/rules/resource-management.md"
     fi
 } > "$REPO_DIR/config/CLAUDE.md"
 
-rule_count=$(ls "$REPO_DIR/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
-info "Generated CLAUDE.md with $rule_count rules from: $REPO_DIR/rules/"
+info "Generated lightweight CLAUDE.md from:"
+for rule in "$REPO_DIR/rules/universal.md" "$REPO_DIR/rules/resource-management.md"; do
+    if [[ -f "$rule" ]]; then
+        echo "  $rule"
+    fi
+done
 
 # Step 2: Symlink universal configuration files
 step "Symlinking configuration files..."
