@@ -20,5 +20,6 @@
 
 ## Related Commands
 - `/create-plan` — Design implementation approach
+- `/fix-bug` — Bug workflow that invokes internal planning only when needed
 - `/start` — Initialize work session
 - `/update-project-file` — Refresh PROJECT.md

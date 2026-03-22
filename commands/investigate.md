@@ -1,10 +1,11 @@
-# /investigate - Investigation & Root Cause
+# /investigate - Standalone Investigation & RCA
 
 @/Users/joeli/opt/code/ai-toolkit/rules/investigation.md
 @/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 
-> **When**: Something is broken and you need to find why.
-> **Produces**: Root cause analysis documented in PROJECT.md, validated by the shared review-rca skill.
+> **When**: You want a standalone investigation and root-cause analysis without running the full `/fix-bug` workflow.
+> **Produces**: Root cause analysis documented in PROJECT.md, validated by the shared review-rca skill, plus recommended next steps.
 
 ## Usage
 ```
@@ -33,100 +34,69 @@
 
    Fold the extracted context into the problem documentation in Step 1.
 
-1. **Document the Problem**
-   ```markdown
-   ## Investigation: [Issue Name]
+1. **Document and Investigate the Problem**
 
-   ### The Problem
-   - **What's broken**: [Exact symptoms/error]
-   - **When it occurs**: [Trigger conditions]
-   - **Impact**: [What functionality affected]
-   - **Environment**: [Branch, version, setup]
+   Delegate the code-level RCA to the developer persona:
 
-   ### Timeline
-   - [Timestamp]: Starting investigation
-   ```
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/investigate-bug.md
 
-2. **Reproduce**
-   ```bash
-   # Verify issue exists
-   [Run failing command/test]
+   Pull in external context first when the input is a Shortcut story, GitHub issue, or GitHub PR.
 
-   # Check current state
-   git status
-   git branch
-   git log --oneline -5
-   ```
+2. **Validate RCA**
 
-3. **Git History Analysis**
-   ```bash
-   # Blame - who/when changed it
-   git blame -- <file>
+   Use the shared validator:
 
-   # Search history
-   git log -S "problematic-code" --oneline
-   git log --grep="keyword" --oneline
+   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
 
-   # Binary search (if needed)
-   git bisect start
-   git bisect bad
-   git bisect good <known-good>
-   ```
+   If the review identifies gaps, investigate further before summarizing.
 
-4. **Find Introducing Commit**
-   ```bash
-   git show <commit-hash>
-   git show --stat <commit-hash>
-   git log --oneline <commit>~5..<commit>+5
+3. **Update PROJECT.md**
 
-   # Find associated PR
-   git log --grep="Merge pull request" --oneline
-   ```
+   Write the validated RCA, evidence, and open questions to `PROJECT.md`.
 
-5. **Check for Existing Fixes**
-   ```bash
-   git log --all --grep="fix.*<issue>"
-   git branch -a --contains <commit>
-   ```
+4. **Recommend the Next Action**
 
-6. **Document Root Cause**
-   ```markdown
-   ### Root Cause
-   - **Introducing commit**: `<hash>` - "<message>"
-   - **Author**: [author]
-   - **PR**: #[number] (if applicable)
-   - **Why it broke**: [Explanation]
+   Do not auto-chain.
+   Recommend the next best workflow explicitly:
+   - `/fix-bug` when the issue should move into the end-to-end bug workflow
+   - `/cherry-pick` when the fix already exists elsewhere
+   - `/create-plan` when the work is feature-like or needs broader design
+   - stop when the RCA is still too weak
 
-   ### Evidence
-   [Command outputs, code snippets, git history that support the RCA]
+## PROJECT.md Update Discipline
 
-   ### Existing Fix?
-   [Yes/No - details if yes]
-   ```
+Update `PROJECT.md` at these points:
+- after the first substantial investigation pass
+- after RCA validation
+- at final completion with the validated RCA and recommended next action
 
-7. **Validate RCA**
+## Continuation Checkpoint
 
-   Spawn a Task subagent (subagent_type: "general-purpose") with `skills/core/review-rca/SKILL.md` instructions to validate:
-   - Is the root cause plausible?
-   - Could alternative root causes exist?
-   - Is the evidence sufficient?
-   - Are there missing investigation steps?
+If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
-   If the review identifies gaps, investigate further before proceeding.
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /investigate <arguments>
+- Phase: fetch-context / investigate / rca-review / summarize
+- Resume target: <issue, story, PR, file set, or remaining open question>
+- Completed items: <finished investigation steps>
+### State
+- Current RCA: <best hypothesis so far>
+- Evidence status: <strong / partial / weak>
+- Remaining gaps: <what still needs validation>
+```
 
-8. **Update PROJECT.md**
+After writing the checkpoint:
+- run `/clear`
+- run `/start`
+- resume `/investigate` at the saved phase and target
 
-   Write the validated RCA to PROJECT.md.
-
-9. **Auto-Chain: Create Plan**
-
-   After validated RCA is documented in PROJECT.md, automatically invoke `/create-plan`:
-   - Pass the RCA context (root cause, evidence, introducing commit)
-   - `/create-plan` will use this as the foundation for the fix plan
+Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
 - Always use git history first
 - Find root cause, not just symptoms
 - Prefer existing fixes over creating new ones
 - Document with evidence (command outputs)
-- Do NOT propose solutions — that's `/create-plan`'s job
+- Use `/fix-bug` for the full bug workflow; `/investigate` is the manual RCA-only entrypoint

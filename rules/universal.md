@@ -15,14 +15,14 @@
 | Situation | Workflow | Command |
 |-----------|----------|---------|
 | Building something new | New Feature | `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
-| Something's broken | Bug Fix | `/investigate` → auto: `/create-plan` → `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
+| Something's broken | Bug Fix | `/fix-bug` |
+| RCA only | Investigation | `/investigate` |
 | Exploring for bugs | Test Analysis | `/analyze-tests` |
 | Testing against live env | QA Testing | `/run-qa` |
-| Is this bug fixed somewhere? | Issue Review | `/review-issue` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/create-plan` → same as new feature |
-| Cross-branch work (single) | Cherry-Pick | `/review-issue` → `/cherry-pick` |
-| Cross-branch work (batch) | Cherry-Pick | `/review-issue` → `/cherry-pick <multiple> [--plan-only]` |
+| Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |
+| Cross-branch work (batch) | Cherry-Pick | `/cherry-pick <multiple> [--plan-only]` |
 | System in bad state | Recovery | See troubleshooting rules |
 | CI build failed | CI Remediation | `/fix-ci` |
 | Pre-commit quality pass | Self Review | `/review-code` |
@@ -39,9 +39,9 @@ At every **chain boundary** or **loop iteration**, check context depth:
 - **Below ~70%**: Continue automatically. Don't pause.
 - **At or above ~70%**: Save state and continue in a fresh conversation. Don't ask — just do it.
 
-Chain boundaries: `/investigate` → `/create-plan`, `/create-plan` → `/review-plan`, `/review-plan` → `/finalize-plan`, etc.
+Chain boundaries: `/fix-bug` internal phase transitions, `/create-plan` → `/review-plan`, `/review-plan` → `/finalize-plan`, etc.
 Loop iterations: each `/review-plan` round, each `/review-code` round.
-Sub-invocations: when `/implement` or `/fix-ci` calls `/review-code`.
+Sub-invocations: when `/implement`, `/fix-bug`, or `/fix-ci` calls `/review-code`.
 
 ### Save & Continue Protocol
 

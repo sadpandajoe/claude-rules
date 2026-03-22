@@ -67,6 +67,10 @@ Surface it only if intervention is needed or summarize adherence in the final re
    For a single input, investigate that change directly.
    For multiple inputs, process the planned sequence one change at a time.
 
+   When the change is intended to resolve a bug, validate that the target line still needs it before applying:
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
+
    This phase produces the risk assessment for each change.
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
    Otherwise record the status in the execution table and stop for user input only where required.

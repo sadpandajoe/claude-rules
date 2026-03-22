@@ -123,6 +123,42 @@
    - Do not commit automatically
    ```
 
+## PROJECT.md Update Discipline
+
+Update `PROJECT.md` at these points:
+- after log collection and initial failure classification
+- after RCA validation when that path runs
+- after the action gate determines whether the fix will proceed automatically
+- after local verification and `/review-code`
+- at final completion with verification strength and commit recommendation
+
+Keep the updates compact, but do not defer all state changes to the end of the workflow.
+
+## Continuation Checkpoint
+
+If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /fix-ci <arguments>
+- Phase: gather-logs / classify / rca / gate / apply / verify / review / summarize
+- Resume target: <run id, artifact, failing job, or changed file set>
+- Completed items: <finished phases or already-fixed failures>
+### State
+- Failure summary: <current best classification>
+- Gate result: <proceed / approval / stop>
+- Files changed so far: <files or none>
+- Pending blockers or decisions: <if any>
+```
+
+After writing the checkpoint:
+- run `/clear`
+- run `/start`
+- resume `/fix-ci` at the saved phase and target
+
+Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
+
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone
 - Auto-fixing is a phase, not the contract; the command still stops before commit

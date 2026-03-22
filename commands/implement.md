@@ -1,86 +1,79 @@
-# /implement - Implementation Workflow
+# /implement - Manual Implementation Workflow
 
 @/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
+@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 
-> **When**: Ready to implement a planned change.
-> **Produces**: Committed, tested code following project conventions.
+> **When**: You already know what to build and want the expert/manual implementation entrypoint without the full `/fix-bug` orchestration.
+> **Produces**: Tested local changes, review results, and a summary of what is ready to commit.
 
 ## Steps
 
-1. **Pre-Implementation Checks (Parallel Agents)**
+1. **Prepare the Environment**
 
-   Read PROJECT.md for the approved plan, then spawn parallel Task subagents:
+   Read `PROJECT.md` or the provided task context, then use:
 
-   **Agent 1: Environment Verification**
-   - Verify correct branch and clean working tree
-   - Check `node_modules` / virtualenv / dependencies are installed
-   - If missing: install them (`npm install`, `pip install -r requirements.txt`, etc.)
-   - Verify build outputs are fresh (no stale `.d.ts`, compiled JS, etc.)
-   - If stale: rebuild affected packages
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/prepare-environment.md
 
-   **Agent 2: Local Environment Setup** (if PROJECT.md or project config specifies how)
-   - Check if a local stack is needed for testing (Docker, dev server, etc.)
-   - If instructions exist: spin it up (respecting resource-management rules — check `docker ps` first)
-   - If no instructions: skip, note that testing will be unit/integration only
+2. **Implement Through `developer`**
 
-   **Agent 3: Dependency Audit**
-   - Verify imports/packages referenced in the plan actually exist in the project
-   - Check for version conflicts or missing peer dependencies
-   - Flag anything that needs manual resolution
+   Use:
 
-   **These agents run in the background** — do NOT wait for them before starting TDD.
-   - If an agent encounters issues, it should try to resolve them autonomously (install deps, rebuild, etc.)
-   - Only surface to the user at the end (in the summary) or if resolution fails and blocks testing
-   - Implementation proceeds in parallel with environment setup
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
 
-2. **Write Tests (RED)**
-   - Generate tests based on the plan's testing strategy
-   - Run tests — they should FAIL (confirms they test the right thing)
+   Follow the approved plan when one exists.
 
-3. **Review Tests**
+3. **Review Changed Files**
 
-   Invoke `/review-code` on the test files.
-   (`/review-code` wraps the built-in `/review` and handles the fix + re-review loop internally.)
+   Invoke `/review-code` on the changed repo-tracked files.
 
-   Commit passing test structure: `test: add tests for [feature]`
-
-4. **Write Implementation (GREEN)**
-   - Implement the minimum code to make tests pass
-   - Follow existing patterns, keep changes focused
-
-5. **Review Implementation**
-
-   Invoke `/review-code` on the implementation files.
-   (`/review-code` wraps the built-in `/review` and handles the fix + re-review loop internally.)
-
-6. **Refactor (if needed)**
-   - Clean up only if there are clear improvements
-   - Run tests after refactoring
-
-7. **Commit**
-   - Commit working implementation
-   - Pre-flight checks: build, type-check, hooks (per implementation.md rules)
-
-8. **Summary**
+4. **Summary**
    ```markdown
    ## Implementation Complete
 
-   ### Tests Written
-   - [List of test files and what they cover]
-
    ### Code Changes
-   - [List of implementation files and what changed]
+   - [Files changed and what they now do]
 
-   ### Review-Code Rounds
-   - Tests: X rounds, Y issues fixed
-   - Implementation: X rounds, Y issues fixed
+   ### Verification
+   - [Checks run locally]
 
-   ### Remaining Nitpicks (not fixed)
-   - [Any items noted but not addressed]
+   ### Review-Code
+   - [Rounds run or skipped]
 
-   ### Ambiguities Surfaced (needs user input)
-   - [Any items where review-code couldn't decide]
+   ### Ready to Commit?
+   - [Yes / No - what still blocks it]
    ```
+
+## PROJECT.md Update Discipline
+
+Update `PROJECT.md` at these points:
+- after environment prep if it changes the expected validation path
+- after the main implementation pass
+- after `/review-code` and targeted verification
+- at final completion with the resulting file set and readiness-to-commit status
+
+## Continuation Checkpoint
+
+If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /implement <arguments>
+- Phase: prepare-environment / implement / review / summarize
+- Resume target: <plan section, file set, or current failing check>
+- Completed items: <finished implementation or validation steps>
+### State
+- Files changed so far: <files or none>
+- Verification status: <passed / partial / blocked>
+- Pending blockers or decisions: <if any>
+```
+
+After writing the checkpoint:
+- run `/clear`
+- run `/start`
+- resume `/implement` at the saved phase and target
+
+Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Review-Code Loop Termination Rules
 - **Stop** when only `[nitpick]` items remain
@@ -106,6 +99,6 @@ type: brief description
 Types: feat, fix, docs, style, refactor, test, chore
 
 ## Notes
+- `/implement` is the manual expert entrypoint; use `/fix-bug` for end-to-end bug work
 - Working solution first, then optimize
-- Commit working states before refactoring
-- Test as you go, not at the end
+- Test as you go, not only at the end

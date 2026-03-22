@@ -49,4 +49,4 @@ Will forcing this break existing?
 
 ## Related Commands
 - `/cherry-pick` — Plan, order, and cherry-pick one or more PRs/SHAs with conflict resolution
-- `/review-issue` — Verify if bug exists across branches before cherry-picking
+- `/fix-bug` — Routes internally to cherry-pick when the bug is already fixed upstream

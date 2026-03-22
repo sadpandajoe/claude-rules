@@ -6,6 +6,9 @@
 > **When**: Facing a non-trivial task that needs a plan before coding.
 > **Produces**: Documented implementation plan in PROJECT.md.
 
+Use this for feature work or other manual planning.
+For bug reports, prefer `/fix-bug` and let it invoke internal planning only when the action gate says direct implementation is not safe.
+
 ## Usage
 ```
 /create-plan "add caching to the API"

@@ -44,7 +44,8 @@
 **In worktrees**: dependencies and build outputs may not exist. Run `npm install` / rebuild before pre-flight checks.
 
 ## Related Commands
-- `/implement` — Write code (TDD workflow)
+- `/implement` — Manual expert entrypoint for writing code
+- `/fix-bug` — End-to-end bug workflow that routes into implementation when safe
 - `/create-plan` — Design implementation approach
 - `/create-tests` — Write automated test code
 - `/fix-ci` — Diagnose CI failures, apply safe fixes, and stop before commit

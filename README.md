@@ -71,20 +71,27 @@ ai-toolkit/
 │   ├── code-review.md      # Review guidelines
 │   ├── api.md              # GitHub / Shortcut / external API reference
 │   └── pgm.md              # Program reporting rules
+├── skills/
+│   ├── build-engineer/     # CI diagnosis and remediation persona
+│   ├── core/               # Shared helpers like review-rca and existing-fix checks
+│   ├── developer/          # Investigation, implementation, review, and adaptation persona
+│   ├── qa/                 # Bug triage, scenario expansion, and validation persona
+│   ├── release-engineer/   # Cherry-pick and branch-movement persona
+│   └── review-*/           # Plan and test review helper skills
 └── commands/
     ├── start.md            # Start or resume session
+    ├── fix-bug.md          # End-to-end bug workflow
     ├── create-plan.md      # Create implementation plan
     ├── review-plan.md      # Domain expert plan review
     ├── finalize-plan.md    # Fresh-eyes final gate
-    ├── investigate.md      # Debug issues
-    ├── implement.md        # Write code (TDD)
+    ├── investigate.md      # Standalone RCA
+    ├── implement.md        # Manual implementation workflow
     ├── create-tests.md     # Create automated tests
     ├── analyze-tests.md    # Find gaps and likely bugs
     ├── run-qa.md           # Execute QA plan
     ├── fix-ci.md           # Diagnose and safely fix CI failures
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
-    ├── review-issue.md     # Check if a bug is already fixed elsewhere
     ├── address-feedback.md # Address PR feedback
     ├── cherry-pick.md      # Cross-branch work
     ├── create-status-report.md   # Live program health report
@@ -99,11 +106,12 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/start` | Start session - load rules, check PROJECT.md |
+| `/fix-bug` | End-to-end bug workflow with QA triage, RCA, implementation, and validation |
 | `/create-plan` | Create implementation plan |
 | `/review-plan` | Multi-perspective plan review with reviewer skills |
 | `/finalize-plan` | Fresh-eyes final plan gate before implementation |
-| `/investigate` | Debug issues, find root causes |
-| `/implement` | Write code with TDD → uses `/review-code` for local review/fix loops |
+| `/investigate` | Standalone RCA and evidence gathering |
+| `/implement` | Manual implementation entrypoint → uses `/review-code` for local review/fix loops |
 
 ### Quality & Testing
 | Command | Purpose |
@@ -118,7 +126,6 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/review-pr` | Review third-party GitHub PRs with scoring framework |
-| `/review-issue` | Check whether a bug already exists or is fixed on another branch |
 | `/address-feedback` | Triage PR review comments, fix valid items, draft replies |
 | `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
 
@@ -182,11 +189,11 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
 | `rules/planning.md` | `/create-plan`, `/review-plan`, `/finalize-plan`, `/update-project-file` |
-| `rules/investigation.md` | `/investigate`, `/review-issue` |
-| `rules/implementation.md` | `/implement`, `/fix-ci` |
+| `rules/investigation.md` | `/fix-bug`, `/investigate` |
+| `rules/implementation.md` | `/fix-bug`, `/implement`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/analyze-tests`, `/run-qa` |
 | `rules/troubleshooting.md` | Emergency recovery |
-| `rules/cherry-picking.md` | `/cherry-pick` |
+| `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |
 | `rules/api.md` | Commands that query GitHub, Shortcut, or other external systems |
 | `rules/pgm.md` | `/create-status-report`, `/create-velocity-report` |
@@ -241,4 +248,4 @@ Claude Code:
 ```
 
 **Claude Code** = workflow orchestrator, planner, and implementer
-**Reviewer skills** = focused helper roles for plan review, branch work, and reporting
+**Persona skills** = focused helper roles for QA, development, branch work, and reporting

@@ -1,0 +1,216 @@
+# /fix-bug - End-to-End Bug Workflow
+
+@/Users/joeli/opt/code/ai-toolkit/rules/investigation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/SKILL.md
+
+> **When**: You have a bug report and want the repo-standard workflow to triage it, check whether it is already fixed upstream or pending in a PR, implement a safe fix when needed, and finish the local bug-fix flow end to end.
+> **Produces**: Triage notes, upstream-status decision, validated RCA, implemented fix when appropriate, review and QA results, and either an automatic `fix:` commit or a handoff to the user.
+
+## Usage
+```
+/fix-bug "saving settings fails on Safari"
+/fix-bug sc-12345
+/fix-bug apache/superset#28456
+/fix-bug https://github.com/owner/repo/issues/123
+/fix-bug https://app.shortcut.com/.../story/123
+```
+
+## Steps
+
+1. **Normalize Input**
+
+   Accept:
+   - plain-language bug description
+   - Shortcut story ID or URL
+   - GitHub issue or PR reference / URL
+
+   Pull in external context when references are provided.
+
+2. **Launch Early Lanes in Parallel**
+
+   Start these tracks together:
+   - `qa/triage-bug.md` for first-pass triage and repro requirements
+   - `developer/investigate-bug.md`
+   - `core/check-existing-fix.md`
+   - `developer/prepare-environment.md` when UI or workflow validation is likely
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/qa/triage-bug.md
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/investigate-bug.md
+   @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/prepare-environment.md
+
+3. **Sync the Early Findings**
+
+   Merge the outputs from QA, developer, and the existing-fix check.
+   For UI and workflow bugs, treat QA repro as a two-stage flow:
+   - first-pass triage from the report and available evidence
+   - full reproduction once the local app or target environment is ready
+
+   Update `PROJECT.md` with:
+   - bug summary
+   - repro status
+   - likely affected area
+   - upstream-fix status
+   - intended next action
+
+4. **Re-Sync Once UI Repro Is Runnable**
+
+   For UI and workflow bugs:
+   - wait for environment prep to make the app runnable when possible
+   - have QA re-run the repro with Playwright MCP
+   - update `PROJECT.md` with the stronger repro result before moving into RCA or implementation
+
+5. **Branch on Existing-Fix Status**
+
+   The shared helper returns one of:
+   - `FIXED_UPSTREAM`
+   - `FIX_PENDING_PR`
+   - `UNFIXED`
+
+   Also allow the workflow to stop early if QA concludes the report is not a bug.
+   If QA cannot reproduce but production evidence is strong, continue as a plausible bug with lower confidence and a stricter action gate.
+
+6. **Stop Early When No Code Change Is Needed**
+
+   If QA cannot reproduce and evidence is weak:
+   - stop with the missing evidence called out clearly
+
+   If the helper returns `FIX_PENDING_PR`:
+   - stop with the PR reference and recommendation to monitor, adopt, or supersede it
+   - do not auto-review or merge it inside `/fix-bug`
+
+7. **Route to Cherry-Pick When the Fix Exists Upstream**
+
+   If the helper returns `FIXED_UPSTREAM`:
+   - route internally to `/cherry-pick`
+   - let `release-engineer` own the branch movement
+   - return to this workflow for validation, `/review-code`, and final summary
+   - do not auto-commit after the cherry-pick path; let the user decide whether any follow-up should be amended or added separately
+
+8. **Validate the RCA for Unfixed Bugs**
+
+   For `UNFIXED` issues:
+   - validate the diagnosis with the shared RCA reviewer
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
+
+9. **Run the Action Gate**
+
+   Decide whether to:
+   - fix directly now
+   - do internal planning first
+   - stop for ambiguity or risk
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
+
+10. **Implement Through `developer`**
+
+   For direct fixes:
+   - use `developer/implement-change.md`
+
+   For non-trivial fixes:
+   - use `developer/plan-change.md`
+   - then continue with `developer/implement-change.md`
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-change.md
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
+
+11. **Expand Regression Coverage**
+
+   Keep this phase tightly scoped to the bug at hand:
+   - `developer` adds or updates only the automated tests needed to protect this fix
+   - `qa` identifies must-cover scenarios, suggested follow-up tests, and out-of-scope risks
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/qa/expand-scenarios.md
+
+12. **Review Changed Files**
+
+   Run `/review-code` on changed repo-tracked files before the final summary.
+
+13. **Validate the Fix With QA When Needed**
+
+   For UI, workflow, or live-behavior bugs:
+   - run `qa/validate-fix.md` when the app is runnable locally or in a suitable environment
+   - use Playwright MCP as the default UI repro and validation path when available
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/qa/validate-fix.md
+
+14. **Commit New Bug Fixes**
+
+   If this workflow implemented a new fix itself:
+   - create a normal `fix:` commit after review and validation pass
+
+   If this workflow routed through cherry-pick:
+   - do not auto-commit beyond the cherry-pick result
+   - leave any follow-up amend or extra-commit decision to the user
+
+15. **Summary**
+   ```markdown
+   ## Fix-Bug Complete
+
+   ### Bug
+   - [Issue or report summary]
+
+   ### Branch Outcome
+   - [Not a bug / fixed upstream / pending PR / fixed here]
+
+   ### Root Cause
+   - [Validated RCA or why no RCA was needed]
+
+   ### Changes Applied
+   - [Files changed or "no code change needed"]
+
+   ### Verification
+   - [Automated checks run]
+   - [QA validation result, including whether Playwright MCP was used or blocked]
+
+   ### Commit Result
+   - [Created `fix:` commit / no new commit because cherry-pick or no-op path]
+   - [Any manual follow-up decision left to the user]
+   ```
+
+## PROJECT.md Update Discipline
+
+Update `PROJECT.md` at these points:
+- after the first early-lane sync with triage, investigation, and upstream-status findings
+- after the UI repro re-sync when that path applies
+- after RCA validation and action-gate outcome
+- after implementation, review, and QA validation
+- at final completion with the branch outcome and commit result
+
+Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
+
+## Continuation Checkpoint
+
+If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /fix-bug <arguments>
+- Phase: triage / existing-fix-check / ui-repro / rca / plan / implement / review / qa-validate / commit / summarize
+- Resume target: <issue, PR, repro path, file set, or current validation target>
+- Completed items: <finished phases or decisions already locked in>
+### State
+- Existing-fix status: <FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED>
+- RCA status: <validated / pending / not needed>
+- Files changed so far: <files or none>
+- Pending blockers or decisions: <if any>
+```
+
+After writing the checkpoint:
+- run `/clear`
+- run `/start`
+- resume `/fix-bug` at the saved phase and target
+
+Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
+
+## Notes
+- `/fix-bug` is the public bug entrypoint; use `/investigate` only for standalone RCA work
+- Keep `PROJECT.md` updates command-owned
+- Prefer the open-PR or cherry-pick path over inventing a new fix
+- Auto-commit only when this workflow implemented a fresh bug fix itself

@@ -60,7 +60,8 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
 
    Suggest relevant commands based on context:
    - New feature → `/create-plan`
-   - Debugging/issues → `/investigate`
+   - Bug report or broken behavior → `/fix-bug`
+   - Standalone RCA → `/investigate`
    - Writing tests → `/create-tests`
    - Writing code → `/implement`
    - Cherry-picking → `/cherry-pick`
