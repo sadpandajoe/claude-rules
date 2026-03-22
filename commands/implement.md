@@ -40,7 +40,7 @@
 3. **Review Tests**
 
    Invoke `/review-code` on the test files.
-   (`/review-code` handles its own loop internally — review, fix, re-review until clean.)
+   (`/review-code` wraps the built-in `/review` and handles the fix + re-review loop internally.)
 
    Commit passing test structure: `test: add tests for [feature]`
 
@@ -51,7 +51,7 @@
 5. **Review Implementation**
 
    Invoke `/review-code` on the implementation files.
-   (`/review-code` handles its own loop internally.)
+   (`/review-code` wraps the built-in `/review` and handles the fix + re-review loop internally.)
 
 6. **Refactor (if needed)**
    - Clean up only if there are clear improvements

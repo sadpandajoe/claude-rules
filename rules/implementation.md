@@ -47,4 +47,4 @@
 - `/implement` — Write code (TDD workflow)
 - `/plan` — Design implementation approach
 - `/generate-tests` — Write automated test code
-- `/review-code` — Auto-fix local code review
+- `/review-code` — Wrapper around built-in `/review` for local fix + verify loops

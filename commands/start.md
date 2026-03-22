@@ -22,15 +22,23 @@
 2. **Check for Continuation Checkpoint**
 
    If PROJECT.md contains a `## Continuation Checkpoint` section:
-   - Read the checkpoint state (completed commands, next command, scores, context)
+   - Read the checkpoint state:
+     - top-level command
+     - phase
+     - resume target
+     - completed items
+     - key workflow state
    - Add a session entry noting this is a continuation:
      ```markdown
      ### [Timestamp] - Session Resumed
      - Branch: [current branch]
      - Resuming from: [checkpoint timestamp]
-     - Next: [next command from checkpoint]
+     - Command: [top-level command from checkpoint]
+     - Phase: [saved phase]
+     - Resume target: [saved item or iteration]
      ```
-   - **Automatically invoke the next command** from the checkpoint. Do not prompt the user.
+   - **Automatically resume the saved top-level command** from the checkpoint. Do not prompt the user.
+   - The resumed command loads its own rules, skills, and supporting files on demand.
 
 3. **Normal Session** (no checkpoint)
 
@@ -51,10 +59,11 @@
    - Debugging/issues → `/investigate`
    - Writing tests → `/create-tests`
    - Writing code → `/implement`
-   - Cherry-picking → `/cherry-plan` or `/cherry-pick`
+   - Cherry-picking → `/cherry-pick`
 
 ## Notes
-- This command loads context only
-- Specific workflows load their own rules as needed
+- This command initializes or resumes workflow state
+- Specific workflows load their own rules, skills, and supporting files as needed
 - If a continuation checkpoint exists, resumes automatically — no prompt
+- After `/clear`, use `/start` as the only supported resume path
 - Always start here for a new session

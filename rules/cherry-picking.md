@@ -48,6 +48,5 @@ Will forcing this break existing?
 | Structure | Can extract logic? | Functional only | Force structure |
 
 ## Related Commands
-- `/cherry-pick` — Cherry-pick a single PR/SHA with conflict resolution
-- `/cherry-plan` — Plan order for multiple cherry-picks
+- `/cherry-pick` — Plan, order, and cherry-pick one or more PRs/SHAs with conflict resolution
 - `/review-issue` — Verify if bug exists across branches before cherry-picking

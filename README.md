@@ -95,7 +95,7 @@ ai-toolkit/
 |---------|---------|
 | `/start` | Start session - load rules, check PROJECT.md |
 | `/plan` | Create implementation plan → triggers `/review-plan` |
-| `/implement` | Write code with TDD → triggers `/review` |
+| `/implement` | Write code with TDD → uses `/review-code` for local review/fix loops |
 | `/test` | Write and organize tests |
 | `/investigate` | Debug issues, find root causes |
 | `/refactor` | Improve code structure safely |
@@ -103,7 +103,8 @@ ai-toolkit/
 ### Reviews (Iterate to 8/10)
 | Command | Purpose |
 |---------|---------|
-| `/review` | Code review - Codex reviews, Claude fixes, iterate until 8/10 |
+| `/review` | Claude built-in review command |
+| `/review-code` | Wrapper around built-in `/review` for local autofix and verification |
 | `/review-plan` | Plan review - Codex reviews, Claude improves, iterate until 8/10 |
 | `/review-pr` | Review third-party GitHub PRs with scoring framework |
 | `/review-feedback` | Process PR feedback - Claude+Codex consensus on validity |
@@ -124,7 +125,7 @@ ai-toolkit/
 ### Specialized
 | Command | Purpose |
 |---------|---------|
-| `/cherry-pick` | Safe cross-branch cherry-picking |
+| `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
 
 ## Multi-AI Review System
 
@@ -132,10 +133,14 @@ Claude Code orchestrates Codex for reviews, iterating until score ≥ 8/10.
 
 ### Code Reviews
 ```bash
-/review                     # Review uncommitted changes (default)
+/review                     # Claude built-in review for uncommitted changes
 /review --branch main       # Review changes against main
 /review --commit abc123     # Review specific commit
+/review-code                # Wrap built-in /review with local fix + verify loop
 ```
+
+Use `/review` when you want review output only.
+Use `/review-code` when you want the repo-standard wrapper: review, fix, validate, and re-review until clean.
 
 Codex reviews with **full context** but only **comments on changed code**:
 - ✅ Reads full files to understand usage, types, integration
