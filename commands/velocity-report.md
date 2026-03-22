@@ -6,6 +6,13 @@
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.
 
+## Pre-flight
+
+This command is data-heavy — pipeline output and follow-up analysis need context room. Before starting:
+1. If there's meaningful prior work in context, update PROJECT.md with current state
+2. If context is above ~50%, run `/clear` first — you need room for the report AND follow-up conversation
+3. Then proceed with Step 1
+
 ## Usage
 
 ```
