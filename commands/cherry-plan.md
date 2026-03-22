@@ -1,6 +1,6 @@
 # /cherry-plan - Plan Cherry-Pick Order for Multiple Changes
 
-@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+@/Users/joeli/opt/code/ai-toolkit/rules/cherry-picking.md
 
 > **When**: You have multiple PRs/commits to cherry-pick and need to determine the right order.
 > **Produces**: Ordered cherry-pick sequence with dependency analysis.

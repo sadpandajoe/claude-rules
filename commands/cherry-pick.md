@@ -1,6 +1,6 @@
 # /cherry-pick - Cherry-Pick a Single Change
 
-@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+@/Users/joeli/opt/code/ai-toolkit/rules/cherry-picking.md
 
 > **When**: Moving a specific change (bug fix, isolated feature) to another branch.
 > **Produces**: Clean cherry-pick with conflicts resolved, documented in PROJECT.md.

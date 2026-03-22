@@ -1,8 +1,8 @@
 # /velocity-report — Monthly Velocity Metrics
 
-@/Users/joeli/opt/code/claude-rules/rules/universal.md
-@/Users/joeli/opt/code/claude-rules/rules/pgm.md
-@/Users/joeli/opt/code/claude-rules/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/universal.md
+@/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
+@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.

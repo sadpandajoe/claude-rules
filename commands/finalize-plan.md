@@ -1,6 +1,6 @@
 # /finalize-plan - Fresh-Eyes Plan Finalization
 
-@/Users/joeli/opt/code/claude-rules/rules/planning.md
+@/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 
 > **When**: Plan has been reviewed and is ready for a final independent check.
 > **Produces**: Go/no-go recommendation from a fresh expert perspective.

@@ -1,8 +1,8 @@
 # /create-report — Live Program Health Report
 
-@/Users/joeli/opt/code/claude-rules/rules/universal.md
-@/Users/joeli/opt/code/claude-rules/rules/pgm.md
-@/Users/joeli/opt/code/claude-rules/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/universal.md
+@/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
+@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.
 > **Produces**: Program health report with epic progress, flow health, risks, blockers, and team state.
@@ -33,7 +33,7 @@ This command is data-heavy — agents return large synthesized results. Before s
 ### 2. Gather Data (Parallel Agents)
 
 Use the **Agent tool** to spawn 2-3 agents **in a single message** (this is critical — multiple Agent tool calls in one message run concurrently). Each agent prompt must include instructions to:
-- Read `/Users/joeli/opt/code/claude-rules/rules/pgm.md` for API patterns
+- Read `/Users/joeli/opt/code/ai-toolkit/rules/pgm.md` for API patterns
 - Read `/Users/joeli/opt/code/pgm/config.json` for team UUIDs, members, bots
 - Return structured JSON or markdown that the main context can synthesize
 

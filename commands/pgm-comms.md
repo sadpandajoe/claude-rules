@@ -1,6 +1,6 @@
 # /pgm-comms — Format for Audience
 
-@/Users/joeli/opt/code/claude-rules/skills/pgm/comms/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/pgm/comms/SKILL.md
 
 > **When**: After generating a report or gathering program data, format it for a specific audience.
 > **Produces**: Audience-formatted output (executive, delivery, eng+QA, cross-functional, broad stakeholder, or escalation).

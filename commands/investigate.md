@@ -1,7 +1,7 @@
 # /investigate - Investigation & Root Cause
 
-@/Users/joeli/opt/code/claude-rules/rules/investigation.md
-@/Users/joeli/opt/code/claude-rules/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/investigation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: Something is broken and you need to find why.
 > **Produces**: Root cause analysis documented in PROJECT.md, validated by review-rca skill.

@@ -1,6 +1,6 @@
 # /review-pr - Review GitHub Pull Request
 
-@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+@/Users/joeli/opt/code/ai-toolkit/rules/code-review.md
 
 > **When**: Asked to review someone else's GitHub PR.
 > **Produces**: Scored review with actionable feedback, optionally posted to GitHub.

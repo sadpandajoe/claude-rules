@@ -6,8 +6,8 @@ One-stop setup repo for AI-assisted coding with Claude Code and Codex CLI.
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/claude-rules.git ~/opt/code/claude-rules
-cd ~/opt/code/claude-rules
+git clone https://github.com/YOUR_USERNAME/ai-toolkit.git ~/opt/code/ai-toolkit
+cd ~/opt/code/ai-toolkit
 
 # 2. Install dependencies (claude, codex, tmux, node)
 ./setup.sh
@@ -49,7 +49,7 @@ claude
 ## Repository Structure
 
 ```
-claude-rules/
+ai-toolkit/
 ├── setup.sh                # Install tools (run once)
 ├── install.sh              # Link configs to ~/.claude/
 ├── PROJECT_TEMPLATE.md     # Template for project documentation
@@ -190,7 +190,7 @@ Claude and Codex independently evaluate each feedback item:
 After pulling updates, re-run install to refresh configs:
 
 ```bash
-cd ~/opt/code/claude-rules
+cd ~/opt/code/ai-toolkit
 git pull
 ./install.sh
 ```

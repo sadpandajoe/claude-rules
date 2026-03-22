@@ -1,6 +1,6 @@
 # /analyze-tests - Analyze Test Coverage and Discover Bugs
 
-@/Users/joeli/opt/code/claude-rules/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 
 > **When**: Exploring a feature area to find potential bugs, edge cases,
 >   missing validations, and asymmetries before or instead of manual testing.

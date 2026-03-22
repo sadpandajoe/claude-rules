@@ -1,6 +1,6 @@
 # /implement - Implementation Workflow
 
-@/Users/joeli/opt/code/claude-rules/rules/implementation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
 
 > **When**: Ready to implement a planned change.
 > **Produces**: Committed, tested code following project conventions.
