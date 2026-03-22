@@ -1,13 +1,32 @@
-# /archive - Archive Completed Work
+# /archive-project-file - Archive Completed Work
 
 > **When**: A project/feature is done and needs to be preserved.
 > **Produces**: Archived PROJECT.md and metadata.
 
+This command should be owned by one main agent.
+Do not split the write across multiple agents — the archive boundary, breadcrumb, and preserved active context must stay consistent.
+
+## Contract
+
+### Goal
+Keep PROJECT.md focused on active work by moving completed-phase detail into PROJECT_ARCHIVE.md.
+
+### In Scope
+- completed investigations, implementations, milestones, and resolved blockers
+- older log sections that are no longer needed for active execution
+- leaving a short summary and reference behind in PROJECT.md
+
+### Out of Scope
+- active work
+- current status
+- current continuation checkpoint
+- anything still needed for the next immediate phase
+
 ## When to Archive
 
 **Good times:**
-- After investigation completes and solution chosen
-- After feature implemented and merged
+- After a major phase is complete and no longer active
+- After feature implementation is merged and follow-up work is minimal
 - After major refactoring finishes
 - When PROJECT.md becomes hard to navigate
 - Before starting new major phase
@@ -17,18 +36,22 @@
 - Solution not validated
 - Tests still failing
 - Under active review
+- The archived material is still needed for the next immediate phase
 
 ## Steps
 
 1. **Identify What to Archive**
-   
-   Ask user: "What phase would you like to archive?"
-   
-   Common phases:
-   - Completed investigation
-   - Implemented feature
-   - Finished refactoring
-   - Closed milestone
+
+   Infer the best archive candidate from PROJECT.md first.
+
+   Common candidates:
+   - completed investigation
+   - implemented feature
+   - finished refactoring
+   - closed milestone
+
+   Only ask the user if multiple archive candidates are equally plausible or if the boundary is unclear.
+   If there is one clear completed phase, proceed automatically once the command is invoked.
 
 2. **Read Current PROJECT.md**
 
@@ -49,6 +72,8 @@
    - ❌ Recent Development Log (last few entries)
    - ❌ Open blockers
    - ❌ Next steps
+   - ❌ Current continuation checkpoint
+   - ❌ Anything needed for the next immediate phase
 
 4. **Create Archive Entry**
    ```markdown
@@ -95,9 +120,15 @@
    [Continue with active work]
    ```
 
+   Leave a short breadcrumb only:
+   - phase name and completion date
+   - 1-3 sentence summary
+   - pointer to `PROJECT_ARCHIVE.md`
+
 6. **Write Archive File**
    
-   Create/append to PROJECT_ARCHIVE.md.
+   Append to PROJECT_ARCHIVE.md.
+   Preserve prior archive history; do not rewrite old archive entries unless explicitly needed.
 
 7. **Update PROJECT.md**
    
@@ -153,4 +184,6 @@ See PROJECT_ARCHIVE.md.
 - Archive completed phases, don't delete
 - Keep PROJECT.md focused on current work
 - Searchable history in archive
-- Run when context gets too large
+- Use when completed phases are cluttering active work, not as a substitute for checkpointing
+- Once invoked, auto-archive the clear candidate rather than pausing for routine confirmation
+- Ask only when the archive boundary is genuinely ambiguous
