@@ -152,9 +152,9 @@ ls "$REPO_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | 
 done
 echo ""
 info "Available skills ($SKILL_COUNT):"
-find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | xargs -I {} basename {} | sort | while read skill; do
-    echo "  $skill"
-done
+find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | while read dir; do
+    echo "  ${dir#$REPO_DIR/skills/}"
+done | sort
 echo ""
 info "To start using Claude Code with your new config:"
 echo "  claude"
