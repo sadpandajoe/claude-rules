@@ -1,11 +1,37 @@
 # /investigate - Investigation & Root Cause
 
 @/Users/joeli/opt/code/claude-rules/rules/investigation.md
+@/Users/joeli/opt/code/claude-rules/rules/api.md
 
 > **When**: Something is broken and you need to find why.
 > **Produces**: Root cause analysis documented in PROJECT.md, validated by review-rca skill.
 
+## Usage
+```
+/investigate "the login page is broken"          # Describe the problem
+/investigate sc-12345                             # Start from a Shortcut story
+/investigate apache/superset#28456               # Start from a GitHub issue
+/investigate https://github.com/.../issues/123   # Start from a GitHub URL
+/investigate https://app.shortcut.com/...        # Start from a Shortcut URL
+```
+
 ## Steps
+
+0. **Fetch External Context (if reference provided)**
+
+   Use the Input Detection table in `rules/api.md` to identify the source type from the argument.
+
+   **Shortcut story** (`sc-12345`, Shortcut URL):
+   - Query the story via Shortcut REST API (see `api.md`)
+   - Extract: title, description, acceptance criteria, labels, story type, linked PRs (`external_links`), comments, epic context
+   - Use the description and comments to understand what's broken and any prior investigation
+
+   **GitHub issue/PR** (`#12345`, `owner/repo#12345`, GitHub URL):
+   - Query via `gh issue view` or `gh pr view` (see `api.md`)
+   - Extract: title, body, labels, linked PRs, comments, repro steps
+   - Check for linked Shortcut stories in the body/comments
+
+   Fold the extracted context into the problem documentation in Step 1.
 
 1. **Document the Problem**
    ```markdown

@@ -27,6 +27,8 @@
 | CI build failed | CI Diagnosis | `/diagnose-ci` |
 | Pre-commit quality pass | Self Review | `/review-code` |
 | PR has review comments | PR Feedback | `/address-feedback` |
+| Program health snapshot | PGM Report | `/create-report` |
+| Monthly velocity metrics | Velocity | `/velocity-report` |
 
 **GATE** = user reviews and manually triggers next step.
 
@@ -95,4 +97,6 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 | `resource-management.md` | Docker limits, test worker scaling |
 | `cherry-picking.md` | Cross-branch work |
 | `code-review.md` | Review guidelines, scoring |
+| `api.md` | External API reference: GitHub CLI, Shortcut REST, Notion MCP |
+| `pgm.md` | Program management: org context, audience tiers, data collection rules |
 
