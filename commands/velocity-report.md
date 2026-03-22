@@ -1,5 +1,6 @@
 # /velocity-report — Monthly Velocity Metrics
 
+@/Users/joeli/opt/code/claude-rules/rules/universal.md
 @/Users/joeli/opt/code/claude-rules/rules/pgm.md
 @/Users/joeli/opt/code/claude-rules/rules/api.md
 
@@ -8,9 +9,9 @@
 
 ## Pre-flight
 
-This command is data-heavy — pipeline output and follow-up analysis need context room. Before starting:
-1. If there's meaningful prior work in context, update PROJECT.md with current state
-2. If context is above ~50%, run `/clear` first — you need room for the report AND follow-up conversation
+This command is data-heavy — pipeline output and follow-up analysis need context room. Before starting, follow the **Context Management** protocol from `rules/universal.md`:
+1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/velocity-report` arguments like `--month`), commit, then `/clear` → `/start` to resume
+2. If context is below ~70% but above ~50%, check whether the pipeline output + follow-up conversation will fit — if tight, checkpoint and clear
 3. Then proceed with Step 1
 
 ## Usage

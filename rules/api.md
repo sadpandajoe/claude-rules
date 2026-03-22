@@ -9,11 +9,11 @@ Single source of truth for all external tool integrations. Commands reference th
 ### PR Operations
 
 ```bash
-# List open PRs
-gh pr list -R <owner>/<repo> --state open --json number,title,author,createdAt,reviewDecision,url,labels
+# List open PRs (default limit is 30 — raise for reports)
+gh pr list -R <owner>/<repo> --state open --limit 100 --json number,title,author,createdAt,reviewDecision,url,labels
 
-# List merged PRs (by date)
-gh pr list -R <owner>/<repo> --state merged --json number,title,author,mergedAt,url --search "merged:>YYYY-MM-DD"
+# List merged PRs (by date — raise limit for monthly reports)
+gh pr list -R <owner>/<repo> --state merged --limit 200 --json number,title,author,mergedAt,url --search "merged:>YYYY-MM-DD"
 
 # View PR metadata
 gh pr view <number-or-url> --json title,body,author,baseRefName,headRefName,files,additions,deletions

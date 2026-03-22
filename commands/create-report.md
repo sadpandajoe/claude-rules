@@ -1,5 +1,6 @@
 # /create-report — Live Program Health Report
 
+@/Users/joeli/opt/code/claude-rules/rules/universal.md
 @/Users/joeli/opt/code/claude-rules/rules/pgm.md
 @/Users/joeli/opt/code/claude-rules/rules/api.md
 
@@ -8,9 +9,9 @@
 
 ## Pre-flight
 
-This command is data-heavy — agents return large synthesized results. Before starting:
-1. If there's meaningful prior work in context, update PROJECT.md with current state
-2. If context is above ~50%, run `/clear` first — you need room for the report AND follow-up conversation
+This command is data-heavy — agents return large synthesized results. Before starting, follow the **Context Management** protocol from `rules/universal.md`:
+1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/create-report` arguments), commit, then `/clear` → `/start` to resume
+2. If context is below ~70% but above ~50%, check whether the report data + follow-up conversation will fit — if tight, checkpoint and clear
 3. Then proceed with Step 1
 
 ## Usage
@@ -59,8 +60,8 @@ Handle pagination on all search calls. Filter out bot-owned stories.
 
 Run all repo queries in **parallel bash calls** (each repo is independent):
 - For each of the 3 repos, in parallel:
-  - **Open PRs**: `gh pr list -R <repo> --state open --json number,title,author,createdAt,reviewDecision,url,labels`
-  - **Recently merged**: `gh pr list -R <repo> --state merged --json number,title,author,mergedAt,url --search "merged:>YYYY-MM-DD"` (14 days ago)
+  - **Open PRs**: `gh pr list -R <repo> --state open --limit 100 --json number,title,author,createdAt,reviewDecision,url,labels`
+  - **Recently merged**: `gh pr list -R <repo> --state merged --limit 200 --json number,title,author,mergedAt,url --search "merged:>YYYY-MM-DD"` (14 days ago)
 
 That's 6 independent gh calls (2 per repo) — run them all in parallel.
 
