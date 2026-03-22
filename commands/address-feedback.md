@@ -1,6 +1,6 @@
 # /address-feedback - Address PR Review Feedback
 
-@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+@/Users/joeli/opt/code/ai-toolkit/rules/code-review.md
 
 > **When**: A PR has review comments that need to be addressed.
 > **Produces**: Fixes committed, responses drafted or posted.

@@ -1,6 +1,6 @@
 # /run-qa - Execute QA Test Plan & File Bugs
 
-@/Users/joeli/opt/code/claude-rules/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 
 > **When**: You have use cases (from /qa-discover or PROJECT.md) and a running
 >   environment to test against.

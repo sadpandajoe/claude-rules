@@ -1,7 +1,7 @@
 # /review-issue - Verify Bug Across Branches
 
-@/Users/joeli/opt/code/claude-rules/rules/investigation.md
-@/Users/joeli/opt/code/claude-rules/rules/cherry-picking.md
+@/Users/joeli/opt/code/ai-toolkit/rules/investigation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/cherry-picking.md
 
 > **When**: You have a bug report (or stale ticket) and need to know if it still exists,
 >   was already fixed, or needs cherry-picking.

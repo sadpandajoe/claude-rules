@@ -1,6 +1,6 @@
 # /diagnose-ci - Diagnose CI Failures
 
-@/Users/joeli/opt/code/claude-rules/rules/implementation.md
+@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
 
 > **When**: A CI build has failed and you need to diagnose and fix it.
 > **Produces**: Diagnosis of failures, auto-fixes for known patterns, recommendations for novel failures.

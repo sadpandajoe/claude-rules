@@ -1,6 +1,6 @@
 # /review-code - Auto-Fix Local Code Review
 
-@/Users/joeli/opt/code/claude-rules/rules/code-review.md
+@/Users/joeli/opt/code/ai-toolkit/rules/code-review.md
 
 > **When**: You have local uncommitted changes and want a quality pass before committing.
 > **Produces**: Fixed code with only nitpicks remaining, plus a summary of changes made.

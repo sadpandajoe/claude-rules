@@ -1,7 +1,7 @@
 # /create-plan - Create Implementation Plan
 
-@/Users/joeli/opt/code/claude-rules/rules/planning.md
-@/Users/joeli/opt/code/claude-rules/PROJECT_TEMPLATE.md
+@/Users/joeli/opt/code/ai-toolkit/rules/planning.md
+@/Users/joeli/opt/code/ai-toolkit/PROJECT_TEMPLATE.md
 
 > **When**: Facing a non-trivial task that needs a plan before coding.
 > **Produces**: Documented implementation plan in PROJECT.md.

@@ -1,6 +1,6 @@
 # Program Management Context
 
-@/Users/joeli/opt/code/claude-rules/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 ## Org Structure
 

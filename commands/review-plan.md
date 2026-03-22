@@ -1,6 +1,6 @@
 # /review-plan - Domain Expert Plan Review
 
-@/Users/joeli/opt/code/claude-rules/rules/planning.md
+@/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 
 > **When**: A plan exists in PROJECT.md and needs expert review before implementation.
 > **Produces**: Synthesized multi-perspective feedback, iterated plan scoring 8/10+.

@@ -1,6 +1,6 @@
 # /create-tests - Create Automated Tests
 
-@/Users/joeli/opt/code/claude-rules/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 
 > **When**: Creating or improving automated tests (unit, integration, e2e).
 > **Produces**: Test code following project conventions, validated by review-tests skill.
