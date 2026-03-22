@@ -21,4 +21,4 @@
 ## Related Commands
 - `/investigate` — Debug and find root cause
 - `/review-issue` — Verify if bug exists across branches
-- `/qa-discover` — Find bugs through code analysis
+- `/analyze-tests` — Find bugs through code analysis

@@ -2,7 +2,7 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 
-> **When**: You have use cases (from /qa-discover or PROJECT.md) and a running
+> **When**: You have use cases (from /analyze-tests or PROJECT.md) and a running
 >   environment to test against.
 > **Produces**: Bug tickets in issue tracker with repro steps, screenshots/video,
 >   and logs. Updated use case matrix with PASS/FAIL status.

@@ -60,32 +60,37 @@ ai-toolkit/
 ├── rules/
 │   ├── README.md           # Rules index
 │   ├── universal.md        # Core principles (loaded first)
-│   ├── orchestration.md    # Claude + Codex workflows
+│   ├── orchestration.md    # Multi-agent workflow rules
 │   ├── planning.md         # Project planning
 │   ├── investigation.md    # Debugging & root cause
 │   ├── implementation.md   # Code development
-│   ├── refactor.md         # Refactoring safely
 │   ├── testing.md          # Test strategy
 │   ├── troubleshooting.md  # Emergency recovery
+│   ├── resource-management.md  # Worktrees, Docker, heavy tasks
 │   ├── cherry-picking.md   # Cross-branch work
-│   └── code-review.md      # Review guidelines
+│   ├── code-review.md      # Review guidelines
+│   ├── api.md              # GitHub / Shortcut / external API reference
+│   └── pgm.md              # Program reporting rules
 └── commands/
-    ├── init.md             # Start session
-    ├── plan.md             # Create plan
+    ├── start.md            # Start or resume session
+    ├── create-plan.md      # Create implementation plan
+    ├── review-plan.md      # Domain expert plan review
+    ├── finalize-plan.md    # Fresh-eyes final gate
     ├── investigate.md      # Debug issues
     ├── implement.md        # Write code (TDD)
-    ├── test.md             # Write tests
-    ├── refactor.md         # Refactor code
-    ├── refactor-tests.md   # Move tests to correct layers
-    ├── review.md           # Code review (iterate to 8/10)
-    ├── review-plan.md      # Plan review (iterate to 8/10)
+    ├── create-tests.md     # Create automated tests
+    ├── analyze-tests.md    # Find gaps and likely bugs
+    ├── run-qa.md           # Execute QA plan
+    ├── diagnose-ci.md      # Diagnose CI failures
+    ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
-    ├── review-feedback.md  # Process PR feedback
-    ├── suggest-tests.md    # Generate test cases
-    ├── explain.md          # Explain code
-    ├── update-project-file.md  # Sync PROJECT.md
+    ├── review-issue.md     # Check if a bug is already fixed elsewhere
+    ├── address-feedback.md # Address PR feedback
     ├── cherry-pick.md      # Cross-branch work
-    └── archive.md          # Archive completed work
+    ├── create-status-report.md   # Live program health report
+    ├── create-velocity-report.md # Historical velocity report
+    ├── update-project-file.md    # Sync or checkpoint PROJECT.md
+    └── archive-project-file.md  # Archive completed work
 ```
 
 ## Slash Commands
@@ -94,44 +99,44 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/start` | Start session - load rules, check PROJECT.md |
-| `/plan` | Create implementation plan → triggers `/review-plan` |
-| `/implement` | Write code with TDD → uses `/review-code` for local review/fix loops |
-| `/test` | Write and organize tests |
+| `/create-plan` | Create implementation plan |
+| `/review-plan` | Multi-perspective plan review with reviewer skills |
+| `/finalize-plan` | Fresh-eyes final plan gate before implementation |
 | `/investigate` | Debug issues, find root causes |
-| `/refactor` | Improve code structure safely |
+| `/implement` | Write code with TDD → uses `/review-code` for local review/fix loops |
 
-### Reviews (Iterate to 8/10)
+### Quality & Testing
 | Command | Purpose |
 |---------|---------|
-| `/review` | Claude built-in review command |
+| `/create-tests` | Create or improve automated tests |
+| `/analyze-tests` | Analyze coverage gaps, likely bugs, and missing scenarios |
+| `/run-qa` | Execute QA use cases against a live environment |
+| `/diagnose-ci` | Diagnose CI failures and propose or apply fixes |
 | `/review-code` | Wrapper around built-in `/review` for local autofix and verification |
-| `/review-plan` | Plan review - Codex reviews, Claude improves, iterate until 8/10 |
+
+### Review & Branch Workflows
+| Command | Purpose |
+|---------|---------|
 | `/review-pr` | Review third-party GitHub PRs with scoring framework |
-| `/review-feedback` | Process PR feedback - Claude+Codex consensus on validity |
-
-### Codex Tools
-| Command | Purpose |
-|---------|---------|
-| `/explain` | Have Codex explain code sections |
-| `/suggest-tests` | Have Codex generate test cases |
-| `/refactor-tests` | Analyze and move tests to correct layers |
-
-### Documentation
-| Command | Purpose |
-|---------|---------|
-| `/update-project-file` | Sync PROJECT.md with current progress |
-| `/archive` | Move completed phases to PROJECT_ARCHIVE.md |
-
-### Specialized
-| Command | Purpose |
-|---------|---------|
+| `/review-issue` | Check whether a bug already exists or is fixed on another branch |
+| `/address-feedback` | Triage PR review comments, fix valid items, draft replies |
 | `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
+
+### Project State
+| Command | Purpose |
+|---------|---------|
+| `/update-project-file` | Manually sync PROJECT.md or write a continuation checkpoint |
+| `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
+
+### Reporting
+| Command | Purpose |
+|---------|---------|
 | `/create-status-report` | Create a live program health report, optionally formatted for a target audience |
 | `/create-velocity-report` | Create a historical velocity report, optionally formatted for a target audience |
 
-## Multi-AI Review System
+Claude's built-in `/review` is still available for review-only output; `/review-code` is the repo-standard wrapper when you want fix + verify loops.
 
-Claude Code orchestrates Codex for reviews, iterating until score ≥ 8/10.
+## Review Workflows
 
 ### Code Reviews
 ```bash
@@ -144,16 +149,25 @@ Claude Code orchestrates Codex for reviews, iterating until score ≥ 8/10.
 Use `/review` when you want review output only.
 Use `/review-code` when you want the repo-standard wrapper: review, fix, validate, and re-review until clean.
 
-Codex reviews with **full context** but only **comments on changed code**:
-- ✅ Reads full files to understand usage, types, integration
-- ✅ Checks if functions called correctly, return values handled
-- ❌ Does NOT comment on unchanged code or pre-existing issues
-
 ### Plan Reviews
 ```bash
 /review-plan                # Review PROJECT.md (default)
 /review-plan ./docs/PLAN.md # Review specific file
+/finalize-plan              # Final cold-read gate before /implement
 ```
+
+`/review-plan` selects reviewer skills based on plan content:
+- Architecture, implementation, and test-plan reviewers always run
+- Frontend and backend reviewers are added when the plan needs them
+- `/finalize-plan` is the final fresh-eyes gate before implementation
+
+### PR Feedback Analysis
+```bash
+/address-feedback 123       # Address review comments for PR 123
+/address-feedback <pr-url>  # Address review comments by URL
+```
+
+`/address-feedback` is action-first: investigate comments, fix valid issues, draft replies, then wait for user approval before push/post.
 
 ### GitHub PR Reviews
 ```bash
@@ -161,36 +175,21 @@ Codex reviews with **full context** but only **comments on changed code**:
 /review-pr https://github.com/owner/repo/pull/123  # Review by URL
 ```
 
-Claude reviews with scoring framework, then Codex provides independent review (required per orchestration rules).
-
-### PR Feedback Analysis
-```bash
-/review-feedback            # Analyze PR comments
-/review-feedback --pr 123   # Specific PR number
-```
-
-Claude and Codex independently evaluate each feedback item:
-| Claude | Codex | Action |
-|--------|-------|--------|
-| Fix | Fix | ✅ Add to fix plan |
-| Skip | Skip | ✅ Document why skipped |
-| Fix | Skip | ⚠️ Resolve disagreement |
-| Skip | Fix | ⚠️ Resolve disagreement |
-
 ## Workflow Rules
 
 | File | When to Read |
 |------|--------------|
 | `rules/universal.md` | Always (core principles) |
-| `rules/orchestration.md` | When using Claude + Codex together |
-| `rules/planning.md` | `/plan`, `/review-plan` |
-| `rules/investigation.md` | `/investigate` |
-| `rules/implementation.md` | `/implement` |
-| `rules/refactor.md` | `/refactor` |
-| `rules/testing.md` | `/test`, `/suggest-tests`, `/refactor-tests` |
+| `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
+| `rules/planning.md` | `/create-plan`, `/review-plan`, `/finalize-plan`, `/update-project-file` |
+| `rules/investigation.md` | `/investigate`, `/review-issue` |
+| `rules/implementation.md` | `/implement`, `/diagnose-ci` |
+| `rules/testing.md` | `/create-tests`, `/analyze-tests`, `/run-qa` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick` |
-| `rules/code-review.md` | `/review`, `/review-pr`, `/review-feedback` |
+| `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |
+| `rules/api.md` | Commands that query GitHub, Shortcut, or other external systems |
+| `rules/pgm.md` | `/create-status-report`, `/create-velocity-report` |
 
 ## Updating
 
@@ -231,15 +230,15 @@ The `install.sh` script automatically backs up existing configs to:
 ## How It Works
 
 ```
-User: /plan
+User: /create-plan
 
 Claude Code:
 1. Rules auto-loaded via CLAUDE.md @-includes
-2. Reads commands/plan.md for workflow steps
-3. Executes planning workflow
-4. Calls Codex via `codex exec` for review
-5. Iterates until plan scores 8/10
+2. Reads commands/create-plan.md for workflow steps
+3. Writes or updates PROJECT.md with the plan
+4. Runs /review-plan for multi-perspective review
+5. Uses /finalize-plan as the final gate before /implement
 ```
 
-**Claude Code** = Tech Lead (planning, complex reasoning, fixes)
-**Codex CLI** = Reviewer (analysis, scoring, suggestions)
+**Claude Code** = workflow orchestrator, planner, and implementer
+**Reviewer skills** = focused helper roles for plan review, branch work, and reporting

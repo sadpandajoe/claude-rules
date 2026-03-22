@@ -19,6 +19,6 @@
 - Dependencies confirmed
 
 ## Related Commands
-- `/plan` — Design implementation approach
+- `/create-plan` — Design implementation approach
 - `/start` — Initialize work session
 - `/update-project-file` — Refresh PROJECT.md
