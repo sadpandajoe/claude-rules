@@ -32,5 +32,5 @@ Stop when:
 ## Notes
 
 - If the changed code introduces or modifies behavior without tests, that is a `[major]` issue.
-- Test-gap checks stay scoped to the changed files; broader analysis belongs to `/analyze-tests`.
+- Test-gap checks stay scoped to the changed files; broader scenario discovery belongs to the `qa` support workflows, not `/review-code`.
 - If a fix causes a regression, revert that fix and surface the trade-off instead of shipping it.

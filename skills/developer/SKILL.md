@@ -29,6 +29,7 @@ Load only the supporting file needed for the current phase:
 - `prepare-environment.md` for local setup that may be needed for UI, workflow, or integration validation
 - `plan-change.md` for compact implementation planning inside larger workflows
 - `implement-change.md` for focused implementation and targeted verification
+- `create-tests.md` for manual or transitional standalone test-writing workflows
 - `cherry-pick-adapt.md` for conflict resolution and target-side API adaptation
 - `cherry-pick-validate.md` for build, test, and regression checks
 - `review-local-changes.md` for local `/review` wrapper workflows such as `/review-code`
