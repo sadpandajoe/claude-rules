@@ -22,4 +22,3 @@
 ## Related Commands
 - `/fix-bug` — End-to-end bug workflow with triage, existing-fix checks, RCA, implementation, and validation
 - `/investigate` — Standalone RCA and evidence gathering
-- `/analyze-tests` — Find bugs through code analysis

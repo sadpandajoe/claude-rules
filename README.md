@@ -87,8 +87,6 @@ ai-toolkit/
     ├── investigate.md      # Standalone RCA
     ├── implement.md        # Manual implementation workflow
     ├── create-tests.md     # Create automated tests
-    ├── analyze-tests.md    # Find gaps and likely bugs
-    ├── run-qa.md           # Execute QA plan
     ├── fix-ci.md           # Diagnose and safely fix CI failures
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
@@ -116,9 +114,7 @@ ai-toolkit/
 ### Quality & Testing
 | Command | Purpose |
 |---------|---------|
-| `/create-tests` | Create or improve automated tests |
-| `/analyze-tests` | Analyze coverage gaps, likely bugs, and missing scenarios |
-| `/run-qa` | Execute QA use cases against a live environment |
+| `/create-tests` | Manual/transitional command for creating or improving automated tests |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
 | `/review-code` | Public wrapper over the developer review/fix loop |
 
@@ -191,7 +187,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/planning.md` | `/create-plan`, `/review-plan`, `/finalize-plan`, `/update-project-file` |
 | `rules/investigation.md` | `/fix-bug`, `/investigate` |
 | `rules/implementation.md` | `/fix-bug`, `/implement`, `/fix-ci` |
-| `rules/testing.md` | `/create-tests`, `/analyze-tests`, `/run-qa` |
+| `rules/testing.md` | `/create-tests` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |

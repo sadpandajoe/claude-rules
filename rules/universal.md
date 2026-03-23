@@ -17,8 +17,6 @@
 | Building something new | New Feature | `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
 | Something's broken | Bug Fix | `/fix-bug` |
 | RCA only | Investigation | `/investigate` |
-| Exploring for bugs | Test Analysis | `/analyze-tests` |
-| Testing against live env | QA Testing | `/run-qa` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/create-plan` → same as new feature |
 | Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |

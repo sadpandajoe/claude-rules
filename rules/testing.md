@@ -50,5 +50,4 @@ When you see these → reduce mocks, use real implementations.
 
 ## Related Commands
 - `/create-tests` — Create and improve tests (invokes review-tests skill)
-- `/analyze-tests` — Find bugs through code analysis
-- `/run-qa` — Run test plans against live environments
+- `/fix-bug` — Runs QA and test creation internally when the workflow needs them
