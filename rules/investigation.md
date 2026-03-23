@@ -5,6 +5,7 @@
 - [ ] **Use git history first** — blame, log, bisect
 - [ ] **Find root cause, not symptoms**
 - [ ] **Prefer existing solutions** — check other branches first
+- [ ] **Parallelize when useful** — user-visible triage and code investigation can run together
 - [ ] **Gather evidence** — logs, stack traces, reproduction steps
 - [ ] **Verify assumptions** — dependencies, imports, file existence
 
@@ -19,6 +20,5 @@
 | Skip documentation | Document in PROJECT.md |
 
 ## Related Commands
-- `/investigate` — Debug and find root cause
-- `/review-issue` — Verify if bug exists across branches
-- `/qa-discover` — Find bugs through code analysis
+- `/fix-bug` — End-to-end bug workflow with triage, existing-fix checks, RCA, implementation, and validation
+- `/create-feature` — Uses investigation internally when planned work needs evidence or scope clarification

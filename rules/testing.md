@@ -2,6 +2,7 @@
 
 ## Golden Rules
 - [ ] **Test behavior, not implementation** — tests survive refactors
+- [ ] **Write the failing test first when feasible** — if blocked, record why before changing code or the suite
 - [ ] **Use fixtures** — no hardcoded test data
 - [ ] **Mock ONLY external boundaries** — APIs, databases, file systems, network, time
 - [ ] **One assertion concept per test**
@@ -49,6 +50,8 @@ When you see these → reduce mocks, use real implementations.
 | Slow suite | Too many E2E | Push to lower layers |
 
 ## Related Commands
-- `/create-tests` — Create and improve tests (invokes review-tests skill)
-- `/qa-discover` — Find bugs through code analysis
-- `/qa-test` — Run test plans against live environments
+- `/create-tests` — Create the first meaningful tests when no real suite exists yet
+- `/update-tests` — Improve an existing suite through scoped test maintenance
+- `/run-test-plan` — Derive or review a validation plan, execute it, and summarize findings
+- `/fix-bug` — Runs QA and test creation internally when the workflow needs them
+- `/create-feature` — Handles test-strategy review and test creation internally for planned work

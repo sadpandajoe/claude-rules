@@ -31,6 +31,6 @@
 
 ## Related Commands
 - `/review-pr` — Review someone's PR
-- `/review-plan` — Domain expert plan review
-- `/review-code` — Auto-fix local uncommitted changes
+- `/create-feature` — Runs internal plan review before feature implementation
+- `/review-code` — Wrapper around built-in `/review` for local auto-fix loops
 - `/address-feedback` — Address PR review feedback

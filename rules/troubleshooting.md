@@ -26,5 +26,5 @@ Always start at Safe. Escalate only when lower levels fail.
 - Multiple cascading failures
 
 ## Related Commands
-- `/investigate` — Debug and find root cause
+- `/fix-bug` — Debug, validate root cause, and repair broken behavior
 - `/cherry-pick` — Move fixes across branches

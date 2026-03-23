@@ -4,7 +4,7 @@
 
 ## Org Structure
 
-Joe Li is an EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — frame everything around WIP, cycle time, throughput, and blockers. Not sprints.
+EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — frame everything around WIP, cycle time, throughput, and blockers. Not sprints.
 
 ### Teams
 
@@ -64,7 +64,8 @@ Each agent should:
 
 ## Audience Tiers
 
-Used by `pgm-comms` skill for formatting. Referenced here so commands know what audience modes are available.
+Used by the internal PGM formatting skill for audience-specific output from report commands.
+Referenced here so report commands know what audience modes are available.
 
 | Audience | Focus | Tone |
 |----------|-------|------|

@@ -25,13 +25,16 @@ step() { echo -e "${BLUE}[STEP]${NC} $1"; }
 # Get the directory where this script is located (the repo root)
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="$HOME/.claude"
+CODEX_DIR="$HOME/.codex"
 BACKUP_DIR="$CLAUDE_DIR/backup-$(date +%Y%m%d-%H%M%S)"
 
 info "Repository location: $REPO_DIR"
 info "Claude config dir: $CLAUDE_DIR"
+info "Codex config dir: $CODEX_DIR"
 
-# Create ~/.claude if it doesn't exist
+# Create config directories if they don't exist
 mkdir -p "$CLAUDE_DIR"
+mkdir -p "$CODEX_DIR"
 
 # Backup function
 backup_if_exists() {
@@ -56,6 +59,41 @@ create_symlink() {
     info "Linked: $name -> $source"
 }
 
+# Symlink repo-managed skills into an existing skills directory without
+# replacing the entire directory. This preserves Codex system and third-party
+# skills that are not managed by this repo.
+sync_skill_links() {
+    local source_root=$1
+    local target_root=$2
+    local label=$3
+
+    mkdir -p "$target_root"
+
+    for source in "$source_root"/*; do
+        if [[ -e "$source" ]]; then
+            local name=$(basename "$source")
+            create_symlink "$source" "$target_root/$name"
+        fi
+    done
+
+    # Prune stale repo-managed symlinks whose source no longer exists
+    for link in "$target_root"/*; do
+        if [[ -L "$link" ]]; then
+            local link_target=$(readlink "$link")
+            # Only prune symlinks that point into our repo
+            if [[ "$link_target" == "$source_root"/* ]]; then
+                if [[ ! -e "$link_target" ]]; then
+                    local stale_name=$(basename "$link")
+                    warn "Removing stale link: $stale_name -> $link_target"
+                    rm "$link"
+                fi
+            fi
+        fi
+    done
+
+    info "Synced repo skills into $label"
+}
+
 echo ""
 echo "========================================"
 echo "  Claude Code Configuration Installer"
@@ -65,27 +103,23 @@ echo ""
 # Step 1: Generate CLAUDE.md with correct paths
 step "Generating CLAUDE.md with correct paths..."
 
-# Dynamically include all rules from rules/ directory
-# universal.md first, then alphabetically
+# Keep CLAUDE.md intentionally thin. Workflow-specific rules load on demand
+# from commands and skills.
 {
-    # Universal first (core principles)
     if [[ -f "$REPO_DIR/rules/universal.md" ]]; then
         echo "@$REPO_DIR/rules/universal.md"
     fi
-    # Then all other rules alphabetically (excluding README.md)
-    for rule in "$REPO_DIR/rules/"*.md; do
-        if [[ -f "$rule" && "$(basename "$rule")" != "universal.md" && "$(basename "$rule")" != "README.md" ]]; then
-            echo "@$rule"
-        fi
-    done
-    # Add PROJECT_TEMPLATE.md reference
-    if [[ -f "$REPO_DIR/PROJECT_TEMPLATE.md" ]]; then
-        echo "@$REPO_DIR/PROJECT_TEMPLATE.md"
+    if [[ -f "$REPO_DIR/rules/resource-management.md" ]]; then
+        echo "@$REPO_DIR/rules/resource-management.md"
     fi
 } > "$REPO_DIR/config/CLAUDE.md"
 
-rule_count=$(ls "$REPO_DIR/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
-info "Generated CLAUDE.md with $rule_count rules from: $REPO_DIR/rules/"
+info "Generated lightweight CLAUDE.md from:"
+for rule in "$REPO_DIR/rules/universal.md" "$REPO_DIR/rules/resource-management.md"; do
+    if [[ -f "$rule" ]]; then
+        echo "  $rule"
+    fi
+done
 
 # Step 2: Symlink universal configuration files
 step "Symlinking configuration files..."
@@ -103,6 +137,11 @@ create_symlink "$REPO_DIR/commands" "$CLAUDE_DIR/commands"
 step "Symlinking skills directory..."
 
 create_symlink "$REPO_DIR/skills" "$CLAUDE_DIR/skills"
+
+# Step 3c: Symlink repo skills into Codex skills directory
+step "Symlinking Codex skills..."
+
+sync_skill_links "$REPO_DIR/skills" "$CODEX_DIR/skills" "Codex skills"
 
 # Step 4: Verify installation
 step "Verifying installation..."
@@ -127,6 +166,14 @@ verify_link() {
 verify_link "$CLAUDE_DIR/CLAUDE.md"
 verify_link "$CLAUDE_DIR/commands"
 verify_link "$CLAUDE_DIR/skills"
+verify_link "$CODEX_DIR/skills/build-engineer"
+verify_link "$CODEX_DIR/skills/core"
+verify_link "$CODEX_DIR/skills/developer"
+verify_link "$CODEX_DIR/skills/pm"
+verify_link "$CODEX_DIR/skills/pgm"
+verify_link "$CODEX_DIR/skills/qa"
+verify_link "$CODEX_DIR/skills/release-engineer"
+verify_link "$CODEX_DIR/skills/shared"
 
 echo ""
 
@@ -155,6 +202,11 @@ info "Available skills ($SKILL_COUNT):"
 find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | while read dir; do
     echo "  ${dir#$REPO_DIR/skills/}"
 done | sort
+echo ""
+info "Codex skill links:"
+find "$CODEX_DIR/skills" -maxdepth 1 -mindepth 1 -type l 2>/dev/null | xargs -I {} basename {} | sort | while read skill; do
+    echo "  $skill"
+done
 echo ""
 info "To start using Claude Code with your new config:"
 echo "  claude"

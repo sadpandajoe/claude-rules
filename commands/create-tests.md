@@ -1,15 +1,17 @@
-# /create-tests - Create Automated Tests
+# /create-tests - Create the First Meaningful Tests
 
 @/Users/joeli/opt/code/ai-toolkit/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
 
-> **When**: Creating or improving automated tests (unit, integration, e2e).
-> **Produces**: Test code following project conventions, validated by review-tests skill.
+> **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
+> **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.
 
 ## Usage
 ```
-/create-tests                         # Tests for uncommitted changes
-/create-tests <file>                  # Tests for specific file
-/create-tests --function <name>       # Tests for specific function
+/create-tests                         # First meaningful tests for current uncommitted work
+/create-tests <file>                  # First meaningful tests for a specific file
+/create-tests --function <name>       # First meaningful tests for a specific function
 ```
 
 ## Steps
@@ -21,80 +23,88 @@
    - Specific file or function: as provided
    - Read the code thoroughly before writing any tests
 
-2. **Run review-tests Skill**
+2. **Delegate Initial Test Creation to `developer`**
 
-   Spawn a Task subagent (subagent_type: "general-purpose") with `skills/review-tests/SKILL.md` instructions to analyze:
-   - Existing test coverage for the target code
-   - Missing behavioral coverage
-   - Weak or low-signal tests
-   - Production failure scenarios without test protection
+   @/Users/joeli/opt/code/ai-toolkit/skills/developer/create-tests.md
 
-   This tells us what to write and what to fix.
+   This helper owns:
+   - running `review-tests` before writing tests
+   - choosing the right test layer
+   - creating the first meaningful tests for the target area
+   - targeted verification
 
-3. **Study Project Conventions**
-   - Read existing tests in the same area for structure and patterns
-   - Check project CLAUDE.md or docs for testing guidelines
-   - Follow the project's test naming and organization conventions
+3. **Review Changed Test Files**
 
-4. **Determine Test Types**
+   Run `/review-code` on the changed repo-tracked files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+
+4. **Summary**
+   ```markdown
+## Create-Tests Complete
+
+   ### Outcome
+   - [Created first meaningful suite / stopped on blocker]
+
+   ### Scope
+   - [What behavior or files were covered]
+
+   ### Behavioral Coverage
+   - [What regressions or behaviors are now covered]
+
+   ### Review / Quality
+   - [Review rounds and final review outcome]
+
+   ### Verification
+   - [Checks run]
+
+   ### Risks / Blockers
+   - [Anything still unverified or out of scope]
+
+   ### Remaining Gaps
+   - [Anything still not covered]
+
+   ### Next Decision
+   - [Ready for manual commit / needs more work]
    ```
-   Pure logic/calculation?      → Unit test
-   Calls external services?     → Integration test
-   Renders UI?                  → Component test
-   Spans multiple systems?      → E2E test
-   ```
 
-5. **Create Fixtures**
-   - All test data from fixtures — no hardcoded values
-   - Use realistic data (from actual responses where possible)
-   - Follow project's fixture organization conventions
+## PROJECT.md Update Discipline
 
-6. **Write Tests**
+Update `PROJECT.md` at these points:
+- after the target scope is locked
+- after the main test-writing pass
+- at final completion with the validation result and remaining gaps
 
-   Address review-tests findings in priority order:
-   1. Missing behavioral coverage (gaps)
-   2. Production failure scenarios without protection
-   3. Replacements for weak/low-signal tests
+## Continuation Checkpoint
 
-   For each test:
-   - Mock ONLY external boundaries (APIs, DB, network, filesystem, time)
-   - One assertion concept per test
-   - Test behavior, not implementation
+If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
-7. **What to Mock**
-   | Mock | Don't Mock |
-   |------|------------|
-   | External APIs | Internal functions |
-   | Database | Business logic |
-   | File system | Calculations |
-   | Network | State management |
-   | Time/dates | Data transforms |
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /create-tests <arguments>
+- Phase: scope / review-tests / write-tests / verify / review / summarize
+- Resume target: <files, function, or behavior under test>
+- Completed items: <finished steps>
+### State
+- Current scope: <what is being tested>
+- Review status: <clean / blocked / pending>
+- Tests added so far: <files or none>
+- Verification status: <passed / partial / blocked>
+```
 
-8. **Mock Audit** (before finalizing)
-   For each mock in the test:
-   - [ ] Is this at a system boundary? (API, DB, network, filesystem, time)
-   - [ ] Would using the real implementation be slow or non-deterministic?
-   - [ ] Does the test still verify real logic, not just mock wiring?
-   If any mock fails these checks → remove it and use the real implementation.
+After writing the checkpoint:
+- run `/clear`
+- run `/start`
+- resume `/create-tests` at the saved phase and target
 
-9. **Run and Verify**
-   - Run the tests — they should pass
-   - Break the code → test should fail (validates it's testing real logic)
-
-10. **Re-run review-tests Skill**
-
-    Spawn review-tests again to verify:
-    - Gaps are filled
-    - New tests are high-signal
-    - Score improved
-
-    If score < 8/10 and there are actionable issues, iterate (max 3 rounds).
-
-## Anti-Patterns
-- Testing mocks (test fails only when mock changes)
-- Testing implementation (breaks on refactor)
-- Silent passes (test passes without testing)
-- Multiple concerns per test
+Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Related Commands
-- `/review-plan` — Reviews test strategy during plan phase via review-testplan skill
+- `/update-tests` — Improve an existing suite when meaningful tests already exist
+- `/create-feature` — Handles feature planning and plan review internally when test strategy needs design work
+- `/fix-bug` — Handles test creation internally for bug-fix workflows
+
+## Notes
+- `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
+- Favor the smallest set of high-signal tests over broad test quantity
+- `/review-code` is an internal phase here, not the expected next top-level user step

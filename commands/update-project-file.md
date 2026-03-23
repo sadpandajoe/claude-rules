@@ -2,16 +2,16 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 
-> **When**: PROJECT.md needs refreshing with current state.
-> **Produces**: Updated PROJECT.md sections.
+> **When**: PROJECT.md needs a manual sync, checkpoint, or quick status refresh outside a command's normal workflow.
+> **Produces**: Updated PROJECT.md state with minimal ceremony.
 
 ## Steps
 
 1. **Read Current PROJECT.md**
 
-   Use the `Read` tool to view PROJECT.md contents.
+   Read the current file and identify the sections that actually need updating.
 
-2. **Check Recent Activity**
+2. **Inspect Current State**
    ```bash
    # Recent commits
    git log --oneline -10
@@ -23,15 +23,21 @@
    git diff --stat HEAD~5
    ```
 
-3. **Gather Update Information**
-   
-   Ask user:
-   - What was accomplished?
-   - Any blockers?
-   - What's next?
-   - Any decisions made?
+3. **Choose the Smallest Useful Update**
 
-4. **Update Development Log**
+   Default to the lightest update that keeps PROJECT.md accurate.
+   Use one of these modes:
+
+   - **Quick sync**: refresh Current Status and add a short Development Log entry
+   - **Checkpoint**: write a continuation checkpoint before `/clear`
+   - **Decision update**: record an accepted or failed approach
+   - **Manual note**: append a short user-supplied progress note
+
+4. **Update Only the Relevant Sections**
+
+   Do not rewrite unrelated sections.
+
+   **Quick sync**:
    ```markdown
    ### [Timestamp] - Progress Update
    
@@ -46,7 +52,7 @@
    - [Any findings or learnings]
    ```
 
-5. **Update Current Status**
+   **Current Status**:
    ```markdown
    ## Current Status
    
@@ -64,17 +70,15 @@
    - [Blocker and details, if any]
    ```
 
-6. **Update Solutions** (if decisions made)
-   
-   If a solution was chosen:
+   **Decision update**:
    ```markdown
    ### Accepted Solution
    - **Approach**: [What we're doing]
    - **Decided**: [Timestamp]
    - **Reasoning**: [Why this approach]
    ```
-   
-   If something didn't work:
+
+   **Failed approach**:
    ```markdown
    ### Failed Solutions
    #### [Approach Name]
@@ -83,36 +87,29 @@
    - **Learned**: [Takeaway]
    ```
 
-7. **Update Implementation Notes** (if relevant)
+   **Checkpoint**:
    ```markdown
-   ## Implementation Notes
-   
-   ### [Topic]
-   - [Technical detail]
-   - [Gotcha discovered]
-   - [Pattern to follow]
+   ## Continuation Checkpoint — [timestamp]
+   ### Workflow
+   - Top-level command: [command to resume]
+   - Phase: [current internal phase]
+   - Resume target: [current item or iteration]
+   - Completed items: [items already finished]
+   ### State
+   - [Key decisions made]
+   - [Current status snapshot]
+   - [Pending blockers or intervention points]
    ```
 
-8. **Write Updates**
-   
-   Apply all updates to PROJECT.md.
+5. **Write Updates**
 
-9. **Confirm**
-   ```markdown
-   ## PROJECT.md Updated
-   
-   Changes made:
-   - Added Development Log entry
-   - Updated Current Status
-   - [Other changes]
-   
-   Current state:
-   - In Progress: [X]
-   - Next: [Y]
-   - Blocked: [None / Z]
-   ```
+   Apply only the chosen updates to PROJECT.md.
 
-## Quick Update Mode
+6. **Confirm**
+
+   Summarize what changed and what the file now says is next.
+
+## Quick Modes
 
 For fast updates:
 ```
@@ -124,8 +121,16 @@ Will:
 - Update status based on message
 - Keep it brief
 
+For checkpointing:
+```
+/update-project-file --checkpoint "/cherry-pick ..." "validate" "PR #123"
+```
+
+Will:
+- Write the continuation checkpoint in the standard format
+- Keep the rest of PROJECT.md untouched unless a status refresh is also needed
+
 ## Notes
-- Run periodically to keep PROJECT.md current
-- Especially after completing tasks
-- Before ending a session
-- After making decisions
+- Most commands should update PROJECT.md themselves before finishing
+- Use this command when manual cleanup or checkpoint writing is needed
+- Especially useful before `/clear` or after work done outside a structured command

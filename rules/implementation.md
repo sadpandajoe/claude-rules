@@ -3,6 +3,7 @@
 ## Golden Rules
 - [ ] **Understand codebase** before writing code
 - [ ] **Plan tests before implementation** — TDD
+- [ ] **If TDD is blocked, record why** — do not silently skip test-first order
 - [ ] **Follow existing patterns** — consistency over creativity
 - [ ] **Update existing code** before creating new
 - [ ] **Working solution before optimization**
@@ -44,7 +45,9 @@
 **In worktrees**: dependencies and build outputs may not exist. Run `npm install` / rebuild before pre-flight checks.
 
 ## Related Commands
-- `/implement` — Write code (TDD workflow)
-- `/plan` — Design implementation approach
-- `/generate-tests` — Write automated test code
-- `/review-code` — Auto-fix local code review
+- `/fix-bug` — End-to-end bug workflow that routes into implementation when safe
+- `/create-feature` — End-to-end feature workflow that plans internally before implementation
+- `/create-tests` — Write automated test code
+- `/update-tests` — Improve an existing suite and auto-commit when verification is strong
+- `/fix-ci` — Diagnose CI failures, apply safe fixes, and stop before commit
+- `/review-code` — Wrapper around built-in `/review` for local fix + verify loops
