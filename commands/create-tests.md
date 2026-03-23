@@ -2,7 +2,7 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 @/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/review-tests/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
 
 > **When**: You want the manual/transitional test-writing workflow outside a larger action such as `/fix-bug`.
 > **Produces**: Focused automated tests, validation results, and a summary of remaining test gaps.
@@ -82,7 +82,7 @@ After writing the checkpoint:
 Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Related Commands
-- `/review-plan` — Reviews test strategy during plan phase via review-testplan skill
+- `/create-feature` — Handles feature planning and plan review internally when test strategy needs design work
 - `/fix-bug` — Handles test creation internally for bug-fix workflows
 
 ## Notes

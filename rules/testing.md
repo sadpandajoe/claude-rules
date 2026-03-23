@@ -51,3 +51,4 @@ When you see these → reduce mocks, use real implementations.
 ## Related Commands
 - `/create-tests` — Create and improve tests (invokes review-tests skill)
 - `/fix-bug` — Runs QA and test creation internally when the workflow needs them
+- `/create-feature` — Handles test-strategy review and test creation internally for planned work

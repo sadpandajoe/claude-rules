@@ -73,17 +73,16 @@ ai-toolkit/
 │   └── pgm.md              # Program reporting rules
 ├── skills/
 │   ├── build-engineer/     # CI diagnosis and remediation persona
-│   ├── core/               # Shared helpers like review-rca and existing-fix checks
+│   ├── core/               # Shared reviewers and helpers like review-rca and existing-fix checks
 │   ├── developer/          # Investigation, implementation, review, and adaptation persona
+│   ├── pm/                 # Feature scoping, acceptance criteria, and milestone persona
 │   ├── qa/                 # Bug triage, scenario expansion, and validation persona
 │   ├── release-engineer/   # Cherry-pick and branch-movement persona
-│   └── review-*/           # Plan and test review helper skills
+│   └── shared/             # Reusable execution gates and shared workflow helpers
 └── commands/
     ├── start.md            # Start or resume session
     ├── fix-bug.md          # End-to-end bug workflow
-    ├── create-plan.md      # Create implementation plan
-    ├── review-plan.md      # Domain expert plan review
-    ├── finalize-plan.md    # Fresh-eyes final gate
+    ├── create-feature.md   # End-to-end feature workflow
     ├── investigate.md      # Standalone RCA
     ├── implement.md        # Manual implementation workflow
     ├── create-tests.md     # Create automated tests
@@ -105,9 +104,7 @@ ai-toolkit/
 |---------|---------|
 | `/start` | Start session - load rules, check PROJECT.md |
 | `/fix-bug` | End-to-end bug workflow with QA triage, RCA, implementation, and validation |
-| `/create-plan` | Create implementation plan |
-| `/review-plan` | Multi-perspective plan review with reviewer skills |
-| `/finalize-plan` | Fresh-eyes final plan gate before implementation |
+| `/create-feature` | End-to-end feature and planned refactor workflow with PM and developer planning |
 | `/investigate` | Standalone RCA and evidence gathering |
 | `/implement` | Manual implementation entrypoint → uses `/review-code` for local review/fix loops |
 
@@ -152,17 +149,17 @@ Claude's built-in `/review` is still available for review-only output; `/review-
 Use `/review` when you want review output only.
 Use `/review-code` when you want the repo-standard wrapper: review, fix, validate, and re-review until clean.
 
-### Plan Reviews
+### Feature Planning
 ```bash
-/review-plan                # Review PROJECT.md (default)
-/review-plan ./docs/PLAN.md # Review specific file
-/finalize-plan              # Final cold-read gate before /implement
+/create-feature "bulk edit dashboards"
+/create-feature sc-12345
+/create-feature https://github.com/owner/repo/issues/123
 ```
 
-`/review-plan` selects reviewer skills based on plan content:
-- Architecture, implementation, and test-plan reviewers always run
-- Frontend and backend reviewers are added when the plan needs them
-- `/finalize-plan` is the final fresh-eyes gate before implementation
+`/create-feature` owns the full planning loop:
+- PM planning is conditional and iterates to 8/10 when scope or milestones need it
+- Developer planning iterates to 8/10 with shared reviewers from `skills/core`
+- The internal finalize-plan skill is the last cold-read before implementation continues automatically
 
 ### PR Feedback Analysis
 ```bash
@@ -184,9 +181,9 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 |------|--------------|
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
-| `rules/planning.md` | `/create-plan`, `/review-plan`, `/finalize-plan`, `/update-project-file` |
+| `rules/planning.md` | `/create-feature`, `/update-project-file` |
 | `rules/investigation.md` | `/fix-bug`, `/investigate` |
-| `rules/implementation.md` | `/fix-bug`, `/implement`, `/fix-ci` |
+| `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/implement`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
@@ -233,14 +230,14 @@ The `install.sh` script automatically backs up existing configs to:
 ## How It Works
 
 ```
-User: /create-plan
+User: /create-feature
 
 Claude Code:
 1. Rules auto-loaded via CLAUDE.md @-includes
-2. Reads commands/create-plan.md for workflow steps
-3. Writes or updates PROJECT.md with the plan
-4. Runs /review-plan for multi-perspective review
-5. Uses /finalize-plan as the final gate before /implement
+2. Reads commands/create-feature.md for workflow steps
+3. Builds PM and developer plans in PROJECT.md
+4. Uses shared reviewers in skills/core to iterate planning to 8/10
+5. Runs the internal finalize-plan skill, then continues into implementation unless a decision matters
 ```
 
 **Claude Code** = workflow orchestrator, planner, and implementer

@@ -14,11 +14,11 @@
 
 | Situation | Workflow | Command |
 |-----------|----------|---------|
-| Building something new | New Feature | `/create-plan` → auto: `/review-plan` → `/finalize-plan` → **GATE** → `/implement` |
+| Building something new | New Feature | `/create-feature` |
 | Something's broken | Bug Fix | `/fix-bug` |
 | RCA only | Investigation | `/investigate` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
-| Improving existing code | Refactoring | `/create-plan` → same as new feature |
+| Improving existing code | Refactoring | `/create-feature` |
 | Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/cherry-pick <multiple> [--plan-only]` |
 | System in bad state | Recovery | See troubleshooting rules |
@@ -28,8 +28,6 @@
 | Program health snapshot | PGM Report | `/create-status-report` |
 | Monthly velocity metrics | Velocity | `/create-velocity-report` |
 
-**GATE** = user reviews and manually triggers next step.
-
 ## Context Management
 
 At every **chain boundary** or **loop iteration**, check context depth:
@@ -37,8 +35,8 @@ At every **chain boundary** or **loop iteration**, check context depth:
 - **Below ~70%**: Continue automatically. Don't pause.
 - **At or above ~70%**: Save state and continue in a fresh conversation. Don't ask — just do it.
 
-Chain boundaries: `/fix-bug` internal phase transitions, `/create-plan` → `/review-plan`, `/review-plan` → `/finalize-plan`, etc.
-Loop iterations: each `/review-plan` round, each `/review-code` round.
+Chain boundaries: `/fix-bug` internal phase transitions, `/create-feature` planning → implementation, `/create-feature` implementation → review, etc.
+Loop iterations: each `/create-feature` planning round, each `/review-code` round.
 Sub-invocations: when `/implement`, `/fix-bug`, or `/fix-ci` calls `/review-code`.
 
 ### Save & Continue Protocol

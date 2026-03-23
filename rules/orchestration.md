@@ -37,8 +37,6 @@
 | Retry failures blindly | Understand and simplify |
 
 ## Related Commands
-- `/create-plan` — Design implementation approach
-- `/review-plan` — Domain expert plan review (parallel skill subagents)
-- `/finalize-plan` — Fresh-eyes final signoff
+- `/create-feature` — Orchestrates PM planning, technical planning, review loops, and implementation
 - `/implement` — Write code (TDD)
 - `/explain` — Explain unfamiliar code

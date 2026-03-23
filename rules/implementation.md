@@ -46,7 +46,7 @@
 ## Related Commands
 - `/implement` — Manual expert entrypoint for writing code
 - `/fix-bug` — End-to-end bug workflow that routes into implementation when safe
-- `/create-plan` — Design implementation approach
+- `/create-feature` — End-to-end feature workflow that plans internally before implementation
 - `/create-tests` — Write automated test code
 - `/fix-ci` — Diagnose CI failures, apply safe fixes, and stop before commit
 - `/review-code` — Wrapper around built-in `/review` for local fix + verify loops

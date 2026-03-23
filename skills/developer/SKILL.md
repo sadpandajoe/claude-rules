@@ -28,6 +28,7 @@ Load only the supporting file needed for the current phase:
 - `investigate-change.md` for reusable code-level investigation and root-cause analysis phases in other workflows
 - `prepare-environment.md` for local setup that may be needed for UI, workflow, or integration validation
 - `plan-change.md` for compact implementation planning inside larger workflows
+- `plan-feature.md` for technical planning and PR slicing inside `/create-feature`
 - `implement-change.md` for focused implementation and targeted verification
 - `create-tests.md` for manual or transitional standalone test-writing workflows
 - `cherry-pick-adapt.md` for conflict resolution and target-side API adaptation

@@ -60,7 +60,7 @@
    Recommend the next best workflow explicitly:
    - `/fix-bug` when the issue should move into the end-to-end bug workflow
    - `/cherry-pick` when the fix already exists elsewhere
-   - `/create-plan` when the work is feature-like or needs broader design
+   - `/create-feature` when the work is feature-like or needs broader design
    - stop when the RCA is still too weak
 
 ## PROJECT.md Update Discipline
