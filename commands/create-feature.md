@@ -105,8 +105,10 @@
 
    If no meaningful decision remains:
    - prepare the environment when needed
+   - for each implementation slice, define the acceptance or regression test first
+   - write the failing test before the code change when feasible
+   - if test-first is blocked by env, repro, or harness constraints, record why before implementing
    - implement the feature through `developer`
-   - create tests as needed
    - run `/review-code`
    - run QA validation when the work is user-visible
 
@@ -172,4 +174,5 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 ## Notes
 - `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped
 - Only pause when a real decision matters
+- Use test-first implementation by default for each slice; document why when it is blocked
 - Stop before the final commit or PR action

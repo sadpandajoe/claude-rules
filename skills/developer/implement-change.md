@@ -8,11 +8,12 @@ Implement the narrowest fix that resolves the validated issue, add the right reg
 
 ## Core Steps
 
-1. Write or update the smallest high-signal failing test when practical.
-2. Implement the minimum code change that satisfies the validated RCA.
-3. Run targeted verification for changed files and the reported bug path.
-4. Note anything that could not be verified locally.
-5. Hand changed files back to the calling workflow for `/review-code`.
+1. Write or update the smallest high-signal failing test before the code change when feasible.
+2. If test-first is blocked by repro, env, or harness constraints, record why before continuing.
+3. Implement the minimum code change that satisfies the validated RCA.
+4. Run targeted verification for changed files and the reported bug path.
+5. Note anything that could not be verified locally.
+6. Hand changed files back to the calling workflow for `/review-code`.
 
 ## Output
 

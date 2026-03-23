@@ -60,10 +60,10 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
 
    Suggest relevant commands based on context:
    - New feature or planned refactor → `/create-feature`
-   - Bug report or broken behavior → `/fix-bug`
-   - Standalone RCA → `/investigate`
-   - Writing tests → `/create-tests`
-   - Writing code → `/implement`
+   - Bug report, broken behavior, or RCA-first debugging → `/fix-bug`
+   - Updating an existing test suite → `/update-tests`
+   - Creating the first meaningful tests → `/create-tests`
+   - Validating a story, PR, or environment without fixing it → `/run-test-plan`
    - Cherry-picking → `/cherry-pick`
    - Completed phases cluttering PROJECT.md → `/archive-project-file`
 

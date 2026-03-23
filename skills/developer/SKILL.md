@@ -30,7 +30,8 @@ Load only the supporting file needed for the current phase:
 - `plan-change.md` for compact implementation planning inside larger workflows
 - `plan-feature.md` for technical planning and PR slicing inside `/create-feature`
 - `implement-change.md` for focused implementation and targeted verification
-- `create-tests.md` for manual or transitional standalone test-writing workflows
+- `create-tests.md` for first-suite creation when an area does not yet have meaningful tests
+- `update-tests.md` for improving an existing suite through targeted test maintenance
 - `cherry-pick-adapt.md` for conflict resolution and target-side API adaptation
 - `cherry-pick-validate.md` for build, test, and regression checks
 - `review-local-changes.md` for local `/review` wrapper workflows such as `/review-code`

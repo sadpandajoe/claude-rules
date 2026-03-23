@@ -1,18 +1,19 @@
 # Create Tests
 
-Use this phase when the workflow needs to add or improve automated tests without running a larger end-to-end feature or bug workflow.
+Use this phase when the workflow needs to create the first meaningful automated tests for an area that does not already have a real suite.
 
 ## Goal
 
-Write the smallest set of high-signal tests that protects the intended behavior, follows project conventions, and survives refactors.
+Write the smallest set of high-signal tests that establishes real regression protection, follows project conventions, and gives later `/update-tests` work something meaningful to improve.
 
 ## Core Steps
 
 1. Determine the exact code or behavior under test.
-2. Use `review-tests` to identify missing coverage, weak tests, and realistic failure paths.
-3. Choose the narrowest useful test layer.
-4. Write or replace tests with a bias toward behavioral signal over quantity.
-5. Run the tests, confirm they fail when the behavior breaks, then re-run `review-tests` if needed.
+2. Confirm there is no meaningful existing suite to improve.
+3. Use `review-tests` to identify the minimum high-signal coverage needed.
+4. Choose the narrowest useful test layer.
+5. Write the first meaningful tests with a bias toward behavioral signal over quantity.
+6. Run the tests, confirm they fail when the behavior breaks, then re-run `review-tests` if needed.
 
 ## Output
 

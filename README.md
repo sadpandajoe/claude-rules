@@ -83,9 +83,9 @@ ai-toolkit/
     ├── start.md            # Start or resume session
     ├── fix-bug.md          # End-to-end bug workflow
     ├── create-feature.md   # End-to-end feature workflow
-    ├── investigate.md      # Standalone RCA
-    ├── implement.md        # Manual implementation workflow
-    ├── create-tests.md     # Create automated tests
+    ├── create-tests.md     # Create the first meaningful tests
+    ├── update-tests.md     # Improve an existing test suite
+    ├── run-test-plan.md    # Execute a reviewed validation plan
     ├── fix-ci.md           # Diagnose and safely fix CI failures
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
@@ -105,13 +105,13 @@ ai-toolkit/
 | `/start` | Start session - load rules, check PROJECT.md |
 | `/fix-bug` | End-to-end bug workflow with QA triage, RCA, implementation, and validation |
 | `/create-feature` | End-to-end feature and planned refactor workflow with PM and developer planning |
-| `/investigate` | Standalone RCA and evidence gathering |
-| `/implement` | Manual implementation entrypoint → uses `/review-code` for local review/fix loops |
 
 ### Quality & Testing
 | Command | Purpose |
 |---------|---------|
-| `/create-tests` | Manual/transitional command for creating or improving automated tests |
+| `/create-tests` | Standalone test-only workflow for creating the first meaningful tests in an area |
+| `/update-tests` | End-to-end workflow for improving an existing suite, reviewing it, and auto-committing when ready |
+| `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
 | `/review-code` | Public wrapper over the developer review/fix loop |
 
@@ -161,6 +161,18 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 - Developer planning iterates to 8/10 with shared reviewers from `skills/core`
 - The internal finalize-plan skill is the last cold-read before implementation continues automatically
 
+### Standalone Validation
+```bash
+/run-test-plan ./docs/test-plan.md
+/run-test-plan sql-lab
+/run-test-plan https://github.com/owner/repo/pull/123
+```
+
+`/run-test-plan` owns the standalone QA validation loop:
+- derive or normalize a compact runnable matrix
+- iterate it with `review-testplan` until it reaches 8/10 or blockers stop execution
+- execute it through QA helpers and summarize findings locally
+
 ### PR Feedback Analysis
 ```bash
 /address-feedback 123       # Address review comments for PR 123
@@ -182,9 +194,9 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
 | `rules/planning.md` | `/create-feature`, `/update-project-file` |
-| `rules/investigation.md` | `/fix-bug`, `/investigate` |
-| `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/implement`, `/fix-ci` |
-| `rules/testing.md` | `/create-tests` |
+| `rules/investigation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` when RCA matters |
+| `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |
+| `rules/testing.md` | `/create-tests`, `/update-tests`, `/run-test-plan` |
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |

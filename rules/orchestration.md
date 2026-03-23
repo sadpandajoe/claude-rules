@@ -38,5 +38,5 @@
 
 ## Related Commands
 - `/create-feature` — Orchestrates PM planning, technical planning, review loops, and implementation
-- `/implement` — Write code (TDD)
+- `/fix-bug` — Orchestrates QA, RCA, implementation, and validation for broken behavior
 - `/explain` — Explain unfamiliar code

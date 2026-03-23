@@ -1,17 +1,17 @@
-# /create-tests - Create Automated Tests
+# /create-tests - Create the First Meaningful Tests
 
 @/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 @/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
 
-> **When**: You want the manual/transitional test-writing workflow outside a larger action such as `/fix-bug`.
-> **Produces**: Focused automated tests, validation results, and a summary of remaining test gaps.
+> **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
+> **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.
 
 ## Usage
 ```
-/create-tests                         # Tests for uncommitted changes
-/create-tests <file>                  # Tests for specific file
-/create-tests --function <name>       # Tests for specific function
+/create-tests                         # First meaningful tests for current uncommitted work
+/create-tests <file>                  # First meaningful tests for a specific file
+/create-tests --function <name>       # First meaningful tests for a specific function
 ```
 
 ## Steps
@@ -23,19 +23,19 @@
    - Specific file or function: as provided
    - Read the code thoroughly before writing any tests
 
-2. **Delegate Test Creation to `developer`**
+2. **Delegate Initial Test Creation to `developer`**
 
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/create-tests.md
 
    This helper owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
-   - writing or replacing tests
+   - creating the first meaningful tests for the target area
    - targeted verification
 
 3. **Summary**
    ```markdown
-   ## Create-Tests Complete
+## Create-Tests Complete
 
    ### Scope
    - [What behavior or files were covered]
@@ -82,9 +82,10 @@ After writing the checkpoint:
 Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Related Commands
+- `/update-tests` — Improve an existing suite when meaningful tests already exist
 - `/create-feature` — Handles feature planning and plan review internally when test strategy needs design work
 - `/fix-bug` — Handles test creation internally for bug-fix workflows
 
 ## Notes
-- `/create-tests` is a manual/transitional command; larger workflows should absorb this over time
+- `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
 - Favor the smallest set of high-signal tests over broad test quantity

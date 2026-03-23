@@ -109,6 +109,11 @@
 
 10. **Implement Through `developer`**
 
+   Before changing the code:
+   - define the regression this fix must catch
+   - write or update the failing test first when feasible
+   - if test-first is blocked by repro, env, or harness constraints, record why in `PROJECT.md` before implementing
+
    For direct fixes:
    - use `developer/implement-change.md`
 
@@ -210,7 +215,8 @@ After writing the checkpoint:
 Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
-- `/fix-bug` is the public bug entrypoint; use `/investigate` only for standalone RCA work
+- `/fix-bug` is the public bug entrypoint; RCA-only work now stays inside the internal `developer` and `core` helpers
 - Keep `PROJECT.md` updates command-owned
 - Prefer the open-PR or cherry-pick path over inventing a new fix
+- Use test-first implementation by default; document why when the failing test cannot be written first
 - Auto-commit only when this workflow implemented a fresh bug fix itself

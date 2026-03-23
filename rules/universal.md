@@ -16,9 +16,10 @@
 |-----------|----------|---------|
 | Building something new | New Feature | `/create-feature` |
 | Something's broken | Bug Fix | `/fix-bug` |
-| RCA only | Investigation | `/investigate` |
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/create-feature` |
+| Improving an existing test suite | Test Maintenance | `/update-tests` |
+| Validating a story, PR, or environment | Test Plan Execution | `/run-test-plan` |
 | Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/cherry-pick <multiple> [--plan-only]` |
 | System in bad state | Recovery | See troubleshooting rules |
@@ -37,7 +38,7 @@ At every **chain boundary** or **loop iteration**, check context depth:
 
 Chain boundaries: `/fix-bug` internal phase transitions, `/create-feature` planning → implementation, `/create-feature` implementation → review, etc.
 Loop iterations: each `/create-feature` planning round, each `/review-code` round.
-Sub-invocations: when `/implement`, `/fix-bug`, or `/fix-ci` calls `/review-code`.
+Sub-invocations: when `/create-feature`, `/fix-bug`, `/update-tests`, or `/fix-ci` calls `/review-code`.
 
 ### Save & Continue Protocol
 

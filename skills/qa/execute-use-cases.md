@@ -4,7 +4,7 @@ Use this phase when a workflow already has a use-case matrix or confirmed repro 
 
 ## Goal
 
-Run the relevant scenarios against a real environment, record the outcomes clearly, and hand failures back with reliable repro detail.
+Run the relevant scenarios against a real environment, record the outcomes clearly, and hand the results back with reliable evidence and repro detail.
 
 ## Core Steps
 
@@ -15,7 +15,7 @@ Run the relevant scenarios against a real environment, record the outcomes clear
    - direct HTTP or CLI calls for API-only paths
    - mark blocked scenarios clearly when prerequisites are missing
 4. Record PASS, FAIL, BLOCKED, or SKIP for each scenario.
-5. Hand failures to the bug-filing or reporting phase only when the evidence is strong enough.
+5. Hand the results back to the calling workflow with enough evidence for summary, reporting, or bug filing when needed.
 
 ## Output
 
@@ -26,5 +26,5 @@ Run the relevant scenarios against a real environment, record the outcomes clear
   - Result: <pass / fail / blocked / skip>
   - Validation path: <playwright / api / manual>
   - Evidence: <screenshots, logs, video, or none>
-  - Follow-up: <file bug / rerun later / no action>
+  - Follow-up: <summarize / rerun later / file bug / no action>
 ```

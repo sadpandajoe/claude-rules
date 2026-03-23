@@ -46,6 +46,6 @@
    ```
 
 ## Notes
-- This command is used standalone (`/review-code`) and also invoked by `/implement` and `/fix-ci`
+- This command is used standalone (`/review-code`) and also invoked by `/create-feature`, `/fix-bug`, and `/fix-ci`
 - Wraps Claude's built-in `/review`; it does not replace or shadow it
 - The review/fix loop lives under the `developer` persona so other workflows can reuse it without duplicating logic

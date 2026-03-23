@@ -15,7 +15,7 @@ Use this for:
 - validating whether a suspected fix already exists
 - narrowing failure scope before planning or adaptation
 
-Do not use this file to replace the `/investigate` command when the user explicitly asked for a full standalone investigation workflow.
+This file is the reusable RCA phase for larger workflows. Use it when the public action is still `/fix-bug`, `/create-feature`, or another end-to-end command.
 
 ## Core Steps
 
