@@ -42,7 +42,7 @@
 3. **Iterate the Plan to 8/10**
 
    Review the matrix with the shared test-plan reviewer.
-   Revise the plan until it reaches `8/10`, or stop early if blockers or unresolved ambiguities make execution unsafe or misleading.
+   Revise the plan until it reaches `8/10`, or stop early only if blockers or unresolved ambiguities make execution unsafe or misleading.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
 
@@ -77,6 +77,9 @@
    ```markdown
    ## Run-Test-Plan Complete
 
+   ### Outcome
+   - [Executed plan / stopped on blocker before execution]
+
    ### Source
    - [Plan doc, area, story, or PR]
 
@@ -88,6 +91,9 @@
 
    ### Evidence
    - [Best proof for failures or high-value passes]
+
+   ### Risks / Blockers
+   - [What could not be executed or remains unclear]
 
    ### Follow-Up
    - [Manual next steps only]
@@ -135,3 +141,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - `/run-test-plan` is validation-only in v1
 - Prefer a small runnable matrix over a broad exploratory sweep
 - Keep findings factual and local-first
+- The command should keep tightening and executing the plan automatically until the matrix reaches threshold or a real blocker stops it

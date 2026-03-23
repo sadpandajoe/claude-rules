@@ -109,7 +109,7 @@
    - write the failing test before the code change when feasible
    - if test-first is blocked by env, repro, or harness constraints, record why before implementing
    - implement the feature through `developer`
-   - run `/review-code`
+   - run `/review-code` as an internal loop and keep iterating until only nitpicks remain or a real blocker/user decision appears
    - run QA validation when the work is user-visible
 
    If a meaningful decision remains:
@@ -119,18 +119,30 @@
    ```markdown
    ## Create-Feature Complete
 
-   ### Feature Brief
-   - [Goals, non-goals, acceptance summary]
+   ### Outcome
+   - [What slice or milestone was delivered]
 
-   ### Milestones
-   - [Milestone or PR slices]
+   ### Plan Quality
+   - [PM brief score]
+   - [Technical plan score]
+   - [Final cold-read result]
 
-   ### Implementation Result
-   - [Files changed or "planning only"]
+   ### Acceptance Criteria Status
+   - [Done / partial / blocked against the agreed criteria]
 
-   ### Verification
+   ### Implementation Summary
+   - [What changed in behavior or capability]
+
+   ### Review / Quality
+   - [Review rounds and final review outcome]
+
+   ### Verification / Test Signal
    - [Checks run]
+   - [What regressions or acceptance paths are now covered]
    - [QA result or why skipped]
+
+   ### Risks / Blockers
+   - [Anything still risky, blocked, or unverified]
 
    ### Next Decision
    - [Meaningful decision still needed, or ready for final commit / PR action]
@@ -160,6 +172,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - PM required: <yes / no>
 - PM brief score: <score or skipped>
 - Technical plan score: <score or pending>
+- Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
@@ -175,4 +188,5 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped
 - Only pause when a real decision matters
 - Use test-first implementation by default for each slice; document why when it is blocked
+- `/review-code` is an internal phase here, not the expected next top-level user step
 - Stop before the final commit or PR action

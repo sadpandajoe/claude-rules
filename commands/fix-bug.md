@@ -134,7 +134,8 @@
 
 12. **Review Changed Files**
 
-   Run `/review-code` on changed repo-tracked files before the final summary.
+   Run `/review-code` on changed repo-tracked files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 13. **Validate the Fix With QA When Needed**
 
@@ -157,6 +158,9 @@
    ```markdown
    ## Fix-Bug Complete
 
+   ### Outcome
+   - [What happened: fixed here / fixed upstream / pending PR / no code change]
+
    ### Bug
    - [Issue or report summary]
 
@@ -166,12 +170,19 @@
    ### Root Cause
    - [Validated RCA or why no RCA was needed]
 
-   ### Changes Applied
-   - [Files changed or "no code change needed"]
+   ### Implementation Summary
+   - [What changed or why no code change was needed]
 
-   ### Verification
+   ### Review / Quality
+   - [Review rounds and final review outcome]
+
+   ### Verification / Test Signal
    - [Automated checks run]
+   - [What regressions are now covered]
    - [QA validation result, including whether Playwright MCP was used or blocked]
+
+   ### Risks / Blockers
+   - [Anything still risky, unverified, or left manual]
 
    ### Commit Result
    - [Created `fix:` commit / no new commit because cherry-pick or no-op path]
@@ -203,6 +214,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ### State
 - Existing-fix status: <FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED>
 - RCA status: <validated / pending / not needed>
+- Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
@@ -219,4 +231,5 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - Keep `PROJECT.md` updates command-owned
 - Prefer the open-PR or cherry-pick path over inventing a new fix
 - Use test-first implementation by default; document why when the failing test cannot be written first
+- `/review-code` is an internal phase here, not the expected next top-level user step
 - Auto-commit only when this workflow implemented a fresh bug fix itself

@@ -7,6 +7,7 @@
 - **Incremental progress** — small, verified changes over big risky ones
 - **Document decisions and reasoning** — future maintainers need context
 - **TDD and YAGNI** — test first, build only what's needed now
+- **End-to-end commands own their internal loops** — planning, review, and validation sub-phases should continue automatically until threshold or blocker; do not surface subcommands as the next user step unless the user explicitly chose them
 - **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
 - **Checkpoint when context is deep** — at chain boundaries and loop iterations, if context is above ~70%, save state and continue in a fresh conversation (see Context Management below)
 
@@ -19,6 +20,7 @@
 | Reviewing someone's PR | Code Review | `/review-pr` |
 | Improving existing code | Refactoring | `/create-feature` |
 | Improving an existing test suite | Test Maintenance | `/update-tests` |
+| Creating first tests for untested area | First Tests | `/create-tests` |
 | Validating a story, PR, or environment | Test Plan Execution | `/run-test-plan` |
 | Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |
 | Cross-branch work (batch) | Cherry-Pick | `/cherry-pick <multiple> [--plan-only]` |

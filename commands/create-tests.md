@@ -33,21 +33,38 @@
    - creating the first meaningful tests for the target area
    - targeted verification
 
-3. **Summary**
+3. **Review Changed Test Files**
+
+   Run `/review-code` on the changed repo-tracked files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+
+4. **Summary**
    ```markdown
 ## Create-Tests Complete
+
+   ### Outcome
+   - [Created first meaningful suite / stopped on blocker]
 
    ### Scope
    - [What behavior or files were covered]
 
-   ### Tests Added or Updated
-   - [Files changed]
+   ### Behavioral Coverage
+   - [What regressions or behaviors are now covered]
+
+   ### Review / Quality
+   - [Review rounds and final review outcome]
 
    ### Verification
    - [Checks run]
 
+   ### Risks / Blockers
+   - [Anything still unverified or out of scope]
+
    ### Remaining Gaps
    - [Anything still not covered]
+
+   ### Next Decision
+   - [Ready for manual commit / needs more work]
    ```
 
 ## PROJECT.md Update Discipline
@@ -65,11 +82,12 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /create-tests <arguments>
-- Phase: scope / review-tests / write-tests / verify / summarize
+- Phase: scope / review-tests / write-tests / verify / review / summarize
 - Resume target: <files, function, or behavior under test>
 - Completed items: <finished steps>
 ### State
 - Current scope: <what is being tested>
+- Review status: <clean / blocked / pending>
 - Tests added so far: <files or none>
 - Verification status: <passed / partial / blocked>
 ```
@@ -89,3 +107,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 ## Notes
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
 - Favor the smallest set of high-signal tests over broad test quantity
+- `/review-code` is an internal phase here, not the expected next top-level user step

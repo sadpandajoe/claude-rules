@@ -78,7 +78,8 @@
 
 7. **Review Changed Test Files**
 
-   Run `/review-code` on the changed repo-tracked files.
+   Run `/review-code` on the changed repo-tracked files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 8. **Auto-Commit When Ready**
 
@@ -98,17 +99,26 @@
    ```markdown
    ## Update-Tests Complete
 
+   ### Outcome
+   - [Updated suite / handed off to create-tests / stopped on blocker]
+
    ### Scope
    - [Target area, path, or function]
 
    ### Suite Outcome
    - [Updated existing suite / handed off to create-tests]
 
-   ### Tests Added or Updated
-   - [Files changed]
+   ### Behavioral Coverage
+   - [What regressions or behaviors are now covered]
+
+   ### Review / Quality
+   - [Review rounds and final review outcome]
 
    ### Verification
    - [Checks run]
+
+   ### Risks / Blockers
+   - [Anything still weak, blocked, or intentionally left for follow-up]
 
    ### Remaining Gaps
    - [Suggested follow-up tests or none]
@@ -138,6 +148,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Completed items: <finished phases or accepted decisions>
 ### State
 - Existing suite status: <found / insufficient / none>
+- Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Verification status: <passed / partial / blocked>
 - Pending blockers or follow-up gaps: <if any>
@@ -159,3 +170,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - `/update-tests` is the public workflow for existing-suite maintenance
 - Favor replacing low-signal tests over adding redundant ones
 - Write the failing test first when feasible; if blocked, document why before changing the suite
+- `/review-code` is an internal phase here, not the expected next top-level user step

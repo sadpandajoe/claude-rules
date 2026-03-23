@@ -96,7 +96,8 @@
 
 9. **Review Changed Files**
 
-   If repo-tracked files changed, invoke `/review-code` on the changed files before presenting the result.
+   If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 10. **Summary**
    ```markdown
@@ -111,12 +112,16 @@
    ### Changes Applied
    - [What was changed]
 
+   ### Review / Quality
+   - [Review rounds and final review outcome]
+
    ### Verification
    - [What was run locally]
    - [Verification strength]
+   - [What confidence the checks provide]
 
-   ### Review-Code
-   - [Rounds run or skipped]
+   ### Risks / Blockers
+   - [Weak validation, ambiguity, or residual CI risk]
 
    ### Commit Recommendation
    - Recommend: `new commit` / `amend HEAD`
@@ -148,6 +153,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ### State
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
+- Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
@@ -164,3 +170,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - Auto-fixing is a phase, not the contract; the command still stops before commit
 - Keep PROJECT.md updates command-owned, not skill-owned
 - If verification is weak or the root cause is ambiguous, stop instead of widening scope
+- `/review-code` is an internal phase here, not the expected next top-level user step

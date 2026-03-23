@@ -30,10 +30,16 @@
    ```markdown
    ## Review-Code Complete
 
+   ### Outcome
+   - [Clean / blocked / stopped on user decision]
+
    ### Rounds: [N]
 
    ### Fixed
    - [List of issues fixed, grouped by file]
+
+   ### Verification
+   - [Checks run after fixes]
 
    ### Tests Added
    - [Any tests written to cover gaps]
@@ -41,11 +47,12 @@
    ### Remaining Nitpicks
    - [Items noted but not fixed — optional improvements]
 
-   ### Needs User Input
-   - [Any ambiguities or trade-offs that couldn't be resolved automatically]
+   ### Stop Reason
+   - [Only nitpicks remain / blocker / user decision]
    ```
 
 ## Notes
 - This command is used standalone (`/review-code`) and also invoked by `/create-feature`, `/fix-bug`, and `/fix-ci`
 - Wraps Claude's built-in `/review`; it does not replace or shadow it
 - The review/fix loop lives under the `developer` persona so other workflows can reuse it without duplicating logic
+- When invoked from another top-level workflow, that workflow owns the next step after the review loop finishes
