@@ -29,8 +29,11 @@ Load only the supporting file needed for the current phase:
 - `analyze-use-cases.md` for exploratory QA discovery and use-case matrices
 - `execute-use-cases.md` for running a test or validation matrix against a real environment
 - `capture-evidence.md` for screenshots, video, logs, and artifact organization
-- `file-bug.md` for turning a failed scenario into a clean bug handoff
+- `file-bug.md` for turning a failed scenario into a clean bug handoff with validated repro steps and best-proof evidence
 - `report-shortcut-results.md` for optional Shortcut-specific reporting and state transitions
 - `triage-bug.md` for first-pass bug validation and reproduction
 - `expand-scenarios.md` for scenario and coverage expansion
 - `validate-fix.md` for post-fix QA validation
+
+When asked to create a bug from QA findings, use `file-bug.md`.
+When the user explicitly wants the result posted back to Shortcut, use `report-shortcut-results.md` after the bug handoff or QA result is already clear.
