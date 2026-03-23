@@ -76,6 +76,21 @@ sync_skill_links() {
         fi
     done
 
+    # Prune stale repo-managed symlinks whose source no longer exists
+    for link in "$target_root"/*; do
+        if [[ -L "$link" ]]; then
+            local link_target=$(readlink "$link")
+            # Only prune symlinks that point into our repo
+            if [[ "$link_target" == "$source_root"/* ]]; then
+                if [[ ! -e "$link_target" ]]; then
+                    local stale_name=$(basename "$link")
+                    warn "Removing stale link: $stale_name -> $link_target"
+                    rm "$link"
+                fi
+            fi
+        fi
+    done
+
     info "Synced repo skills into $label"
 }
 

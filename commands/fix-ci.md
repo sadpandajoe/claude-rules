@@ -109,7 +109,7 @@
    ### Failure Summary
    - [What failed and why]
 
-   ### Changes Applied
+   ### Implementation Summary
    - [What was changed]
 
    ### Review / Quality
