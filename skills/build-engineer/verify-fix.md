@@ -10,9 +10,9 @@ Run the smallest local validation set that gives strong confidence the CI failur
 
 Classify verification strength as:
 
-- **STRONG**: the original failing step can be reproduced or closely mirrored locally, and the post-fix check passes
-- **PARTIAL**: only adjacent or narrower checks can be run locally
-- **WEAK**: the failure cannot be meaningfully exercised locally
+- **STRONG**: ran the failing CI command (or close equivalent) locally and it passes. Examples: `npm run lint`, `pytest tests/...`, `npm run build`
+- **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command. Examples: type-check for a build failure, targeted unit tests for an integration failure
+- **WEAK**: code review only, no local execution. Examples: infra-only change, env var needing CI secrets
 
 ## Rules
 

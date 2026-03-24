@@ -31,6 +31,16 @@ Proceed without asking the user only when all of the following are true:
 
 Otherwise stop and surface the reason clearly.
 
+## Verification Strength Reference
+
+Default tier definitions:
+
+- **STRONG**: ran the failing command (or close equivalent) locally and it passes
+- **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command
+- **WEAK**: code review only, no local execution
+
+When `build-engineer/verify-fix.md` is in play, use that skill's expanded definitions instead.
+
 ## Rating Guidance
 
 Set `Decision Required: YES` when:

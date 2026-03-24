@@ -28,6 +28,8 @@
    - no argument: latest failed run on current branch
 
 2. **Gather CI Logs**
+
+   Try `gh` first:
    ```bash
    # Get failed run
    gh run list --branch <branch> --status failure --limit 1
@@ -37,6 +39,11 @@
    gh pr checks <number>
    gh run view <run-id> --log-failed
    ```
+
+   If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
+   - Check whether a local log file or zip bundle was provided in step 1.
+   - If yes, use that file as the log source.
+   - If no, ask the user for a log file path or URL. Do not proceed to classification without actual log output.
 
    If the input is a zip bundle:
    - unzip it automatically
@@ -54,7 +61,22 @@
    - produce a narrow proposed fix
    - state local verification approach
 
-4. **Update PROJECT.md**
+4. **Complexity Gate**
+
+   Evaluate each classified failure against:
+
+   | Signal | Trivial | Standard |
+   |--------|---------|----------|
+   | Failure pattern | Single known-pattern match | Novel or multiple failures |
+   | Files touched | 1-2 | 3+ or unclear |
+   | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
+   | Verification | STRONG or PARTIAL available | WEAK only |
+
+   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Skip directly to step 8 (Apply Safe Fixes). Still verify locally, run `/review-code`, and update PROJECT.md once when done.
+
+   **Standard path**: any signal is in the Standard column, or confidence is below 8/10. Continue to step 5.
+
+5. **Update PROJECT.md**
 
    Record:
    - failing run or artifact source
@@ -63,7 +85,7 @@
    - root-cause hypothesis
    - confidence and proposed next action
 
-5. **Validate RCA When Needed**
+6. **Validate RCA When Needed**
 
    Use the shared RCA validator only when:
    - the failure is novel
@@ -73,15 +95,15 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
 
-6. **Run the Action Gate**
+7. **Run the Action Gate**
 
    @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
    Proceed automatically only when the gate says the fix is low-risk, high-confidence, and sufficiently verifiable.
 
-7. **Apply Safe Fixes**
+8. **Apply Safe Fixes**
 
-   If the gate allows automatic action:
+   If the gate allows automatic action (or the complexity gate routed here directly):
    - apply the narrow proposed fix
    - keep scope limited to the failing surface
    - hand off to `developer` only when code adaptation becomes non-mechanical
@@ -90,52 +112,37 @@
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-8. **Verify Locally** (`build-engineer`)
+9. **Verify Locally** (`build-engineer`)
 
    @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/verify-fix.md
 
-9. **Review Changed Files**
+10. **Review Changed Files**
 
    If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-10. **Summary**
+11. **Summary**
    ```markdown
    ## Fix-CI Complete
+   [1-2 lines: what failed and what was fixed]
 
-   ### Run: [run-id / url]
-   ### Branch: [branch]
+   ### What to do next
+   - [Specific next action]
 
-   ### Failure Summary
-   - [What failed and why]
-
-   ### Implementation Summary
-   - [What was changed]
-
-   ### Review / Quality
-   - [Review rounds and final review outcome]
-
-   ### Verification
-   - [What was run locally]
-   - [Verification strength]
-   - [What confidence the checks provide]
-
-   ### Risks / Blockers
-   - [Weak validation, ambiguity, or residual CI risk]
-
-   ### Commit Recommendation
-   - Recommend: `new commit` / `amend HEAD`
-   - Do not commit automatically
+   ### Open risks
+   - [Anything uncertain or untested]
    ```
 
 ## PROJECT.md Update Discipline
 
-Update `PROJECT.md` at these points:
+**Standard path** — update `PROJECT.md` at these points:
 - after log collection and initial failure classification
 - after RCA validation when that path runs
 - after the action gate determines whether the fix will proceed automatically
 - after local verification and `/review-code`
 - at final completion with verification strength and commit recommendation
+
+**Trivial path** — single `PROJECT.md` update after implementation, verification, and `/review-code` are all complete.
 
 Keep the updates compact, but do not defer all state changes to the end of the workflow.
 
@@ -147,10 +154,11 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / rca / gate / apply / verify / review / summarize
+- Phase: gather-logs / classify / complexity-gate / rca / gate / apply / verify / review / summarize
 - Resume target: <run id, artifact, failing job, or changed file set>
 - Completed items: <finished phases or already-fixed failures>
 ### State
+- Complexity: <trivial / standard>
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
 - Review status: <clean / blocked / pending>

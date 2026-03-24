@@ -50,4 +50,4 @@ For each failure, end with this block:
 **Verification**: [how to verify the fix locally]
 ```
 
-Use `skills/shared/action-gate.md` after producing this output to decide whether to proceed automatically.
+Use `skills/shared/action-gate.md` after producing this output to decide whether to proceed automatically. The calling workflow may also use this output for a complexity gate evaluation.
