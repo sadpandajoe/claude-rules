@@ -33,12 +33,28 @@ Run these tracks in parallel when possible:
    - Confirm whether an equivalent fix already exists on the target branch
    - Identify obvious backport ordering constraints
 
+## Batch Execution
+
+This file describes per-change investigation. When investigating multiple independent changes, prefer parallel subagents (one per change) over sequential investigation in the main context. The within-change tracks (source, target, prereq) are typically fast enough to run sequentially inside a single agent — the bigger parallelism win is across changes.
+
 ## Risk Assessment
 
 Use `skills/shared/action-gate.md` for the final proceed/stop decision.
 
-Always end with the shared execution gate block.
+Always end with the shared execution gate block — this is required even for LOW/Auto changes:
+
+```markdown
+## Execution Gate
+Risk: LOW / MED / HIGH
+Confidence: X/10
+Decision Required: YES / NO
+Verification Strength: STRONG / PARTIAL / WEAK
+Recommendation: Proceed automatically / Ask for approval / Stop and escalate
+```
+
 For cherry-pick work, set `Verification Strength` based on whether routine target-side validation is localized (`STRONG` / `PARTIAL`) or would require non-routine rebuild or environment refresh (`WEAK`).
+
+**Fast path**: For single changes rated `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, emit the gate block and proceed directly to apply without a separate presentation step. The gate block is still required — the presentation pause is what gets skipped.
 
 ## Rating Rules
 

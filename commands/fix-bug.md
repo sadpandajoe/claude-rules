@@ -30,7 +30,39 @@
 
    Pull in external context when references are provided.
 
-2. **Launch Early Lanes in Parallel**
+2. **Complexity Gate**
+
+   Assess the bug before launching investigation lanes:
+
+   | Signal | Trivial | Standard |
+   |--------|---------|----------|
+   | Root cause | Obvious from report | Needs investigation |
+   | Files touched | 1–2 | 3+ or unclear |
+   | Fix type | Typo, config, off-by-one | Logic, architecture |
+   | Regression risk | Isolated, testable | Cross-cutting |
+
+   State the classification explicitly using the action-gate format:
+
+   ```markdown
+   ## Complexity Gate
+   Classification: TRIVIAL / STANDARD
+   Confidence: X/10
+   Reason: [one line]
+   ```
+
+   **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
+   1. Write the regression test (test-first when feasible)
+   2. Implement the fix
+   3. Run tests covering the changed files
+   4. `/review-code` — must produce Review Gate block (this is not optional)
+   5. Update PROJECT.md (single update)
+   6. Emit summary (step 16)
+
+   **Standard**: Continue to step 3.
+
+   Do not silently decide — always emit the gate block above.
+
+3. **Launch Early Lanes in Parallel**
 
    Start these tracks together:
    - `qa/triage-bug.md` for first-pass triage and repro requirements
@@ -43,7 +75,7 @@
    @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/prepare-environment.md
 
-3. **Sync the Early Findings**
+4. **Sync the Early Findings**
 
    Merge the outputs from QA, developer, and the existing-fix check.
    For UI and workflow bugs, treat QA repro as a two-stage flow:
@@ -57,14 +89,14 @@
    - upstream-fix status
    - intended next action
 
-4. **Re-Sync Once UI Repro Is Runnable**
+5. **Re-Sync Once UI Repro Is Runnable**
 
    For UI and workflow bugs:
    - wait for environment prep to make the app runnable when possible
    - have QA re-run the repro with Playwright MCP
    - update `PROJECT.md` with the stronger repro result before moving into RCA or implementation
 
-5. **Branch on Existing-Fix Status**
+6. **Branch on Existing-Fix Status**
 
    The shared helper returns one of:
    - `FIXED_UPSTREAM`
@@ -74,7 +106,7 @@
    Also allow the workflow to stop early if QA concludes the report is not a bug.
    If QA cannot reproduce but production evidence is strong, continue as a plausible bug with lower confidence and a stricter action gate.
 
-6. **Stop Early When No Code Change Is Needed**
+7. **Stop Early When No Code Change Is Needed**
 
    If QA cannot reproduce and evidence is weak:
    - stop with the missing evidence called out clearly
@@ -83,7 +115,7 @@
    - stop with the PR reference and recommendation to monitor, adopt, or supersede it
    - do not auto-review or merge it inside `/fix-bug`
 
-7. **Route to Cherry-Pick When the Fix Exists Upstream**
+8. **Route to Cherry-Pick When the Fix Exists Upstream**
 
    If the helper returns `FIXED_UPSTREAM`:
    - route internally to `/cherry-pick`
@@ -91,14 +123,14 @@
    - return to this workflow for validation, `/review-code`, and final summary
    - do not auto-commit after the cherry-pick path; let the user decide whether any follow-up should be amended or added separately
 
-8. **Validate the RCA for Unfixed Bugs**
+9. **Validate the RCA for Unfixed Bugs**
 
    For `UNFIXED` issues:
    - validate the diagnosis with the shared RCA reviewer
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
 
-9. **Run the Action Gate**
+10. **Run the Action Gate**
 
    Decide whether to:
    - fix directly now
@@ -107,12 +139,13 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
-10. **Implement Through `developer`**
+11. **Implement Through `developer`**
 
    Before changing the code:
    - define the regression this fix must catch
    - write or update the failing test first when feasible
    - if test-first is blocked by repro, env, or harness constraints, record why in `PROJECT.md` before implementing
+   - for mechanical changes (renames, config swaps, off-by-one with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
 
    For direct fixes:
    - use `developer/implement-change.md`
@@ -124,7 +157,7 @@
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-change.md
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
 
-11. **Expand Regression Coverage**
+12. **Expand Regression Coverage**
 
    Keep this phase tightly scoped to the bug at hand:
    - `developer` adds or updates only the automated tests needed to protect this fix
@@ -132,12 +165,16 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/expand-scenarios.md
 
-12. **Review Changed Files**
+13. **Review Changed Files** (gate)
 
    Run `/review-code` on changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-13. **Validate the Fix With QA When Needed**
+   This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
+
+   Do not skip this step when resuming from a pre-built plan.
+
+14. **Validate the Fix With QA When Needed**
 
    For UI, workflow, or live-behavior bugs:
    - run `qa/validate-fix.md` when the app is runnable locally or in a suitable environment
@@ -145,7 +182,7 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/validate-fix.md
 
-14. **Commit New Bug Fixes**
+15. **Commit New Bug Fixes**
 
    If this workflow implemented a new fix itself:
    - create a normal `fix:` commit after review and validation pass
@@ -154,49 +191,34 @@
    - do not auto-commit beyond the cherry-pick result
    - leave any follow-up amend or extra-commit decision to the user
 
-15. **Summary**
+16. **Summary**
    ```markdown
    ## Fix-Bug Complete
+   [1-2 lines: what the bug was, why it was broken, what fixed it, confidence level]
 
-   ### Outcome
-   - [What happened: fixed here / fixed upstream / pending PR / no code change]
+   ### Review
+   - Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 
-   ### Bug
-   - [Issue or report summary]
+   ### What to do next
+   - [Specific next action]
 
-   ### Branch Outcome
-   - [Not a bug / fixed upstream / pending PR / fixed here]
-
-   ### Root Cause
-   - [Validated RCA or why no RCA was needed]
-
-   ### Implementation Summary
-   - [What changed or why no code change was needed]
-
-   ### Review / Quality
-   - [Review rounds and final review outcome]
-
-   ### Verification / Test Signal
-   - [Automated checks run]
-   - [What regressions are now covered]
-   - [QA validation result, including whether Playwright MCP was used or blocked]
-
-   ### Risks / Blockers
-   - [Anything still risky, unverified, or left manual]
-
-   ### Commit Result
-   - [Created `fix:` commit / no new commit because cherry-pick or no-op path]
-   - [Any manual follow-up decision left to the user]
+   ### Open risks
+   - [Anything uncertain or untested]
    ```
 
 ## PROJECT.md Update Discipline
 
 Update `PROJECT.md` at these points:
+
+**Standard path:**
 - after the first early-lane sync with triage, investigation, and upstream-status findings
 - after the UI repro re-sync when that path applies
 - after RCA validation and action-gate outcome
 - after implementation, review, and QA validation
 - at final completion with the branch outcome and commit result
+
+**Trivial path:**
+- after implementation and validation complete (single update is sufficient)
 
 Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
 
@@ -208,10 +230,11 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-bug <arguments>
-- Phase: triage / existing-fix-check / ui-repro / rca / plan / implement / review / qa-validate / commit / summarize
+- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / plan / implement / review / qa-validate / commit / summarize
 - Resume target: <issue, PR, repro path, file set, or current validation target>
 - Completed items: <finished phases or decisions already locked in>
 ### State
+- Complexity: <trivial / standard>
 - Existing-fix status: <FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED>
 - RCA status: <validated / pending / not needed>
 - Review status: <clean / blocked / pending>
@@ -233,3 +256,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - Use test-first implementation by default; document why when the failing test cannot be written first
 - `/review-code` is an internal phase here, not the expected next top-level user step
 - Auto-commit only when this workflow implemented a fresh bug fix itself
+- When resuming from a pre-built plan, enter at the implementation phase but still run review, QA, and pre-flight checks before declaring done

@@ -26,29 +26,37 @@
    - fix + verify loops
    - stop rules
 
-2. **Summary**
+2. **Run Pre-flight Checks**
+
+   Before declaring the review complete, run the repo's standard checks against the changed files:
+   - **Build**: the repo's build command
+   - **Type check**: `tsc --noEmit` (TypeScript) or equivalent
+   - **Lint**: the repo's lint command
+   - **Tests**: covering the changed files
+
+   If any check fails, fix the issue and return to step 1 for another review round.
+
+3. **Emit the Review Gate**
+
+   This block is the required output of `/review-code`. Callers branch on it — completing the review loop without emitting this block is not sufficient.
+
+   ```markdown
+   ## Review Gate
+   Rounds: [N]
+   Pre-flight: pass / fail
+   Status: clean / blocked / user decision
+   ```
+
+4. **Summary** (standalone runs only — skip when called from another workflow)
    ```markdown
    ## Review-Code Complete
-
-   ### Outcome
-   - [Clean / blocked / stopped on user decision]
-
-   ### Rounds: [N]
+   Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 
    ### Fixed
-   - [List of issues fixed, grouped by file]
+   - [Issues fixed, grouped by file — or "none"]
 
-   ### Verification
-   - [Checks run after fixes]
-
-   ### Tests Added
-   - [Any tests written to cover gaps]
-
-   ### Remaining Nitpicks
-   - [Items noted but not fixed — optional improvements]
-
-   ### Stop Reason
-   - [Only nitpicks remain / blocker / user decision]
+   ### Remaining
+   - [Nitpicks left unfixed, or blockers requiring user decision — or "none"]
    ```
 
 ## Notes

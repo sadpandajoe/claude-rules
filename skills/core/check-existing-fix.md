@@ -23,7 +23,7 @@ Run the relevant checks in parallel:
 
 ## Output
 
-Always return a normalized summary:
+Always return the normalized summary block below. The calling workflow branches on this output — gathering the evidence without producing this block is not sufficient.
 
 ```markdown
 ## Existing Fix Status

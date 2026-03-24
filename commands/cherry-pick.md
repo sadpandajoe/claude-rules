@@ -36,8 +36,8 @@ Safely move one or more isolated changes onto the target branch.
 - escalate instead of rebuilding or refreshing the environment automatically
 
 This contract is the default execution boundary for `/cherry-pick`.
-Do not stop just to present it.
-Surface it only if intervention is needed or summarize adherence in the final report.
+Never block execution to present the contract.
+If the workflow would cross a contract boundary, stop and ask the user before proceeding — do not cross first and report after.
 
 ## Usage
 ```
@@ -67,13 +67,17 @@ Surface it only if intervention is needed or summarize adherence in the final re
    For a single input, investigate that change directly.
    For multiple inputs, process the planned sequence one change at a time.
 
-   When the change is intended to resolve a bug, validate that the target line still needs it before applying:
+   When the change is intended to resolve a bug, run `check-existing-fix.md` and produce its formal output block (the `## Existing Fix Status` summary with status, confidence, and evidence). The check itself is not enough — the normalized output is required so the calling workflow can branch on it.
+
+   **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target).
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
 
    This phase produces the risk assessment for each change.
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
    Otherwise record the status in the execution table and stop for user input only where required.
+
+   **Fast path for single LOW-risk changes**: When there is only one change and investigation rates it `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, combine investigate and apply into a single phase — emit the action gate block and proceed directly to apply without a separate presentation step.
 
 3. **Apply Each Auto-Approved Cherry-Pick Sequentially** (`release-engineer`)
 
@@ -129,10 +133,6 @@ Surface it only if intervention is needed or summarize adherence in the final re
    - **Prerequisites**: [Any commits needed first]
    - **Residual risk**: [What remains uncertain]
 
-   ### Contract Adherence
-   - **Within contract**: Yes / No
-   - **Boundary crossed**: [if any]
-   - **Intervention required**: [if any]
    ```
 
    Keep the dependency graph.
@@ -166,6 +166,12 @@ When cherry-picking multiple commits in sequence:
 - If one fails mid-chain, do NOT continue with subsequent picks
 - Clean up the failed state (`git cherry-pick --abort`) before deciding next steps
 - Document which picks succeeded and which didn't
+
+## PROJECT.md Update Discipline
+
+Cherry-picks are branch-movement operations, not project-state changes. PROJECT.md updates are **not required** for cherry-pick workflows. The execution table and final report in the conversation are sufficient documentation.
+
+Exception: if the cherry-pick is part of a larger workflow (e.g., `/fix-bug` routing to `/cherry-pick`), the parent workflow owns the PROJECT.md update.
 
 ## Notes
 - Always use `cherry-pick -x` to preserve source reference

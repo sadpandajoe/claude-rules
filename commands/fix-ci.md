@@ -72,7 +72,12 @@
    | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
    | Verification | STRONG or PARTIAL available | WEAK only |
 
-   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Skip directly to step 8 (Apply Safe Fixes). Still verify locally, run `/review-code`, and update PROJECT.md once when done.
+   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
+   1. Apply the fix (step 8)
+   2. Verify locally (step 9)
+   3. `/review-code` — must produce Review Gate block (this is not optional)
+   4. Update PROJECT.md (single update)
+   5. Emit summary (step 11)
 
    **Standard path**: any signal is in the Standard column, or confidence is below 8/10. Continue to step 5.
 
@@ -116,15 +121,20 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/verify-fix.md
 
-10. **Review Changed Files**
+10. **Review Changed Files** (gate)
 
    If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+
+   This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
 
 11. **Summary**
    ```markdown
    ## Fix-CI Complete
    [1-2 lines: what failed and what was fixed]
+
+   ### Review
+   - Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 
    ### What to do next
    - [Specific next action]

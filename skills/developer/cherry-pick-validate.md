@@ -27,6 +27,8 @@ At minimum:
 2. Run the smallest relevant build or type-check.
 3. Run targeted tests covering the changed area.
 
+For config-only changes (YAML, JSON, feature flags) where there is no build or test to run, validate by parsing the file programmatically and verifying the intended effect (e.g., load YAML and assert the expected keys/values are present).
+
 Run broader validation when:
 
 - the cherry-pick touched shared infrastructure

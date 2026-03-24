@@ -36,6 +36,7 @@ Do not parallelize if:
 - If a prerequisite change is truly required, stop and send the decision back to the release-engineer phase
 - Reject the cherry-pick if preserving source intent would require a broad refactor
 - Record adaptation severity in the execution table as `None`, `Minor`, `Medium`, or `High`
+- **Never use `git checkout --theirs` or `git checkout --ours`** — in cherry-pick context these take the full file from one side, silently discarding the other's changes. Always resolve conflicts by reading markers and editing surgically.
 
 ## Escalation Triggers
 
