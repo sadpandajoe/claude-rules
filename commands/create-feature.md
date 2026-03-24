@@ -28,6 +28,8 @@
    - Shortcut story ID or URL
    - GitHub issue or PR reference / URL
 
+   When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any planning or code investigation. Extract scope, acceptance criteria, and constraints from the source. These are authoritative — don't re-derive scope from scratch.
+
    Pull in external context when references are provided.
 
 2. **Complexity Gate**
@@ -138,7 +140,7 @@
    - prepare the environment when needed
    - for each implementation slice, define the acceptance or regression test first
    - write the failing test before the code change when feasible
-   - if test-first is blocked by env, repro, or harness constraints, record why before implementing
+   - if test-first is blocked by env, repro, or harness constraints, write the test anyway and record the verification gap — writing is separate from running
    - for mechanical changes (renames, config swaps, endpoint changes with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
    - implement the feature through `developer`
    - run QA validation when the work is user-visible

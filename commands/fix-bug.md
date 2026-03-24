@@ -28,6 +28,8 @@
    - Shortcut story ID or URL
    - GitHub issue or PR reference / URL
 
+   When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any code investigation. Extract the reproduction URL, affected page/area, and error description. These are authoritative — don't re-derive the affected area from scratch by scanning code.
+
    Pull in external context when references are provided.
 
 2. **Complexity Gate**
@@ -62,13 +64,17 @@
 
    Do not silently decide — always emit the gate block above.
 
-3. **Launch Early Lanes in Parallel**
+3. **Launch Early Lanes**
 
-   Start these tracks together:
+   These tracks are independent and can run together:
    - `qa/triage-bug.md` for first-pass triage and repro requirements
    - `developer/investigate-bug.md`
    - `core/check-existing-fix.md`
    - `developer/prepare-environment.md` when UI or workflow validation is likely
+
+   Determine whether to spin up subagents (via the Agent tool) for parallel investigation or run the lanes sequentially in the main thread. Subagents are worth it when multiple lanes involve non-trivial work (e.g., code investigation + upstream scan + environment prep). For simpler bugs, sequential in the main thread is fine.
+
+   When using subagents, pass each one the bug context (ticket summary, affected area, branch) and the relevant skill file. Collect the normalized output blocks before proceeding to step 4.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/triage-bug.md
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/investigate-bug.md
@@ -144,8 +150,10 @@
    Before changing the code:
    - define the regression this fix must catch
    - write or update the failing test first when feasible
-   - if test-first is blocked by repro, env, or harness constraints, record why in `PROJECT.md` before implementing
+   - if test-first is blocked by repro, env, or harness constraints, write the test anyway and record the verification gap — writing is separate from running
    - for mechanical changes (renames, config swaps, off-by-one with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
+
+   Before removing or renaming any public function, method, class, or API endpoint, check for callers outside the immediate fix scope. Removing a method that other code depends on is a breaking change — raise it as a decision for the user rather than treating it as cleanup.
 
    For direct fixes:
    - use `developer/implement-change.md`
@@ -157,11 +165,13 @@
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-change.md
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
 
-12. **Expand Regression Coverage**
+12. **Expand Regression Coverage** (gate)
 
    Keep this phase tightly scoped to the bug at hand:
    - `developer` adds or updates only the automated tests needed to protect this fix
    - `qa` identifies must-cover scenarios, suggested follow-up tests, and out-of-scope risks
+
+   Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap — writing the test is separate from running it. The test must exist in the commit; CI or a future local run validates it.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/expand-scenarios.md
 
@@ -181,6 +191,8 @@
    For UI, workflow, or live-behavior bugs:
    - run `qa/validate-fix.md` when the app is runnable locally or in a suitable environment
    - use Playwright MCP as the default UI repro and validation path when available
+
+   If the app cannot be run locally (missing Docker, env dependencies, or data requirements), note the blocker in PROJECT.md and skip QA validation. Check prerequisites before attempting — don't discover the failure experimentally.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/validate-fix.md
 

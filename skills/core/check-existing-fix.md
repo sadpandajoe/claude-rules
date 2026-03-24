@@ -14,12 +14,17 @@ Run the relevant checks in parallel:
 
 1. `upstream scan`
    - Is the bug already fixed in `master`?
+   - Check: `git log master -- <affected-files>` for recent changes to the area
+   - Check: `git log master --grep="<bug keyword>"` for fix-related commits
+   - Check: `gh pr list -R <repo> --state merged --search "<bug keyword>"` for merged PRs
 
 2. `open PR scan`
    - Is there an open PR that appears to contain the fix but is not merged yet?
+   - Check: `gh pr list -R <repo> --state open --search "<bug keyword or affected area>"`
 
 3. `release-target scan` when needed
    - If the repository supports multiple maintained lines, check the relevant target line as well.
+   - Check: `git log <target-branch> -- <affected-files>`
 
 ## Output
 

@@ -28,10 +28,10 @@
 
 2. **Run Pre-flight Checks**
 
-   Before declaring the review complete, run the repo's standard checks against the changed files:
-   - **Build**: the repo's build command
+   Before declaring the review complete, run the repo's standard checks against the changed files. Discover commands from `package.json` scripts, `Makefile` targets, `pyproject.toml`, or the repo's CI config:
+   - **Build**: e.g., `npm run build`, `make build`
    - **Type check**: `tsc --noEmit` (TypeScript) or equivalent
-   - **Lint**: the repo's lint command
+   - **Lint**: e.g., `npm run lint`, `make lint`
    - **Tests**: covering the changed files
 
    If any check fails, fix the issue and return to step 1 for another review round.
@@ -51,6 +51,12 @@
    ```markdown
    ## Review-Code Complete
    Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
+
+   ### Reviewed
+   - [What was checked and why it's safe — e.g., "e.currentTarget correctness (synthetic event contract guarantees non-null)"]
+
+   ### Not reviewed
+   - [What was deliberately out of scope — e.g., "other e.target patterns in codebase (grepped, none found)" or "ColorPicker test coverage (out of scope)"]
 
    ### Fixed
    - [Issues fixed, grouped by file — or "none"]

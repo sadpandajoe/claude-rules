@@ -15,11 +15,12 @@ Wrap Claude's built-in `/review` in a repo-standard loop:
 ## Process
 
 1. Gather the changed files from unstaged and staged diffs, then apply any explicit path filtering.
-2. Run the built-in `/review` on that scope.
+2. Run the built-in `/review` on that scope. Use `Skill("review")` — this is a Skill tool invocation, not a CLI command or user action. If the Skill tool is unavailable, perform a manual code review using the criteria in `rules/code-review.md`.
 3. Classify findings as `[major]`, `[minor]`, or `[nitpick]`.
-4. Fix all `[major]` and `[minor]` items directly.
-5. Re-run targeted tests after each fix to catch regressions.
-6. Re-run `/review` on the changed files.
+4. For bug-fix reviews: grep the codebase for the same pattern that caused the bug (e.g., if the fix changed `e.target` to `e.currentTarget`, search for other occurrences of the broken pattern). Report matches as findings.
+5. Fix all `[major]` and `[minor]` items directly.
+6. Re-run targeted tests after each fix to catch regressions.
+7. Re-run `/review` on the changed files.
 
 ## Stop Rules
 

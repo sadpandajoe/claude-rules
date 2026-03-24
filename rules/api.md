@@ -102,6 +102,8 @@ git show --stat <commit-hash>
 
 **When to use**: Bulk data gathering, automated pipelines, parallel collection. Faster than MCP, no permission prompts, richer fields.
 
+**Transient errors**: The Shortcut API occasionally returns transient errors (e.g., `organization2_missing`) on first call. Retry once before falling back to asking the user or switching to MCP.
+
 ### Endpoints
 
 | Endpoint | Method | Use |
