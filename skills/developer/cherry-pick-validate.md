@@ -47,6 +47,16 @@ For JavaScript/TypeScript files, run at minimum:
 
 Discover commands from `package.json` scripts, `Makefile` targets, `pyproject.toml`, `setup.cfg`, or CI config. These checks are mandatory, not aspirational — if skipped, the validation status must reflect it.
 
+## Validation Gap Flagging
+
+When targeted tests exist and are runnable but were not executed, explicitly flag the gap — do not silently record a weaker status label. Include in the output:
+
+- what tests were available (e.g., "pytest tests/unit_tests/mcp_service/ covers the changed area")
+- why they weren't run (e.g., "time constraint", "environment not set up", "skipped in favor of build-only")
+- what the recommended follow-up is (e.g., "run before merging")
+
+Recording `Checked` or `Structural` when `Tested` was achievable without extraordinary effort is an undercount that must be called out, not accepted silently.
+
 ## Dependency Manifest Rule
 
 If the cherry-pick touches dependency manifests or lockfiles such as `package.json`, `package-lock.json`, `npm-shrinkwrap.json`, `pnpm-lock.yaml`, `yarn.lock`, `requirements.txt`, `setup.py`, or `pyproject.toml`:
@@ -68,6 +78,7 @@ Use these labels in the execution table. Do not overstate what was actually veri
 |-------|---------|
 | **Tested** | Build + targeted tests passed |
 | **Checked** | Lint/type-check passed, no targeted tests run |
+| **Build-only** | Build passed (pre-commit hooks or equivalent), no lint/type-check/test beyond that |
 | **Structural** | Conflict markers clear, file parse OK, no lint/build/test run |
 | **Not run** | No validation performed |
 

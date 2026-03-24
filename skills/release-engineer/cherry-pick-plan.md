@@ -75,9 +75,14 @@ Use these field meanings:
 - `Risk`: `LOW`, `MED`, or `HIGH`
 - `Confidence`: confidence in the move as `X/10`
 - `Decision`: `Auto`, `Approval`, or `Escalate`
-- `Status`: `Planned`, `Applied`, `Blocked`, `Rejected`, or `Skipped`
+- `Status`: `Planned`, `Applied`, `Partial`, `Blocked`, `Rejected`, or `Skipped`
+  - `Partial` = applied but significant portions dropped due to architecture mismatch, missing prerequisites, or target incompatibility. Always requires a Detailed Notes entry explaining what was dropped and why.
 - `Adaptation`: `None`, `Minor`, `Medium`, or `High`
-- `Validation`: `Not run`, `Clean`, `Tested`, `Build-only`, or a short repo-specific equivalent
+  - `None` = applied mechanically, no conflict resolution
+  - `Minor` = resolved import paths, renamed variables, or trivial API differences
+  - `Medium` = rewrote logic to fit target-side APIs or extracted functional subset from a mixed commit
+  - `High` = dropped significant chunks (entire functions, files, or bug fixes) because the target lacks required architecture. Requires user awareness — always pair with a Detailed Notes entry.
+- `Validation`: `Not run`, `Tested`, `Checked`, `Build-only`, `Structural`, or a short repo-specific equivalent
 
 Do not overload the `Risk` field with prose. Put the explanation in `Notes`.
 

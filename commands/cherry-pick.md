@@ -25,7 +25,7 @@ Safely move one or more isolated changes onto the target branch.
 - forcing incompatible dependencies, APIs, or structural changes onto the target branch
 
 ### Success Criteria
-- each requested change is classified as `Applied`, `Blocked`, `Rejected`, or `Skipped`
+- each requested change is classified as `Applied`, `Partial`, `Blocked`, `Rejected`, or `Skipped`
 - applied changes preserve source intent on the target branch
 - validation status is recorded for each applied change
 - PROJECT.md contains the final execution table and detailed notes for non-trivial rows
@@ -106,38 +106,39 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
 
 6. **Document the Plan and Outcome**
+
+   **Planning phase** uses the full execution table (12 columns) defined in `cherry-pick-plan.md`. That table is the working artifact during investigation and apply.
+
+   **Final report** uses a condensed format. Lead with a one-liner, use a compact table, and end with actionable residual items:
+
    ```markdown
-   ## Cherry-Pick Plan
+   ## Cherry-Pick Summary
 
-   ### Target Branch
-   <branch>
+   [X of N applied, Y rejected, Z partial] → <target branch>
 
-   ### Dependency Graph
-   | Change | Depends On | Independent |
-   |--------|------------|-------------|
-   | PR #123 | — | Yes |
-
-   <short summary of whether inter-change dependencies were detected>
-
-   ### Execution Table
-   | # | SHA | PR | Description | Depends On | Risk | Confidence | Decision | Status | Adaptation | Validation | Notes |
-   |---|-----|----|-------------|------------|------|------------|----------|--------|------------|------------|-------|
-   | 1 | `<sha>` | #123 | <summary> | — | LOW | 9/10 | Auto | Applied | None | Tested | Applied cleanly |
-   | 2 | `<sha>` | #124 | <summary> | #123 | MED | 7/10 | Approval | Blocked | Minor | Not run | Needs user approval for prerequisite |
+   ### Results
+   | SHA | PR | Status | Validation | Notes |
+   |-----|----|--------|------------|-------|
+   | `<sha>` | #123 | Applied | Tested | Clean apply |
+   | `<sha>` | #124 | Partial | Checked | 5 of 7 sub-fixes applied; encoding fix dropped — see below |
+   | `<sha>` | #125 | Rejected | — | Missing decorator infrastructure on target |
 
    ### Detailed Notes
    #### `<sha>` — <summary>
-   - **Source**: <source branch or PR>
    - **Why non-trivial**: [conflict, rejection reason, or intervention point]
    - **Adaptation details**: [What was modified and why]
-   - **Prerequisites**: [Any commits needed first]
+   - **What was dropped**: [specific functions, files, or sub-fixes omitted]
    - **Residual risk**: [What remains uncertain]
 
+   ### What to do next
+   - [Actionable residual items — e.g., "encoding bug likely affects target via different code path — needs separate fix"]
+   - [Validation gaps — e.g., "run pytest tests/unit_tests/mcp_service/ before merging"]
+   - [Pending PRs to monitor — e.g., "#38676 still open — pick when merged"]
    ```
 
-   Keep the dependency graph.
-   Use one master execution table for both planning and final outcome.
-   Add detailed notes only for rows that are not straightforward.
+   Keep the dependency graph from the planning phase if inter-change dependencies were detected.
+   The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
+   Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
 
    If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 

@@ -46,6 +46,16 @@
      --jq '.check_runs[] | select(.conclusion == "failure")'
    ```
 
+   If `gh run view --log-failed` returns empty output (exit 0 but no log lines), fall back to per-job logs:
+   ```bash
+   # List jobs for the run
+   gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
+     --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+
+   # Fetch logs for each failed job
+   gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
+   ```
+
    If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
    - Check whether a local log file or zip bundle was provided in step 1.
    - If yes, use that file as the log source.
@@ -69,6 +79,22 @@
 
 4. **Complexity Gate**
 
+   **Not-our-failure fast path**: If ALL classified failures are **Pre-existing / not-our-failure**, exit the workflow early — no fix/verify/review cycle. Emit:
+   ```markdown
+   ## Fix-CI Complete — Not Our Failure
+
+   **Run**: [run URL]
+
+   | Failure | Evidence |
+   |---------|----------|
+   | [failure name] | Not in diff; same failure on [base branch] run [link] |
+
+   ### What to do next
+   - Re-run the failed job if it's flaky, or file a separate issue for the pre-existing failure.
+   - This branch's changes are not implicated.
+   ```
+   If SOME failures are ours and some are pre-existing, note the pre-existing ones and continue the workflow for the remaining failures.
+
    Evaluate each classified failure against:
 
    | Signal | Trivial | Standard |
@@ -81,7 +107,9 @@
    **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
    1. Apply the fix (step 8)
    2. Verify locally (step 9)
-   3. `/review-code` — must produce Review Gate block (this is not optional)
+   3. Review gate — choose based on diff content:
+      - **Zero logic diff** (formatting-only, lint-disable, import reorder): emit Review Gate directly with `Status: skipped` and reason. No `/review-code` invocation needed.
+      - **Any other diff**: invoke `/review-code` — must produce Review Gate block.
    4. Update PROJECT.md (single update)
    5. Emit summary (step 11)
 
@@ -143,15 +171,17 @@
 
    This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
 
-   For truly minimal mechanical fixes (lint-disable comments, import reordering, duplicate removal), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason:
+   **Skip rule** (aligned with trivial path sub-step 3): When the diff contains zero logic changes — formatting-only, lint-disable comments, import reordering, whitespace — skip the `/review-code` invocation and emit the Review Gate block directly:
    ```markdown
    ## Review Gate
    Rounds: 0
    Pre-flight: pass
-   Status: skipped — [reason, e.g. "lint-disable additions only, no logic changes"]
+   Status: skipped — [reason, e.g. "formatting-only fix, no logic changes"]
    ```
+   If the diff touches any logic, invoke `/review-code` — do not skip.
 
 11. **Summary**
+   **Full template** (standard path or trivial path with PARTIAL verification):
    ```markdown
    ## Fix-CI Complete
    [1-2 lines: what failed and what was fixed]
@@ -164,6 +194,13 @@
 
    ### Open risks
    - [Anything uncertain or untested]
+   ```
+
+   **Compact template** (trivial path + STRONG verification + review skipped or clean):
+   ```markdown
+   ## Fix-CI Complete
+   [1 line: what failed → what was fixed] | Verification: STRONG | Review: skipped — [reason]
+   Next: [specific next action]
    ```
 
 ## PROJECT.md Update Discipline
@@ -189,7 +226,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / complexity-gate / rca / gate / apply / verify / review / summarize
+- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
 - Resume target: <run id, artifact, failing job, or changed file set>
 - Completed items: <finished phases or already-fixed failures>
 ### State

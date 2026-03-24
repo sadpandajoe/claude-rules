@@ -33,6 +33,16 @@ Run these tracks in parallel when possible:
    - Confirm whether an equivalent fix already exists on the target branch (via `check-existing-fix.md` — but see that file's skip rules for dependency upgrades and mixed PRs)
    - Identify obvious backport ordering constraints
 
+## Bundled PRs
+
+When a single PR or commit contains multiple independent fixes (e.g., "fix 7 bugs" squashed into one commit):
+
+- Identify and list the distinct sub-fixes during source analysis.
+- Assess each sub-fix individually against the target branch — some may apply cleanly while others hit architecture mismatches.
+- If sub-fixes are independent, they can be included or excluded individually. Use `Partial` status when some sub-fixes are dropped.
+- If sub-fixes are entangled (shared code paths, interdependent changes), treat the commit atomically — apply all or reject all.
+- Note in the execution table's `Notes` column how many sub-fixes the PR contains and how many were included (e.g., "5 of 7 sub-fixes applied, 2 dropped — see Detailed Notes").
+
 ## Batch Execution
 
 This file describes per-change investigation. When investigating multiple independent changes, prefer parallel subagents (one per change) over sequential investigation in the main context. The within-change tracks (source, target, prereq) are typically fast enough to run sequentially inside a single agent — the bigger parallelism win is across changes.
