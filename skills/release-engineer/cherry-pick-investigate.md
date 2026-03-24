@@ -30,7 +30,7 @@ Run these tracks in parallel when possible:
 
 3. Prerequisite scan
    - Look for earlier commits the change appears to depend on
-   - Confirm whether an equivalent fix already exists on the target branch
+   - Confirm whether an equivalent fix already exists on the target branch (via `check-existing-fix.md` — but see that file's skip rules for dependency upgrades and mixed PRs)
    - Identify obvious backport ordering constraints
 
 ## Batch Execution
@@ -81,3 +81,12 @@ Even if the shared action gate would otherwise allow automatic action, stop and 
 - a multi-commit sequencing choice is still unresolved
 
 When this phase overrides the batch plan, update the execution table rather than carrying two competing assessments.
+
+## Presentation
+
+Keep investigation output compact. Focus on:
+- files to exclude and why
+- key risks and adaptation needs
+- the execution gate block
+
+Avoid exhaustive file-by-file tables when most files apply cleanly. A summary line ("12 files apply cleanly, 2 excluded, 1 needs adaptation") is better than a 12-row table with "OK" repeated.

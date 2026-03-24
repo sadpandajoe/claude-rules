@@ -2,6 +2,14 @@
 
 Use this phase once investigation says the change should proceed.
 
+## Pre-Exclusion
+
+When investigation identified files to exclude (e.g., CI configs, submodule pointers, files not relevant to the target branch):
+
+1. Build the exclusion list before running `cherry-pick -x`.
+2. If the exclusion set is large or the change is high-adaptation, consider applying with `git diff <commit>^..<commit> -- <files-to-include> | git apply` instead of cherry-pick + cleanup.
+3. For small exclusion sets, proceed with cherry-pick and revert the excluded files after resolution.
+
 ## Execution
 
 1. Switch to the target branch.

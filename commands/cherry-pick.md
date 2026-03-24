@@ -69,7 +69,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    When the change is intended to resolve a bug, run `check-existing-fix.md` and produce its formal output block (the `## Existing Fix Status` summary with status, confidence, and evidence). The check itself is not enough — the normalized output is required so the calling workflow can branch on it.
 
-   **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target).
+   **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target). **Exception**: skip the check for dependency upgrades, version bumps, or mixed PRs where the primary change is not an isolated defect — see `check-existing-fix.md` skip rules. When skipping, still emit the output block with `Status: SKIPPED`.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
 

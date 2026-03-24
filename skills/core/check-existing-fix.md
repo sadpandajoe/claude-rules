@@ -4,6 +4,15 @@ Use this helper when a workflow needs to know whether a reported bug is already 
 
 This is a shared helper for `developer`, `release-engineer`, and workflows such as `/fix-bug` and `/cherry-pick`.
 
+## When to Skip
+
+Skip this check when the primary change is not an isolated defect correction:
+- Dependency upgrades or version bumps (even if tagged `fix`)
+- Mixed PRs where the dominant change is a dependency or structural upgrade
+- Refactors that happen to fix a side-effect
+
+When skipping, emit the output block with `Status: SKIPPED` and a one-line reason. The calling workflow still needs the block to branch on.
+
 ## Goal
 
 Run the relevant checks in parallel, merge the evidence, and return one normalized outcome that the calling workflow can act on.
@@ -33,7 +42,7 @@ Always return the normalized summary block below. The calling workflow branches 
 ```markdown
 ## Existing Fix Status
 
-Status: FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED
+Status: FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED / SKIPPED
 Confidence: X/10
 
 Upstream Evidence:
