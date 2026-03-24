@@ -40,6 +40,12 @@
    gh run view <run-id> --log-failed
    ```
 
+   If `gh run list` returns no failures, check the check-runs endpoint — failures may be at the check-run level rather than the workflow-run level:
+   ```bash
+   gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
+     --jq '.check_runs[] | select(.conclusion == "failure")'
+   ```
+
    If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
    - Check whether a local log file or zip bundle was provided in step 1.
    - If yes, use that file as the log source.
@@ -67,7 +73,7 @@
 
    | Signal | Trivial | Standard |
    |--------|---------|----------|
-   | Failure pattern | Single known-pattern match | Novel or multiple failures |
+   | Failure pattern | Known-pattern matches (all mechanical) | Novel failure, or mixed mechanical + behavioral |
    | Files touched | 1-2 | 3+ or unclear |
    | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
    | Verification | STRONG or PARTIAL available | WEAK only |
@@ -117,6 +123,15 @@
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
+   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
+   ```bash
+   git commit --fixup=<originating-sha>
+   # repeat for each originating commit
+   git rebase --autosquash <base>
+   ```
+
+   Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
+
 9. **Verify Locally** (`build-engineer`)
 
    @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/verify-fix.md
@@ -127,6 +142,14 @@
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
    This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
+
+   For truly minimal mechanical fixes (lint-disable comments, import reordering, duplicate removal), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason:
+   ```markdown
+   ## Review Gate
+   Rounds: 0
+   Pre-flight: pass
+   Status: skipped — [reason, e.g. "lint-disable additions only, no logic changes"]
+   ```
 
 11. **Summary**
    ```markdown
@@ -153,6 +176,8 @@
 - at final completion with verification strength and commit recommendation
 
 **Trivial path** — single `PROJECT.md` update after implementation, verification, and `/review-code` are all complete.
+
+**No PROJECT.md** — if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required. Note the skip in the summary.
 
 Keep the updates compact, but do not defer all state changes to the end of the workflow.
 

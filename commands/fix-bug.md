@@ -172,6 +172,8 @@
 
    This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
 
+   For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
+
    Do not skip this step when resuming from a pre-built plan.
 
 14. **Validate the Fix With QA When Needed**
@@ -219,6 +221,8 @@ Update `PROJECT.md` at these points:
 
 **Trivial path:**
 - after implementation and validation complete (single update is sufficient)
+
+**No PROJECT.md** — if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required. Note the skip in the summary.
 
 Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
 
