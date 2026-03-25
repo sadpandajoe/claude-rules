@@ -13,6 +13,7 @@ Do not redo batch ordering or final validation here.
 
 Classify each conflict before editing:
 
+- **modify/delete** — file exists on source but not target. Resolve with `git rm` in the apply phase, not here. If adapt receives these, hand back to apply.
 - import or module path mismatch
 - target API mismatch
 - structural drift

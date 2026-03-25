@@ -109,10 +109,12 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    **Planning phase** uses the full execution table (12 columns) defined in `cherry-pick-plan.md`. That table is the working artifact during investigation and apply.
 
-   **Final report** uses a condensed format. Lead with a one-liner, use a compact table, and end with actionable residual items:
+   **Final report** uses a condensed format. Lead with the ticket outcome (what the user cares about), then the execution table, then actionable residuals:
 
    ```markdown
    ## Cherry-Pick Summary
+
+   [1-2 lines answering the user's original question — e.g., "The StructuredContentStripperMiddleware (the encoding fix) is now active on this branch." or "The fix from #38837 is applied; CI re-run needed to confirm."]
 
    [X of N applied, Y rejected, Z partial] → <target branch>
 

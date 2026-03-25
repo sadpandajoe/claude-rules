@@ -26,6 +26,7 @@ Run these tracks in parallel when possible:
    - Check whether touched files and modules exist on the target branch
    - Compare imports, APIs, and obvious dependency differences
    - Detect deleted or renamed target-side modules
+   - **Flag modify/delete risk**: when source files don't exist on target, explicitly note this in the output — the apply phase needs to know it will hit modify/delete conflicts and must use `git rm`, not post-apply revert. List the specific files.
    - If `package.json`, lockfiles, or equivalent dependency manifests changed, treat validation as non-routine and call out whether build or CI verification is needed
 
 3. Prerequisite scan
