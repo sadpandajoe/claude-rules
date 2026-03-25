@@ -2,7 +2,6 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/universal.md
 @/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.
@@ -65,6 +64,8 @@ This takes ~5-10 min. Continue to 3b while it runs.
 **3b. Collect Shortcut data (while GitHub runs in background):**
 
 Use the Shortcut REST API (preferred) via `curl` with `$SHORTCUT_API_TOKEN`.
+
+**Important**: The Shortcut API returns transient errors (e.g., `organization2_missing`) on the first call of a session. This is expected. Retry the exact same request once before reporting any error. See `rules/shortcut-api.md` for the retry wrapper pattern.
 
 Run all team queries in **parallel bash calls** — each team's queries are independent:
 - **Completed stories** per team: `POST /stories/search` with `completed_at_start`/`completed_at_end` from config date range, `group_id`

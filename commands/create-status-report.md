@@ -2,7 +2,6 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/universal.md
 @/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
 
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.
 > **Produces**: Program health report with epic progress, flow health, risks, blockers, and team state.
@@ -55,6 +54,8 @@ Use the **Agent tool** to spawn 2-3 agents **in a single message** (this is crit
 - Return structured JSON or markdown that the main context can synthesize
 
 **Agent 1 — Shortcut REST API** (via `curl` with `$SHORTCUT_API_TOKEN`):
+
+**Important**: The Shortcut API returns transient errors (e.g., `organization2_missing`) on the first call of a session. This is expected. Retry the exact same request once before reporting any error. See `rules/shortcut-api.md` for the retry wrapper pattern.
 
 Run all team queries in **parallel bash calls** (each team's queries are independent):
 - **WIP stories** per team: `POST /stories/search` with `workflow_state_types: ["started"]` and `group_id`

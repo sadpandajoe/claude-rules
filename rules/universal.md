@@ -100,5 +100,6 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 | `resource-management.md` | Docker limits, test worker scaling |
 | `cherry-picking.md` | Cross-branch work |
 | `code-review.md` | Review guidelines, scoring |
-| `api.md` | External API reference: GitHub CLI, Shortcut REST, Notion MCP |
+| `shortcut-api.md` | Shortcut REST API: auth, endpoints, retry, query patterns |
+| `input-detection.md` | Route ticket/issue inputs to Shortcut or GitHub |
 | `pgm.md` | Program management: org context, audience tiers, data collection rules |

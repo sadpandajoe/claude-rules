@@ -2,7 +2,7 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 @/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
 @/Users/joeli/opt/code/ai-toolkit/skills/pm/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
