@@ -10,6 +10,25 @@
 > **When**: You have a bug report and want the repo-standard workflow to triage it, check whether it is already fixed upstream or pending in a PR, implement a safe fix when needed, and finish the local bug-fix flow end to end.
 > **Produces**: Triage notes, upstream-status decision, validated RCA, implemented fix when appropriate, review and QA results, and either an automatic `fix:` commit or a handoff to the user.
 
+## Plan Mode Usage
+
+Steps 1–2 (normalize input, complexity gate) happen **before** plan mode in normal mode. The complexity gate must be visible in conversation, and a TRIVIAL result skips plan mode entirely.
+
+**Standard path**: After the complexity gate, enter plan mode for investigation and planning (steps 3–10). Let plan mode's natural phases drive the work, seeded with this command's requirements:
+
+| Plan mode phase | `/fix-bug` work |
+|-----------------|----------------|
+| **Explore** | Early lanes — triage, investigate, check existing fix, prepare env (steps 3–5) |
+| **Design** | Branch on existing-fix status, validate RCA (steps 6–9) |
+| **Review** | Action gate — risk, confidence, verification strength (step 10) |
+| **Final Plan** | Produce plan file with: RCA, fix approach, test strategy, validation plan |
+
+On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PROJECT.md, then implement, review, QA, commit.
+
+**Trivial path**: Do not enter plan mode. Go straight to implementation.
+
+**Exit trigger**: When the action gate (step 10) says "proceed" or "plan first," exit plan mode immediately — the next steps require file writes. If it says "stop and escalate," exit plan mode and surface the decision to the user.
+
 ## Usage
 ```
 /fix-bug "saving settings fails on Safari"
@@ -53,12 +72,16 @@
    ```
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
-   1. Write the regression test (test-first when feasible)
-   2. Implement the fix
-   3. Run tests covering the changed files
+   1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
+   2. Implement the fix — do not enter plan mode for trivial fixes; go straight to the edit
+   3. Run the actual test suite covering the changed files (e.g., `pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
    4. `/review-code` — must produce Review Gate block (this is not optional)
    5. Update PROJECT.md (single update)
-   6. Emit summary (step 16)
+   6. Emit summary (step 17)
+
+   **Micro-fix** (subset of trivial): When the diff is ≤3 lines, pre-commit passes, test suite passes, and confidence is 10/10:
+   - `/review-code` may be collapsed to a single Review Gate block with `Status: micro-fix` and the diff inlined — no iterative loop needed
+   - PROJECT.md update is optional if no PROJECT.md exists and the workflow completes in a single pass
 
    **Standard**: Continue to step 3.
 
@@ -88,7 +111,7 @@
    - first-pass triage from the report and available evidence
    - full reproduction once the local app or target environment is ready
 
-   Update `PROJECT.md` with:
+   Track the merged findings in conversation (plan mode prevents file writes):
    - bug summary
    - repro status
    - likely affected area
@@ -100,7 +123,7 @@
    For UI and workflow bugs:
    - wait for environment prep to make the app runnable when possible
    - have QA re-run the repro with Playwright MCP
-   - update `PROJECT.md` with the stronger repro result before moving into RCA or implementation
+   - record the stronger repro result in conversation before moving into RCA
 
 6. **Branch on Existing-Fix Status**
 
@@ -145,7 +168,18 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
-11. **Implement Through `developer`**
+11. **Exit Plan Mode → PROJECT.md**
+
+   Read the plan file produced by plan mode. Write its content into PROJECT.md:
+   - bug summary, repro status, affected area
+   - upstream-fix status
+   - validated RCA
+   - fix approach and test strategy
+   - action-gate outcome
+
+   This is the first PROJECT.md write for the standard path. All findings collected during plan mode are flushed here.
+
+12. **Implement Through `developer`**
 
    Before changing the code:
    - define the regression this fix must catch
@@ -165,7 +199,7 @@
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-change.md
    @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
 
-12. **Expand Regression Coverage** (gate)
+13. **Expand Regression Coverage** (gate)
 
    Keep this phase tightly scoped to the bug at hand:
    - `developer` adds or updates only the automated tests needed to protect this fix
@@ -175,7 +209,7 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/expand-scenarios.md
 
-13. **Review Changed Files** (gate)
+14. **Review Changed Files** (gate)
 
    Run `/review-code` on changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
@@ -186,7 +220,7 @@
 
    Do not skip this step when resuming from a pre-built plan.
 
-14. **Validate the Fix With QA When Needed**
+15. **Validate the Fix With QA When Needed**
 
    For UI, workflow, or live-behavior bugs:
    - run `qa/validate-fix.md` when the app is runnable locally or in a suitable environment
@@ -196,7 +230,7 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/qa/validate-fix.md
 
-15. **Commit New Bug Fixes**
+16. **Commit New Bug Fixes**
 
    If this workflow implemented a new fix itself:
    - create a normal `fix:` commit after review and validation pass
@@ -205,19 +239,27 @@
    - do not auto-commit beyond the cherry-pick result
    - leave any follow-up amend or extra-commit decision to the user
 
-16. **Summary**
+17. **Summary**
+
+   Lead with the answer to the user's original question — not the implementation details. If the user asked "did X break things?", answer that first. Technical details go in a collapsible section or are omitted unless the user asked for them.
+
    ```markdown
    ## Fix-Bug Complete
-   [1-2 lines: what the bug was, why it was broken, what fixed it, confidence level]
-
-   ### Review
-   - Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
+   [1-2 lines answering the user's original question, then: what fixed it, confidence level]
 
    ### What to do next
-   - [Specific next action]
+   - [Specific next action — PR link, CI re-run, merge step]
 
    ### Open risks
    - [Anything uncertain or untested]
+
+   <details><summary>Technical details</summary>
+
+   - Root cause: [brief]
+   - Fix: [what changed]
+   - Review: Rounds [N] | Pre-flight [pass/fail] | Status [clean/blocked]
+
+   </details>
    ```
 
 ## PROJECT.md Update Discipline
@@ -225,9 +267,7 @@
 Update `PROJECT.md` at these points:
 
 **Standard path:**
-- after the first early-lane sync with triage, investigation, and upstream-status findings
-- after the UI repro re-sync when that path applies
-- after RCA validation and action-gate outcome
+- **step 11** — after exiting plan mode, flush all investigation findings (triage, RCA, upstream status, action-gate outcome) into PROJECT.md. This is the first write.
 - after implementation, review, and QA validation
 - at final completion with the branch outcome and commit result
 
@@ -246,7 +286,7 @@ If context gets deep before the workflow completes, write a continuation checkpo
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-bug <arguments>
-- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / plan / implement / review / qa-validate / commit / summarize
+- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / implement / review / qa-validate / commit / summarize
 - Resume target: <issue, PR, repro path, file set, or current validation target>
 - Completed items: <finished phases or decisions already locked in>
 ### State
@@ -264,6 +304,14 @@ After writing the checkpoint:
 - resume `/fix-bug` at the saved phase and target
 
 Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
+
+## Cross-Repo Bugs
+
+When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fix goes in repo B (e.g., upstream):
+- The verification target is repo A's CI, not repo B's local test suite
+- Skip local test steps that cannot exercise the failure path (e.g., `pytest` in repo B when the failure only manifests with repo A's migrations or config)
+- Note the cross-repo gap in the summary under "Open risks"
+- If local tests in repo B can partially cover the fix (e.g., model introspection, type checks), still run them — partial coverage beats none
 
 ## Notes
 - `/fix-bug` is the public bug entrypoint; RCA-only work now stays inside the internal `developer` and `core` helpers

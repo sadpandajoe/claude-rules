@@ -3,12 +3,37 @@
 @/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 @/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
 @/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
+@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/rules/orchestration.md
 @/Users/joeli/opt/code/ai-toolkit/skills/pm/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
 
 > **When**: You have a feature request or other planned non-bug work and want the repo-standard workflow to scope it, review it, implement it, and keep going until a real decision matters.
 > **Produces**: Feature brief, milestones, implementation plan, reviewed plan, implemented local changes, review and QA results, and a handoff before the final commit or PR action.
+
+## Plan Mode Usage
+
+Steps 1–2 (normalize input, complexity gate) happen **before** plan mode in normal mode. The complexity gate must be visible in conversation so the user can react, and a TRIVIAL result skips plan mode entirely.
+
+**Standard path**: After the complexity gate, enter plan mode for planning (steps 3–8). Let plan mode's natural phases (Explore→Design→Review→Final Plan) drive the work, seeded with this command's requirements:
+
+| Plan mode phase | `/create-feature` work |
+|-----------------|----------------------|
+| **Explore** | Decide PM scope, codebase exploration (step 3) |
+| **Design** | Feature brief + milestones (if PM needed), technical plan (steps 4–6) |
+| **Review** | PM brief to 8/10, tech plan to 8/10, cold read (steps 5, 7–8) |
+| **Final Plan** | Produce the plan file with: feature brief, milestones, tech plan, review scores, implementation slices |
+
+On exit, plan mode produces a plan file. The execution phases (steps 9–12) read that plan file as their input.
+
+**Trivial path**: Do not enter plan mode. Go straight to implementation.
+
+**After exiting plan mode** (step 9 onward):
+1. Read the plan file
+2. Write the plan content into PROJECT.md sections (Feature Brief, Milestones, Implementation Plan, Review Summary)
+3. Hit the action gate — decide whether to proceed, stop, or surface a decision
+4. Implement, review, summarize
 
 ## Usage
 ```
@@ -43,7 +68,7 @@
    | New APIs / migrations | No | Yes |
    | Behavioral risk | Mechanical / cosmetic | Functional change |
 
-   State the classification explicitly using the action-gate format:
+   State the classification explicitly **in the conversation** (not just in a plan file) using the action-gate format. The user must see this block and be able to react before the workflow continues.
 
    ```markdown
    ## Complexity Gate
@@ -54,12 +79,12 @@
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Implement the change
-   2. Run tests covering the changed files
+   2. Run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
    3. `/review-code` — must produce Review Gate block (this is not optional)
    4. Update PROJECT.md (single update)
    5. Emit summary (step 12)
 
-   **Standard**: Continue to step 3.
+   **Standard**: Continue to step 3. Make this decision yourself and continue automatically — do not ask the user whether to run review iterations, which reviewers to use, or whether the plan is "good enough." End-to-end commands own their internal loops.
 
    Do not silently decide — always emit the gate block above.
 
@@ -109,7 +134,7 @@
    - `core/review-frontend`
    - `core/review-backend`
 
-   Revise the plan until all applicable reviewers are at `8/10` or better.
+   Revise the plan until all applicable reviewers are at `8/10` or better. Run the iterations automatically — do not ask the user whether to continue reviewing or which reviewers to use. Only stop for a blocking decision that requires user input.
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/review-architecture/SKILL.md
    @/Users/joeli/opt/code/ai-toolkit/skills/core/review-implementation/SKILL.md
@@ -124,15 +149,17 @@
 
    @/Users/joeli/opt/code/ai-toolkit/skills/core/finalize-plan/SKILL.md
 
-9. **Update PROJECT.md**
+9. **Exit Plan Mode → PROJECT.md + Action Gate**
 
-   Keep these sections current:
+   Read the plan file produced by plan mode. Write its content into PROJECT.md sections:
    - `Feature Brief`
    - `Milestones`
    - `Implementation Plan`
    - `Review Summary`
 
-   Milestones live only in `PROJECT.md` for now.
+   Then run the action gate to decide whether to proceed, stop, or surface a decision. Use `skills/shared/action-gate.md` — auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
+
+   @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
 10. **Continue Into Implementation**
 
@@ -160,29 +187,36 @@
    Do not skip this step when resuming from a pre-built plan.
 
 12. **Summary**
+
+   Lead with the outcome, not the process. If the user gave you a ticket, answer whether it's done. Keep it concise — technical details go in the collapsible section.
+
    ```markdown
    ## Create-Feature Complete
-   [1-2 lines: what was built and delivered]
-
-   ### Review
-   - Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
+   [1-2 lines: what was built, whether it meets the acceptance criteria, confidence level]
 
    ### What to do next
-   - [Specific next action]
+   - [Specific next action — PR link, deploy step, remaining slices]
 
    ### Open risks
    - [Anything uncertain or untested]
+
+   <details><summary>Technical details</summary>
+
+   - Approach: [brief]
+   - Files changed: [count or list]
+   - Review: Rounds [N] | Pre-flight [pass/fail] | Status [clean/blocked]
+
+   </details>
    ```
 
 ## PROJECT.md Update Discipline
 
+PROJECT.md is the single source of truth for durable state.
+
 Update `PROJECT.md` at these points:
 
 **Standard path:**
-- after the initial feature brief exists
-- after PM brief review reaches `8/10`
-- after the technical plan reaches `8/10`
-- after the final cold read
+- **step 9** — after exiting plan mode, flush the plan file content (feature brief, milestones, tech plan, review scores) into PROJECT.md sections. This is the first and primary write.
 - after implementation and validation complete
 
 **Trivial path:**

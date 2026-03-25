@@ -3,7 +3,7 @@
 **Auth**: `Shortcut-Token: $SHORTCUT_API_TOKEN` header
 **Base URL**: `https://api.app.shortcut.com/api/v3`
 
-**Transient errors**: The Shortcut API returns `organization2_missing` (or similar) on the first call of a session. This is normal — not a real failure. Retry the exact same request once. If the retry also fails, then fall back. Do not report, debug, or switch to MCP on the first failure.
+**⚠️ Transient errors — RETRY ONCE before giving up**: The Shortcut API returns `organization2_missing` (or similar) on the first call of a session. This is normal — not a real failure. Retry the exact same request once. If the retry also fails, then fall back or surface the gap to the user. Do not report, debug, or switch to MCP on the first failure — and do not silently move on after a single retry without flagging that the data is missing.
 
 **Retry pattern** — wrap every Shortcut curl call:
 ```bash

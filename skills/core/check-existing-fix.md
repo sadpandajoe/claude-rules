@@ -11,6 +11,8 @@ Skip this check when the primary change is not an isolated defect correction:
 - Mixed PRs where the dominant change is a dependency or structural upgrade
 - Refactors that happen to fix a side-effect
 
+**Do not skip** when a dependency upgrade *exposes* a pre-existing bug. In that case the bug itself is the subject — the upgrade is context, not the fix. Classify as UNFIXED and continue.
+
 When skipping, emit the output block with `Status: SKIPPED` and a one-line reason. The calling workflow still needs the block to branch on.
 
 ## Goal
