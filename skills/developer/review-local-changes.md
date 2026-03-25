@@ -14,13 +14,16 @@ Wrap Claude's built-in `/review` in a repo-standard loop:
 
 ## Process
 
-1. Gather the changed files from unstaged and staged diffs, then apply any explicit path filtering.
-2. Run the built-in `/review` on that scope. Use `Skill("review")` — this is a Skill tool invocation, not a CLI command or user action. If the Skill tool is unavailable, perform a manual code review using the criteria in `rules/code-review.md`.
+1. Gather the changed files:
+   - **Uncommitted mode** (default): unstaged and staged diffs.
+   - **Committed mode** (`--committed` or when invoked on already-committed changes): `git diff <base>..HEAD`. Skip stage/commit steps in the calling workflow.
+   - Apply any explicit path filtering.
+2. Perform a code review using the criteria in `rules/code-review.md`. Read each changed file, examine the diff, and assess against the scoring framework and severity tags.
 3. Classify findings as `[major]`, `[minor]`, or `[nitpick]`.
 4. For bug-fix reviews: grep the codebase for the same pattern that caused the bug (e.g., if the fix changed `e.target` to `e.currentTarget`, search for other occurrences of the broken pattern). Report matches as findings.
 5. Fix all `[major]` and `[minor]` items directly.
 6. Re-run targeted tests after each fix to catch regressions.
-7. Re-run `/review` on the changed files.
+7. Re-run review on the changed files — including files you just fixed. Review your own fix as if someone else wrote it: check error paths, async ordering, state consistency, and boundary conditions. The re-review is not a formality.
 
 ## Stop Rules
 
@@ -32,6 +35,6 @@ Stop when:
 
 ## Notes
 
-- If the changed code introduces or modifies behavior without tests, that is a `[major]` issue.
+- If the changed code introduces or modifies behavior without tests, that is a `[major]` issue. **Exception**: if the test gap is explicitly tracked as a follow-up in PROJECT.md with a clear plan and owner, do not classify it as a finding — note it in the summary's Remaining section as an acknowledged gap instead.
 - Test-gap checks stay scoped to the changed files; broader scenario discovery belongs to the `qa` support workflows, not `/review-code`.
 - If a fix causes a regression, revert that fix and surface the trade-off instead of shipping it.
