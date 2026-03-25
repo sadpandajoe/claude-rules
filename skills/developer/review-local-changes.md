@@ -21,9 +21,10 @@ Wrap Claude's built-in `/review` in a repo-standard loop:
 2. Perform a code review using the criteria in `rules/code-review.md`. Read each changed file, examine the diff, and assess against the scoring framework and severity tags.
 3. Classify findings as `[major]`, `[minor]`, or `[nitpick]`.
 4. For bug-fix reviews: grep the codebase for the same pattern that caused the bug (e.g., if the fix changed `e.target` to `e.currentTarget`, search for other occurrences of the broken pattern). Report matches as findings.
-5. Fix all `[major]` and `[minor]` items directly.
-6. Re-run targeted tests after each fix to catch regressions.
-7. Re-run review on the changed files — including files you just fixed. Review your own fix as if someone else wrote it: check error paths, async ordering, state consistency, and boundary conditions. The re-review is not a formality.
+5. **Check test coverage for changed behavior.** For each changed file that introduces or modifies behavior, verify that a corresponding test exists. Missing tests are a `[major]` finding. This applies to the original diff **and** to any fixes made during this review loop — if you fix code in step 6, that fix also needs test coverage. Exception: if the test gap is explicitly tracked as a follow-up in PROJECT.md with a clear plan and owner, note it in the summary's Remaining section instead of classifying it as a finding.
+6. Fix all `[major]` and `[minor]` items directly — including adding tests for uncovered behavior.
+7. Re-run targeted tests after each fix to catch regressions.
+8. Re-run review on the changed files — including files you just fixed and tests you just added. Review your own fix as if someone else wrote it: check error paths, async ordering, state consistency, and boundary conditions. The re-review is not a formality.
 
 ## Stop Rules
 
@@ -35,6 +36,5 @@ Stop when:
 
 ## Notes
 
-- If the changed code introduces or modifies behavior without tests, that is a `[major]` issue. **Exception**: if the test gap is explicitly tracked as a follow-up in PROJECT.md with a clear plan and owner, do not classify it as a finding — note it in the summary's Remaining section as an acknowledged gap instead.
 - Test-gap checks stay scoped to the changed files; broader scenario discovery belongs to the `qa` support workflows, not `/review-code`.
 - If a fix causes a regression, revert that fix and surface the trade-off instead of shipping it.
