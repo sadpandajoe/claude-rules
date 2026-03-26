@@ -54,15 +54,11 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    If multiple PRs or SHAs are provided, or if `--plan-only` is set:
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/cherry-pick-plan.md
-
    This phase owns dependency analysis, ordering, and the initial execution table.
 
    If `--plan-only` is set, stop after producing the plan report.
 
 2. **Investigate Each Change in Order** (`release-engineer`)
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/cherry-pick-investigate.md
 
    For a single input, investigate that change directly.
    For multiple inputs, process the planned sequence one change at a time.
@@ -71,8 +67,6 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target). **Exception**: skip the check for dependency upgrades, version bumps, or mixed PRs where the primary change is not an isolated defect — see `check-existing-fix.md` skip rules. When skipping, still emit the output block with `Status: SKIPPED`.
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
-
    This phase produces the risk assessment for each change.
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
    Otherwise record the status in the execution table and stop for user input only where required.
@@ -80,8 +74,6 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    **Fast path for single LOW-risk changes**: When there is only one change and investigation rates it `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, combine investigate and apply into a single phase — emit the action gate block and proceed directly to apply without a separate presentation step.
 
 3. **Apply Each Auto-Approved Cherry-Pick Sequentially** (`release-engineer`)
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/cherry-pick-apply.md
 
    ```bash
    git checkout <target-branch>
@@ -92,15 +84,11 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
 4. **Adapt Conflicts if Needed** (`developer`)
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/cherry-pick-adapt.md
-
    This phase owns conflict classification and code-level adaptation.
    If the cherry-pick state is lost, do not continue blindly; return to the apply phase.
    If a prerequisite or behavior decision is required, stop and ask the user.
 
 5. **Validate Each Applied Change** (`developer`)
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/cherry-pick-validate.md
 
    This phase owns validation depth, including stronger checks for dependency-manifest changes.
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
@@ -142,8 +130,6 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
    Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
 
-   If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
-
    ```markdown
    ## Continuation Checkpoint — [timestamp]
    ### Workflow
@@ -156,11 +142,6 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    - Current execution table snapshot: [latest status summary]
    - Pending intervention points: [any user decisions still needed]
    ```
-
-   After writing the checkpoint:
-   - run `/clear`
-   - run `/start`
-   - resume `/cherry-pick` at the saved phase and target
 
 ## Sequential Cherry-Pick Safety
 

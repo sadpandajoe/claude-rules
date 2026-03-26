@@ -6,14 +6,7 @@
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.
 
-## Pre-flight
-
-This command is data-heavy — pipeline output and follow-up analysis need context room. Before starting, follow the **Context Management** protocol from `rules/universal.md`:
-1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/create-velocity-report` arguments like `--month`), commit, then `/clear` → `/start` to resume
-2. If context is below ~70% but above ~50%, check whether the pipeline output + follow-up conversation will fit — if tight, checkpoint and clear
-3. Then proceed with Step 1
-
-Use this checkpoint shape:
+## Continuation Checkpoint
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
@@ -105,12 +98,7 @@ Flag data quality issues:
 
 Read and present `data/{month}/report.md` to the user.
 
-If `--summary-only`: read `data/{month}/metrics.json` and produce a concise executive summary using:
-
-@/Users/joeli/opt/code/ai-toolkit/skills/pgm/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/pgm/comms.md
-
-with `executive` audience.
+If `--summary-only`: read `data/{month}/metrics.json` and produce a concise executive summary using `pgm/comms.md` with `executive` audience.
 
 If `--audience <mode>` is provided, format the final output for that audience using the same internal PGM formatting skill.
 
@@ -128,4 +116,3 @@ Suggest follow-up actions:
 - For live/current-state data, use `/create-status-report` instead
 - If the pipeline fails, read the error output and diagnose — don't silently skip steps
 - Raw data files can be re-analyzed without re-collecting: skip to Step 3d if `raw_*.json` files already exist for the month
-- If a `/clear` is needed mid-run, write the continuation checkpoint in the format above before resuming through `/start`

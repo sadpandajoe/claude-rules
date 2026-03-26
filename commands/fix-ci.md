@@ -68,8 +68,6 @@
 
 3. **Classify Failures** (`build-engineer`)
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/classify-failure.md
-
    For each failure:
    - identify the failing step
    - match known patterns where possible
@@ -132,11 +130,7 @@
    - multiple plausible root causes exist
    - the proposed fix changes behavior
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
-
 7. **Run the Action Gate**
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
    Proceed automatically only when the gate says the fix is low-risk, high-confidence, and sufficiently verifiable.
 
@@ -162,14 +156,12 @@
 
 9. **Verify Locally** (`build-engineer`)
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/verify-fix.md
-
 10. **Review Changed Files** (gate)
 
    If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
+   `/review-code` must emit its Review Gate block (see `review-code.md` step 3).
 
    **Skip rule** (aligned with trivial path sub-step 3): When the diff contains zero logic changes — formatting-only, lint-disable comments, import reordering, whitespace — skip the `/review-code` invocation and emit the Review Gate block directly:
    ```markdown
@@ -212,15 +204,9 @@
 - after local verification and `/review-code`
 - at final completion with verification strength and commit recommendation
 
-**Trivial path** — single `PROJECT.md` update after implementation, verification, and `/review-code` are all complete.
-
-**No PROJECT.md** — if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required. Note the skip in the summary.
-
 Keep the updates compact, but do not defer all state changes to the end of the workflow.
 
 ## Continuation Checkpoint
-
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
@@ -237,13 +223,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/fix-ci` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone

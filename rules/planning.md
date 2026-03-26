@@ -17,9 +17,3 @@
 - Approach validated
 - Risks assessed
 - Dependencies confirmed
-
-## Related Commands
-- `/create-feature` — End-to-end feature and planned refactor workflow
-- `/fix-bug` — Bug workflow that invokes internal planning only when needed
-- `/start` — Initialize work session
-- `/update-project-file` — Refresh PROJECT.md

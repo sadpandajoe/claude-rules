@@ -18,9 +18,7 @@
 
 1. **Delegate the Review/Fix Loop to `developer`**
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/review-local-changes.md
-
-   This helper owns:
+   Use `developer/review-local-changes.md`. This helper owns:
    - changed-file discovery and scoping (uncommitted or committed mode)
    - code review against `rules/code-review.md`
    - finding normalization

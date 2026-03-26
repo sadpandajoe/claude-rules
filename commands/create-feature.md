@@ -83,10 +83,6 @@ Enter plan mode. Inside plan mode, do all of the following:
 
 Exit plan mode when you have a draft feature brief and technical plan. These do not need to be polished — review iterations in step 4 will refine them.
 
-@/Users/joeli/opt/code/ai-toolkit/skills/pm/create-feature-brief.md
-@/Users/joeli/opt/code/ai-toolkit/skills/pm/plan-milestones.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-feature.md
-
 ### 3. Write PROJECT.md (hard gate)
 
 After exiting plan mode, read the plan file. Write its content into PROJECT.md sections:
@@ -127,15 +123,6 @@ Revise the plan until all applicable reviewers are at 8/10 or better. Run iterat
 
 Update PROJECT.md with final review scores after this step.
 
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-feature-brief/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-architecture/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-implementation/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-frontend/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-backend/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/core/finalize-plan/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
-
 ### 5. Implementation
 
 **Standard path** (from step 4):
@@ -157,7 +144,7 @@ If a meaningful decision surfaces during implementation, stop and present it cle
 
 Run `/review-code` on changed repo-tracked files as an internal loop. Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
+`/review-code` must emit its Review Gate block (see `review-code.md` step 3).
 
 For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
 
@@ -209,21 +196,12 @@ Use this checklist to verify you haven't skipped a gate:
 
 ## PROJECT.md Update Discipline
 
-PROJECT.md is the single source of truth for durable state.
-
 **Standard path:**
 - **step 3** — after exiting plan mode, flush the draft plan into PROJECT.md. This is the first write and a hard gate.
 - **step 4** — after review iterations complete, update with final review scores.
 - after implementation and validation complete.
 
-**Trivial path:**
-- after implementation and validation complete (single update is sufficient).
-
-**No PROJECT.md** — if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required. Note the skip in the summary.
-
 ## Continuation Checkpoint
-
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
@@ -242,13 +220,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/create-feature` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
 - `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped

@@ -74,10 +74,17 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
    2. Implement the fix — do not enter plan mode for trivial fixes; go straight to the edit
-   3. Run the actual test suite covering the changed files (e.g., `pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
+   3. Run the actual test suite covering the changed files (e.g., `pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient. Record the result:
+      - **STRONG**: test suite ran and passes
+      - **PARTIAL**: related checks ran but not the exact suite
+      - **WEAK**: tests could not run locally (missing Docker, env, data) — note why
+      `/review-code` inherits this assessment — do not re-discover the same limitation there.
    4. `/review-code` — must produce Review Gate block (this is not optional)
-   5. Update PROJECT.md (single update)
-   6. Emit summary (step 17)
+   5. Commit the fix (step 16)
+   6. Update PROJECT.md (single update)
+   7. Emit summary (step 17)
+
+   The review gate at step 4 is mid-workflow — steps 5–7 must still execute. Do not stop after the review gate passes.
 
    **Micro-fix** (subset of trivial): When the diff is ≤3 lines, pre-commit passes, test suite passes, and confidence is 10/10:
    - `/review-code` may be collapsed to a single Review Gate block with `Status: micro-fix` and the diff inlined — no iterative loop needed
@@ -98,11 +105,6 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    Determine whether to spin up subagents (via the Agent tool) for parallel investigation or run the lanes sequentially in the main thread. Subagents are worth it when multiple lanes involve non-trivial work (e.g., code investigation + upstream scan + environment prep). For simpler bugs, sequential in the main thread is fine.
 
    When using subagents, pass each one the bug context (ticket summary, affected area, branch) and the relevant skill file. Collect the normalized output blocks before proceeding to step 4.
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/triage-bug.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/investigate-bug.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/check-existing-fix.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/prepare-environment.md
 
 4. **Sync the Early Findings**
 
@@ -157,16 +159,12 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    For `UNFIXED` issues:
    - validate the diagnosis with the shared RCA reviewer
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
-
 10. **Run the Action Gate**
 
    Decide whether to:
    - fix directly now
    - do internal planning first
    - stop for ambiguity or risk
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
 
 11. **Exit Plan Mode → PROJECT.md**
 
@@ -196,9 +194,6 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - use `developer/plan-change.md`
    - then continue with `developer/implement-change.md`
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-change.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/implement-change.md
-
 13. **Expand Regression Coverage** (gate)
 
    Keep this phase tightly scoped to the bug at hand:
@@ -207,18 +202,22 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap — writing the test is separate from running it. The test must exist in the commit; CI or a future local run validates it.
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/expand-scenarios.md
+14. **Review Changed Files** (gate — not the finish line)
 
-14. **Review Changed Files** (gate)
+   Switch mental mode: review the changes as if someone else wrote them.
 
    Run `/review-code` on changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   This step is a gate — `/review-code` must produce its Review Gate block before the workflow can proceed. If the block is missing, the review has not been completed.
+   If step 13 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
+
+   `/review-code` must emit its Review Gate block (see `review-code.md` step 3).
 
    For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
 
    Do not skip this step when resuming from a pre-built plan.
+
+   **After the review gate passes, continue to steps 15–17.** The review gate is mid-workflow, not the end.
 
 15. **Validate the Fix With QA When Needed**
 
@@ -227,8 +226,6 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - use Playwright MCP as the default UI repro and validation path when available
 
    If the app cannot be run locally (missing Docker, env dependencies, or data requirements), note the blocker in PROJECT.md and skip QA validation. Check prerequisites before attempting — don't discover the failure experimentally.
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/validate-fix.md
 
 16. **Commit New Bug Fixes**
 
@@ -283,16 +280,9 @@ Update `PROJECT.md` at these points:
 - after implementation, review, and QA validation
 - at final completion with the branch outcome and commit result
 
-**Trivial path:**
-- after implementation and validation complete (single update is sufficient)
-
-**No PROJECT.md** — if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required. Note the skip in the summary.
-
 Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
 
 ## Continuation Checkpoint
-
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
@@ -309,13 +299,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/fix-bug` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Cross-Repo Bugs
 

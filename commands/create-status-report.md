@@ -6,14 +6,7 @@
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.
 > **Produces**: Program health report with epic progress, flow health, risks, blockers, and team state.
 
-## Pre-flight
-
-This command is data-heavy — agents return large synthesized results. Before starting, follow the **Context Management** protocol from `rules/universal.md`:
-1. If context is at or above ~70%, write a **continuation checkpoint** to PROJECT.md (including the `/create-status-report` arguments), commit, then `/clear` → `/start` to resume
-2. If context is below ~70% but above ~50%, check whether the report data + follow-up conversation will fit — if tight, checkpoint and clear
-3. Then proceed with Step 1
-
-Use this checkpoint shape:
+## Continuation Checkpoint
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
@@ -146,10 +139,7 @@ Per team:
 
 Present the report.
 
-If `--audience <mode>` is provided, format the final output for that audience using:
-
-@/Users/joeli/opt/code/ai-toolkit/skills/pgm/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/pgm/comms.md
+If `--audience <mode>` is provided, format the final output for that audience using `pgm/comms.md`.
 
 Otherwise, present the default detailed report and suggest follow-up actions:
 
@@ -164,4 +154,3 @@ Otherwise, present the default detailed report and suggest follow-up actions:
 - For historical metrics and trends, use `/create-velocity-report` instead
 - The report identifies risks from signals but doesn't prescribe solutions — that's a conversation
 - If Shortcut API is unavailable, fall back to Shortcut MCP tools (slower, permission prompts)
-- If a `/clear` is needed mid-run, write the continuation checkpoint in the format above before resuming through `/start`
