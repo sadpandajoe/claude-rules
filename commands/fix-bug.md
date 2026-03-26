@@ -247,17 +247,29 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    ## Fix-Bug Complete
    [1-2 lines answering the user's original question, then: what fixed it, confidence level]
 
+   ### What was fixed
+   - [Specific behavior change — what the user or system does differently now]
+
+   ### Verify manually
+   - [Things automated tests can't cover — live integration, UI rendering, environment-specific behavior]
+   - [Omit section if everything is covered by automated tests]
+
+   ### Key decisions
+   - [Non-obvious choices made during investigation or fix — e.g., fix layer, scope boundary, alternative approaches rejected]
+   - [Omit section for straightforward fixes with no meaningful alternatives]
+
    ### What to do next
    - [Specific next action — PR link, CI re-run, merge step]
 
    ### Open risks
-   - [Anything uncertain or untested]
+   - [Anything uncertain or untested — omit section if none]
 
    <details><summary>Technical details</summary>
 
    - Root cause: [brief]
    - Fix: [what changed]
-   - Review: Rounds [N] | Pre-flight [pass/fail] | Status [clean/blocked]
+   - Files changed: [list]
+   - Review: Rounds [N] | Status [clean/blocked]
 
    </details>
    ```
