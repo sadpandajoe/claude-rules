@@ -1,7 +1,7 @@
 # /run-test-plan - Standalone QA Validation
 
 @/Users/joeli/opt/code/ai-toolkit/rules/testing.md
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
 @/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
 
@@ -37,14 +37,10 @@
    If no plan is provided:
    - derive a compact use-case matrix from the target area or external context
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/analyze-use-cases.md
-
 3. **Iterate the Plan to 8/10**
 
    Review the matrix with the shared test-plan reviewer.
    Revise the plan until it reaches `8/10`, or stop early only if blockers or unresolved ambiguities make execution unsafe or misleading.
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
 
 4. **Execute the Plan**
 
@@ -55,13 +51,9 @@
    - API or CLI calls for non-UI validation
    - clear `BLOCKED` or `SKIP` outcomes when prerequisites are missing
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/execute-use-cases.md
-
 5. **Capture Evidence**
 
    Capture only the artifacts that materially improve confidence or explain failures.
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/capture-evidence.md
 
 6. **Display Findings**
 
@@ -109,8 +101,6 @@ Update `PROJECT.md` at these points:
 
 ## Continuation Checkpoint
 
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
-
 ```markdown
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
@@ -124,18 +114,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Evidence status: <captured / none / pending>
 - Blockers or unclear items: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/run-test-plan` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
-
-## Related Commands
-- `/fix-bug` — Use when a validated failure should turn into a bug-fix workflow
-- `/create-feature` — Uses QA internally for planned work
-- `/update-tests` — Improve an existing automated suite rather than executing a validation plan
 
 ## Notes
 - `/run-test-plan` is validation-only in v1

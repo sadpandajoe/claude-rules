@@ -28,9 +28,3 @@
 - Personal style preferences
 - Demanding specific implementation
 - Scope creep (unrelated fixes)
-
-## Related Commands
-- `/review-pr` — Review someone's PR
-- `/create-feature` — Runs internal plan review before feature implementation
-- `/review-code` — Wrapper around built-in `/review` for local auto-fix loops
-- `/address-feedback` — Address PR review feedback

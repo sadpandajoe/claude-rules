@@ -25,9 +25,7 @@
 
 2. **Delegate Initial Test Creation to `developer`**
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/create-tests.md
-
-   This helper owns:
+   Use `developer/create-tests.md`. This helper owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
    - creating the first meaningful tests for the target area
@@ -76,8 +74,6 @@ Update `PROJECT.md` at these points:
 
 ## Continuation Checkpoint
 
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
-
 ```markdown
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
@@ -91,18 +87,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Tests added so far: <files or none>
 - Verification status: <passed / partial / blocked>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/create-tests` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
-
-## Related Commands
-- `/update-tests` — Improve an existing suite when meaningful tests already exist
-- `/create-feature` — Handles feature planning and plan review internally when test strategy needs design work
-- `/fix-bug` — Handles test creation internally for bug-fix workflows
 
 ## Notes
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows

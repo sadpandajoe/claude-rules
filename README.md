@@ -69,7 +69,8 @@ ai-toolkit/
 │   ├── resource-management.md  # Worktrees, Docker, heavy tasks
 │   ├── cherry-picking.md   # Cross-branch work
 │   ├── code-review.md      # Review guidelines
-│   ├── api.md              # GitHub / Shortcut / external API reference
+│   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
+│   ├── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
 │   └── pgm.md              # Program reporting rules
 ├── skills/
 │   ├── build-engineer/     # CI diagnosis and remediation persona
@@ -200,7 +201,8 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/troubleshooting.md` | Emergency recovery |
 | `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |
-| `rules/api.md` | Commands that query GitHub, Shortcut, or other external systems |
+| `rules/shortcut-api.md` | PGM commands that query Shortcut REST API |
+| `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
 | `rules/pgm.md` | `/create-status-report`, `/create-velocity-report` |
 
 ## Updating

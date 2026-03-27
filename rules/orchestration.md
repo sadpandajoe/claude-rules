@@ -35,8 +35,3 @@
 | Lose context | Update PROJECT.md |
 | Use wrong tool | Match tool to task type |
 | Retry failures blindly | Understand and simplify |
-
-## Related Commands
-- `/create-feature` — Orchestrates PM planning, technical planning, review loops, and implementation
-- `/fix-bug` — Orchestrates QA, RCA, implementation, and validation for broken behavior
-- `/explain` — Explain unfamiliar code

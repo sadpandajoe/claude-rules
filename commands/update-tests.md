@@ -45,14 +45,10 @@
    - production blind spots
    - simplification opportunities
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
-
 4. **Expand Use Cases When Needed**
 
    For workflow-heavy, integration-heavy, or user-visible targets:
    - run QA use-case analysis to produce a compact must-cover scenario matrix
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/qa/analyze-use-cases.md
 
 5. **Scope the Smallest Useful Update**
 
@@ -65,9 +61,7 @@
 
 6. **Update the Tests Through `developer`**
 
-   Use the dedicated helper:
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/update-tests.md
+   Use `developer/update-tests.md`:
 
    This helper owns:
    - updating existing tests first
@@ -137,8 +131,6 @@ Update `PROJECT.md` at these points:
 
 ## Continuation Checkpoint
 
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
-
 ```markdown
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
@@ -153,18 +145,6 @@ If context gets deep before the workflow completes, write a continuation checkpo
 - Verification status: <passed / partial / blocked>
 - Pending blockers or follow-up gaps: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/update-tests` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
-
-## Related Commands
-- `/create-tests` — Create the first meaningful suite when there is nothing real to update
-- `/fix-bug` — Handles regression tests internally for bug-fix workflows
-- `/create-feature` — Handles test-first implementation internally for planned work
 
 ## Notes
 - `/update-tests` is the public workflow for existing-suite maintenance

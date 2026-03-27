@@ -46,7 +46,3 @@ Will forcing this break existing?
 | API | Compatible? | Adapt to target | Force source |
 | Test fails | What expected? | Meet expectations | Change tests |
 | Structure | Can extract logic? | Functional only | Force structure |
-
-## Related Commands
-- `/cherry-pick` — Plan, order, and cherry-pick one or more PRs/SHAs with conflict resolution
-- `/fix-bug` — Routes internally to cherry-pick when the bug is already fixed upstream

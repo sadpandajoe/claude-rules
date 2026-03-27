@@ -28,6 +28,8 @@
    - no argument: latest failed run on current branch
 
 2. **Gather CI Logs**
+
+   Try `gh` first:
    ```bash
    # Get failed run
    gh run list --branch <branch> --status failure --limit 1
@@ -38,14 +40,33 @@
    gh run view <run-id> --log-failed
    ```
 
+   If `gh run list` returns no failures, check the check-runs endpoint — failures may be at the check-run level rather than the workflow-run level:
+   ```bash
+   gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
+     --jq '.check_runs[] | select(.conclusion == "failure")'
+   ```
+
+   If `gh run view --log-failed` returns empty output (exit 0 but no log lines), fall back to per-job logs:
+   ```bash
+   # List jobs for the run
+   gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
+     --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+
+   # Fetch logs for each failed job
+   gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
+   ```
+
+   If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
+   - Check whether a local log file or zip bundle was provided in step 1.
+   - If yes, use that file as the log source.
+   - If no, ask the user for a log file path or URL. Do not proceed to classification without actual log output.
+
    If the input is a zip bundle:
    - unzip it automatically
    - locate the failing logs
    - split multi-job bundles into per-failure units before classification
 
 3. **Classify Failures** (`build-engineer`)
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/classify-failure.md
 
    For each failure:
    - identify the failing step
@@ -54,7 +75,45 @@
    - produce a narrow proposed fix
    - state local verification approach
 
-4. **Update PROJECT.md**
+4. **Complexity Gate**
+
+   **Not-our-failure fast path**: If ALL classified failures are **Pre-existing / not-our-failure**, exit the workflow early — no fix/verify/review cycle. Emit:
+   ```markdown
+   ## Fix-CI Complete — Not Our Failure
+
+   **Run**: [run URL]
+
+   | Failure | Evidence |
+   |---------|----------|
+   | [failure name] | Not in diff; same failure on [base branch] run [link] |
+
+   ### What to do next
+   - Re-run the failed job if it's flaky, or file a separate issue for the pre-existing failure.
+   - This branch's changes are not implicated.
+   ```
+   If SOME failures are ours and some are pre-existing, note the pre-existing ones and continue the workflow for the remaining failures.
+
+   Evaluate each classified failure against:
+
+   | Signal | Trivial | Standard |
+   |--------|---------|----------|
+   | Failure pattern | Known-pattern matches (all mechanical) | Novel failure, or mixed mechanical + behavioral |
+   | Files touched | 1-2 | 3+ or unclear |
+   | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
+   | Verification | STRONG or PARTIAL available | WEAK only |
+
+   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
+   1. Apply the fix (step 8)
+   2. Verify locally (step 9)
+   3. Review gate — choose based on diff content:
+      - **Zero logic diff** (formatting-only, lint-disable, import reorder): emit Review Gate directly with `Status: skipped` and reason. No `/review-code` invocation needed.
+      - **Any other diff**: invoke `/review-code` — must produce Review Gate block.
+   4. Update PROJECT.md (single update)
+   5. Emit summary (step 11)
+
+   **Standard path**: any signal is in the Standard column, or confidence is below 8/10. Continue to step 5.
+
+5. **Update PROJECT.md**
 
    Record:
    - failing run or artifact source
@@ -63,7 +122,7 @@
    - root-cause hypothesis
    - confidence and proposed next action
 
-5. **Validate RCA When Needed**
+6. **Validate RCA When Needed**
 
    Use the shared RCA validator only when:
    - the failure is novel
@@ -71,17 +130,13 @@
    - multiple plausible root causes exist
    - the proposed fix changes behavior
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-rca/SKILL.md
-
-6. **Run the Action Gate**
-
-   @/Users/joeli/opt/code/ai-toolkit/skills/shared/action-gate.md
+7. **Run the Action Gate**
 
    Proceed automatically only when the gate says the fix is low-risk, high-confidence, and sufficiently verifiable.
 
-7. **Apply Safe Fixes**
+8. **Apply Safe Fixes**
 
-   If the gate allows automatic action:
+   If the gate allows automatic action (or the complexity gate routed here directly):
    - apply the narrow proposed fix
    - keep scope limited to the failing surface
    - hand off to `developer` only when code adaptation becomes non-mechanical
@@ -90,47 +145,59 @@
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-8. **Verify Locally** (`build-engineer`)
+   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
+   ```bash
+   git commit --fixup=<originating-sha>
+   # repeat for each originating commit
+   git rebase --autosquash <base>
+   ```
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/verify-fix.md
+   Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
 
-9. **Review Changed Files**
+9. **Verify Locally** (`build-engineer`)
+
+10. **Review Changed Files** (gate)
 
    If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-10. **Summary**
+   `/review-code` must emit its Review Gate block (see `review-code.md` step 3).
+
+   **Skip rule** (aligned with trivial path sub-step 3): When the diff contains zero logic changes — formatting-only, lint-disable comments, import reordering, whitespace — skip the `/review-code` invocation and emit the Review Gate block directly:
+   ```markdown
+   ## Review Gate
+   Rounds: 0
+   Pre-flight: pass
+   Status: skipped — [reason, e.g. "formatting-only fix, no logic changes"]
+   ```
+   If the diff touches any logic, invoke `/review-code` — do not skip.
+
+11. **Summary**
+   **Full template** (standard path or trivial path with PARTIAL verification):
    ```markdown
    ## Fix-CI Complete
+   [1-2 lines: what failed and what was fixed]
 
-   ### Run: [run-id / url]
-   ### Branch: [branch]
+   ### Review
+   - Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 
-   ### Failure Summary
-   - [What failed and why]
+   ### What to do next
+   - [Specific next action]
 
-   ### Implementation Summary
-   - [What was changed]
+   ### Open risks
+   - [Anything uncertain or untested]
+   ```
 
-   ### Review / Quality
-   - [Review rounds and final review outcome]
-
-   ### Verification
-   - [What was run locally]
-   - [Verification strength]
-   - [What confidence the checks provide]
-
-   ### Risks / Blockers
-   - [Weak validation, ambiguity, or residual CI risk]
-
-   ### Commit Recommendation
-   - Recommend: `new commit` / `amend HEAD`
-   - Do not commit automatically
+   **Compact template** (trivial path + STRONG verification + review skipped or clean):
+   ```markdown
+   ## Fix-CI Complete
+   [1 line: what failed → what was fixed] | Verification: STRONG | Review: skipped — [reason]
+   Next: [specific next action]
    ```
 
 ## PROJECT.md Update Discipline
 
-Update `PROJECT.md` at these points:
+**Standard path** — update `PROJECT.md` at these points:
 - after log collection and initial failure classification
 - after RCA validation when that path runs
 - after the action gate determines whether the fix will proceed automatically
@@ -141,29 +208,21 @@ Keep the updates compact, but do not defer all state changes to the end of the w
 
 ## Continuation Checkpoint
 
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
-
 ```markdown
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / rca / gate / apply / verify / review / summarize
+- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
 - Resume target: <run id, artifact, failing job, or changed file set>
 - Completed items: <finished phases or already-fixed failures>
 ### State
+- Complexity: <trivial / standard>
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/fix-ci` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone

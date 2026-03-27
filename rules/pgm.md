@@ -1,6 +1,6 @@
 # Program Management Context
 
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/shortcut-api.md
 
 ## Org Structure
 
@@ -32,7 +32,7 @@ Bot accounts to filter from metrics: listed in `config.json` under `bots`.
 
 ## API Reference
 
-See `rules/api.md` for all API patterns (Shortcut REST, GitHub CLI, Notion MCP, Shortcut MCP). For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
+See `rules/shortcut-api.md` for Shortcut REST patterns and `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
 
 ## Parallel Agent Pattern
 
@@ -59,6 +59,7 @@ Agent 3 (Notion MCP, optional):
 
 Each agent should:
 - Read `config.json` for team/member context
+- Read `skills/shared/shortcut-fetch.md` for Shortcut API operational patterns (Agent 1)
 - Filter out bot accounts
 - Return structured data for synthesis
 

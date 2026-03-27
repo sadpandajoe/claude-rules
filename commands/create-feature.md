@@ -2,13 +2,30 @@
 
 @/Users/joeli/opt/code/ai-toolkit/rules/planning.md
 @/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
-@/Users/joeli/opt/code/ai-toolkit/rules/api.md
+@/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
+@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
+@/Users/joeli/opt/code/ai-toolkit/rules/orchestration.md
 @/Users/joeli/opt/code/ai-toolkit/skills/pm/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
 
 > **When**: You have a feature request or other planned non-bug work and want the repo-standard workflow to scope it, review it, implement it, and keep going until a real decision matters.
 > **Produces**: Feature brief, milestones, implementation plan, reviewed plan, implemented local changes, review and QA results, and a handoff before the final commit or PR action.
+
+## Plan Mode Boundary
+
+Plan mode is for **exploration and design only** — step 2 below. Review iterations (step 4) happen in **normal mode** after plan mode exit, where agents can be launched freely and PROJECT.md can be written.
+
+**Why reviews live outside plan mode**: Plan mode constrains turn-ending behavior ("end turns with AskUserQuestion or ExitPlanMode") and is read-only except for the plan file. Review iterations need to launch multiple reviewer agents, auto-loop to 8/10, and write to PROJECT.md — all of which conflict with plan mode constraints. Separating them eliminates the ambiguity.
+
+**Standard path**:
+1. Complexity gate in normal mode (must be visible in conversation).
+2. Enter plan mode for exploration + design (PM brief, tech plan draft).
+3. Exit plan mode → write draft plan to PROJECT.md (hard gate).
+4. Review iterations in normal mode (agents, auto-loop, cold read).
+5. Implement, review, summarize.
+
+**Trivial path**: Skip plan mode entirely. Implement → `/review-code` → summary.
 
 ## Usage
 ```
@@ -21,168 +38,188 @@
 
 ## Steps
 
-1. **Normalize Input**
+### 1. Normalize Input + Complexity Gate
 
-   Accept:
-   - plain-language feature request
-   - Shortcut story ID or URL
-   - GitHub issue or PR reference / URL
+Accept:
+- plain-language feature request
+- Shortcut story ID or URL
+- GitHub issue or PR reference / URL
 
-   Pull in external context when references are provided.
+When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any planning or code investigation. Extract scope, acceptance criteria, and constraints from the source. These are authoritative — don't re-derive scope from scratch.
 
-2. **Decide Whether PM Planning Is Needed**
+Then assess complexity:
 
-   Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial.
-   Skip it when the work is already tightly scoped and just needs technical planning.
+| Signal | Trivial | Standard |
+|--------|---------|----------|
+| Files touched | 1–2 | 3+ or unclear |
+| Design decisions | None | Any |
+| New APIs / migrations | No | Yes |
+| Behavioral risk | Mechanical / cosmetic | Functional change |
 
-3. **Create the Feature Brief**
+Emit the gate block **in conversation** (not just in a plan file):
 
-   If PM planning is needed:
-   - use `pm/create-feature-brief.md`
-   - include goals, non-goals, acceptance criteria, assumptions, and rollout framing
-   - add milestones with `pm/plan-milestones.md`
+```markdown
+## Complexity Gate
+Classification: TRIVIAL / STANDARD
+Confidence: X/10
+Reason: [one line]
+```
 
-   If PM planning is skipped:
-   - synthesize a minimal feature brief from the request before technical planning starts
+**Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/pm/create-feature-brief.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/pm/plan-milestones.md
+**Standard**: Continue to step 2. Make this decision yourself and continue automatically — do not ask the user whether to run review iterations, which reviewers to use, or whether the plan is "good enough." End-to-end commands own their internal loops.
 
-4. **Iterate the PM Brief to 8/10**
+Do not silently decide — always emit the gate block above.
 
-   Review the feature brief with the shared PM brief reviewer and revise until it reaches `8/10`.
+### 2. Plan Mode → Exploration + Design
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-feature-brief/SKILL.md
+Enter plan mode. Inside plan mode, do all of the following:
 
-5. **Create the Technical Plan**
+**a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
 
-   Use `developer/plan-feature.md` to define:
-   - technical approach
-   - PR slices
-   - migrations or API implications
-   - test strategy
-   - implementation sequencing
+**b. Create the feature brief**: If PM planning is needed, use `pm/create-feature-brief.md` with milestones via `pm/plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/developer/plan-feature.md
+**c. Create the technical plan**: Use `developer/plan-feature.md` to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 
-6. **Iterate the Technical Plan to 8/10**
+Exit plan mode when you have a draft feature brief and technical plan. These do not need to be polished — review iterations in step 4 will refine them.
 
-   Always run these reviewers:
-   - `core/review-architecture`
-   - `core/review-implementation`
-   - `core/review-testplan`
+### 3. Write PROJECT.md (hard gate)
 
-   Add these when the plan needs them:
-   - `core/review-frontend`
-   - `core/review-backend`
+After exiting plan mode, read the plan file. Write its content into PROJECT.md sections:
+- `Feature Brief`
+- `Milestones` (if PM planning was used)
+- `Implementation Plan`
+- `Test Strategy`
 
-   Revise the plan until all applicable reviewers are at `8/10` or better.
+**Do not proceed to step 4 until this confirmation block is emitted:**
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-architecture/SKILL.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-implementation/SKILL.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-frontend/SKILL.md
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/review-backend/SKILL.md
+```markdown
+## PROJECT.md Updated
+Sections written: [list of sections written]
+```
 
-7. **Run the Final Cold Read**
+This gate ensures the plan is durable before review iterations begin. If the plan is only in conversation or a plan file, it can be lost on context refresh.
 
-   Use the shared finalize-plan skill as an internal cold read.
-   If it finds a blocking issue, revise the relevant layer and re-run it.
+### 4. Review Iterations + Action Gate
 
-   @/Users/joeli/opt/code/ai-toolkit/skills/core/finalize-plan/SKILL.md
+Now in normal mode, iterate the plan using reviewer agents. This is the main quality gate.
 
-8. **Update PROJECT.md**
+**a. PM brief review** (if PM planning was used): Run `core/review-feature-brief` and revise until 8/10.
 
-   Keep these sections current:
-   - `Feature Brief`
-   - `Milestones`
-   - `Implementation Plan`
-   - `Review Summary`
+**b. Technical plan review**: Always run these reviewers:
+- `core/review-architecture`
+- `core/review-implementation`
+- `core/review-testplan`
 
-   Milestones live only in `PROJECT.md` for now.
+Add when the plan needs them:
+- `core/review-frontend`
+- `core/review-backend`
 
-9. **Continue Into Implementation**
+Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input.
 
-   If no meaningful decision remains:
-   - prepare the environment when needed
-   - for each implementation slice, define the acceptance or regression test first
-   - write the failing test before the code change when feasible
-   - if test-first is blocked by env, repro, or harness constraints, record why before implementing
-   - implement the feature through `developer`
-   - run `/review-code` as an internal loop and keep iterating until only nitpicks remain or a real blocker/user decision appears
-   - run QA validation when the work is user-visible
+**c. Cold read**: Use `core/finalize-plan` as a fresh-eyes final check. If it finds a blocking issue, revise and re-run.
 
-   If a meaningful decision remains:
-   - stop and surface it clearly
+**d. Action gate**: Run `skills/shared/action-gate.md`. Auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
 
-10. **Summary**
-   ```markdown
-   ## Create-Feature Complete
+Update PROJECT.md with final review scores after this step.
 
-   ### Outcome
-   - [What slice or milestone was delivered]
+### 5. Implementation
 
-   ### Plan Quality
-   - [PM brief score]
-   - [Technical plan score]
-   - [Final cold-read result]
+**Standard path** (from step 4):
+- For each implementation slice, define the acceptance or regression test first
+- Write the failing test before the code change when feasible
+- If test-first is blocked by env, repro, or harness constraints, write the test anyway and record the verification gap — writing is separate from running
+- For mechanical changes (renames, config swaps, endpoint changes with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
+- Implement the feature through `developer`
+- Run QA validation when the work is user-visible
 
-   ### Acceptance Criteria Status
-   - [Done / partial / blocked against the agreed criteria]
+**Trivial path** (from step 1):
+1. Implement the change
+2. Run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
+3. Update PROJECT.md (single update) — skip if no PROJECT.md exists and work completes without blockers
 
-   ### Implementation Summary
-   - [What changed in behavior or capability]
+If a meaningful decision surfaces during implementation, stop and present it clearly.
 
-   ### Review / Quality
-   - [Review rounds and final review outcome]
+### 6. Review Changed Files (gate)
 
-   ### Verification / Test Signal
-   - [Checks run]
-   - [What regressions or acceptance paths are now covered]
-   - [QA result or why skipped]
+Run `/review-code` on changed repo-tracked files as an internal loop. Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   ### Risks / Blockers
-   - [Anything still risky, blocked, or unverified]
+`/review-code` must emit its Review Gate block (see `review-code.md` step 3).
 
-   ### Next Decision
-   - [Meaningful decision still needed, or ready for final commit / PR action]
-   ```
+For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
+
+Do not skip this step when resuming from a pre-built plan.
+
+### 7. Summary
+
+Lead with the outcome, not the process. If the user gave you a ticket, answer whether it's done.
+
+```markdown
+## Create-Feature Complete
+[1-2 lines: what was built, whether acceptance criteria are met]
+
+### What was built
+- [Specific behavior/UX flow — what the user or system does differently now]
+
+### Verify manually
+- [Things automated tests can't cover — live integration, UI rendering, permissions]
+- [Omit section if everything is covered by automated tests]
+
+### Key decisions
+- [Decisions made during planning that shaped the implementation]
+
+### What to do next
+- [Specific next action — PR, deploy step, remaining slices]
+
+### Open risks
+- [Anything uncertain or untested — omit section if none]
+
+<details><summary>Technical details</summary>
+
+- Files changed: [list]
+- Review: Rounds [N] | Status [clean/blocked]
+
+</details>
+```
+
+## Non-Negotiable Gates
+
+Use this checklist to verify you haven't skipped a gate:
+
+- [ ] Complexity Gate block emitted (step 1)
+- [ ] PROJECT.md written with plan content (step 3) — standard path only
+- [ ] All applicable reviewers at 8/10 (step 4b) — standard path only
+- [ ] Cold read passed (step 4c) — standard path only
+- [ ] `/review-code` Review Gate block emitted (step 6)
+- [ ] PROJECT.md updated with final status
+- [ ] Summary emitted (step 7)
 
 ## PROJECT.md Update Discipline
 
-Update `PROJECT.md` at these points:
-- after the initial feature brief exists
-- after PM brief review reaches `8/10`
-- after the technical plan reaches `8/10`
-- after the final cold read
-- after implementation and validation complete
+**Standard path:**
+- **step 3** — after exiting plan mode, flush the draft plan into PROJECT.md. This is the first write and a hard gate.
+- **step 4** — after review iterations complete, update with final review scores.
+- after implementation and validation complete.
 
 ## Continuation Checkpoint
-
-If context gets deep before the workflow completes, write a continuation checkpoint before clearing:
 
 ```markdown
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /create-feature <arguments>
-- Phase: input / pm-brief / pm-review / tech-plan / tech-review / finalize / implement / review / qa-validate / summarize
+- Phase: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / implement / review-code / summarize
 - Resume target: <story, issue, milestone, PR slice, file set, or current blocker>
 - Completed items: <finished phases or accepted decisions>
 ### State
-- PM required: <yes / no>
+- Complexity: <trivial / standard>
+- PM required: <yes / no / skipped — trivial>
 - PM brief score: <score or skipped>
-- Technical plan score: <score or pending>
+- Technical plan scores: <reviewer: score, ... or pending>
+- Cold read: <go / no-go / pending>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
 ```
-
-After writing the checkpoint:
-- run `/clear`
-- run `/start`
-- resume `/create-feature` at the saved phase and target
-
-Use `/update-project-file --checkpoint ...` only when you need a manual checkpoint outside the normal flow.
 
 ## Notes
 - `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped
@@ -190,3 +227,4 @@ Use `/update-project-file --checkpoint ...` only when you need a manual checkpoi
 - Use test-first implementation by default for each slice; document why when it is blocked
 - `/review-code` is an internal phase here, not the expected next top-level user step
 - Stop before the final commit or PR action
+- When resuming from a pre-built plan, enter at the implementation phase but still run review, QA, and pre-flight checks before declaring done

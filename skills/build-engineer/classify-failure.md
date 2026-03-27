@@ -21,6 +21,7 @@ Identify the failing step, match it to a known pattern when possible, and produc
 | **Node version mismatch** | Syntax errors or API differences | Check `.nvmrc` / `engines` field vs CI node version | MEDIUM |
 | **Out-of-memory** | `FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed` | Reduce `maxWorkers`, add `--max-old-space-size` | HIGH |
 | **Lock file conflict** | `npm ci` fails with lockfile mismatch | Regenerate lockfile: `npm install`, commit `package-lock.json` | HIGH |
+| **Pre-existing / not-our-failure** | Failing file/test is not in our diff; same failure exists on the base branch | N/A — not caused by this branch | HIGH |
 
 ## Analysis Steps
 
@@ -28,7 +29,11 @@ Identify the failing step, match it to a known pattern when possible, and produc
 2. Identify the actual failing step: build, test, lint, install, or workflow/config.
 3. Split multi-job failures into separate failure units and de-duplicate repeated stack traces.
 4. Match each failure against the known patterns above.
-5. If no pattern matches, read the referenced files and recent commits before classifying it as novel.
+5. **Ownership check**: For each failure, determine whether this branch caused it:
+   - Is the failing file or test touched by our diff? (`git diff --name-only <base>...HEAD`)
+   - Does the same failure exist on the base branch? (`gh run list --branch <base> --status failure --limit 3`)
+   - If the answer is "not in our diff" AND "fails on base too", classify as **Pre-existing / not-our-failure**.
+6. If no pattern matches, read the referenced files and recent commits before classifying it as novel.
 
 Use numeric confidence with these defaults:
 - `8-10` = `HIGH`
@@ -50,4 +55,6 @@ For each failure, end with this block:
 **Verification**: [how to verify the fix locally]
 ```
 
-Use `skills/shared/action-gate.md` after producing this output to decide whether to proceed automatically.
+For **Pre-existing / not-our-failure** classifications, set `Proposed Fix: N/A` and `Verification: N/A`. The calling workflow handles the early-exit path.
+
+Use `skills/shared/action-gate.md` after producing this output to decide whether to proceed automatically. The calling workflow may also use this output for a complexity gate evaluation.

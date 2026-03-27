@@ -11,6 +11,13 @@
 - **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
 - **Checkpoint when context is deep** — at chain boundaries and loop iterations, if context is above ~70%, save state and continue in a fresh conversation (see Context Management below)
 
+## PROJECT.md Update Defaults
+
+These defaults apply to all commands unless the command specifies otherwise:
+
+- **Trivial path**: single update after implementation and validation complete
+- **No PROJECT.md**: if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required — note the skip in the summary
+
 ## Workflow Selection
 
 | Situation | Workflow | Command |
@@ -100,5 +107,6 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 | `resource-management.md` | Docker limits, test worker scaling |
 | `cherry-picking.md` | Cross-branch work |
 | `code-review.md` | Review guidelines, scoring |
-| `api.md` | External API reference: GitHub CLI, Shortcut REST, Notion MCP |
+| `shortcut-api.md` | Shortcut REST API: auth, endpoints, retry, query patterns |
+| `input-detection.md` | Route ticket/issue inputs to Shortcut or GitHub |
 | `pgm.md` | Program management: org context, audience tiers, data collection rules |

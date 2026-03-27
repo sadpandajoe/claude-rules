@@ -18,7 +18,3 @@
 | Assume | Verify with commands |
 | Patch symptoms | Fix root cause |
 | Skip documentation | Document in PROJECT.md |
-
-## Related Commands
-- `/fix-bug` — End-to-end bug workflow with triage, existing-fix checks, RCA, implementation, and validation
-- `/create-feature` — Uses investigation internally when planned work needs evidence or scope clarification

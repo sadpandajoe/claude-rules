@@ -24,7 +24,3 @@ Always start at Safe. Escalate only when lower levels fail.
 - Production affected
 - Security implications
 - Multiple cascading failures
-
-## Related Commands
-- `/fix-bug` — Debug, validate root cause, and repair broken behavior
-- `/cherry-pick` — Move fixes across branches
