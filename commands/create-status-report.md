@@ -1,6 +1,5 @@
 # /create-status-report — Live Program Health Report
 
-@/Users/joeli/opt/code/ai-toolkit/rules/universal.md
 @/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
 
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.

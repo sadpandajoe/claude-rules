@@ -2,6 +2,9 @@
 
 Use this phase when local repo-tracked files have changed and need a review/fix loop before commit.
 
+## Required Context
+Read before starting: `rules/code-review.md`, `rules/review-gate.md`, `rules/stop-rules.md`
+
 ## Goal
 
 Wrap Claude's built-in `/review` in a repo-standard loop:
@@ -28,11 +31,7 @@ Wrap Claude's built-in `/review` in a repo-standard loop:
 
 ## Stop Rules
 
-Stop when:
-
-- only `[nitpick]` items remain
-- a user decision is required
-- the same issue persists across two consecutive rounds
+Apply stop rules from `rules/stop-rules.md`.
 
 ## Notes
 

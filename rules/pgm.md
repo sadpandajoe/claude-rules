@@ -1,7 +1,5 @@
 # Program Management Context
 
-@/Users/joeli/opt/code/ai-toolkit/rules/shortcut-api.md
-
 ## Org Structure
 
 EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — frame everything around WIP, cycle time, throughput, and blockers. Not sprints.
@@ -32,7 +30,7 @@ Bot accounts to filter from metrics: listed in `config.json` under `bots`.
 
 ## API Reference
 
-See `rules/shortcut-api.md` for Shortcut REST patterns and `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
+Subagents read `rules/shortcut-api.md` when making Shortcut API calls. See `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
 
 ## Parallel Agent Pattern
 

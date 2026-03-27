@@ -1,8 +1,6 @@
 # /fix-ci - Fix CI Failures
 
-@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
-@/Users/joeli/opt/code/ai-toolkit/skills/build-engineer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
 
 > **When**: A CI build has failed and you want the repo-standard workflow to diagnose it, apply safe fixes, verify locally, and stop before commit.
 > **Produces**: Failure classification, PROJECT.md update, safe fixes where appropriate, validation results, and a recommended commit action.
@@ -161,15 +159,9 @@
    If repo-tracked files changed, invoke `/review-code` on the changed files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   `/review-code` must emit its Review Gate block (see `review-code.md` step 3).
+   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
 
-   **Skip rule** (aligned with trivial path sub-step 3): When the diff contains zero logic changes — formatting-only, lint-disable comments, import reordering, whitespace — skip the `/review-code` invocation and emit the Review Gate block directly:
-   ```markdown
-   ## Review Gate
-   Rounds: 0
-   Pre-flight: pass
-   Status: skipped — [reason, e.g. "formatting-only fix, no logic changes"]
-   ```
+   For zero-logic diffs (formatting-only, lint-disable, import reorder), apply the skip rule from `rules/review-gate.md`.
    If the diff touches any logic, invoke `/review-code` — do not skip.
 
 11. **Summary**

@@ -9,6 +9,9 @@ disable-model-invocation: true
 
 Use this persona when the workflow needs user-visible validation, reproducible bug reports, or broader scenario thinking beyond the code change itself.
 
+## Required Context
+Read before starting: `rules/testing.md`
+
 ## Responsibilities
 
 - Confirm whether a reported issue is plausibly a bug

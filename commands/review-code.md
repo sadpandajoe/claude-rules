@@ -1,8 +1,5 @@
 # /review-code - Wrapper Around Built-In /review
 
-@/Users/joeli/opt/code/ai-toolkit/rules/code-review.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-
 > **When**: You have local changes (uncommitted or already committed) and want a quality pass.
 > **Produces**: Built-in `/review` findings translated into the repo-standard developer review/fix loop, with validation and a summary of changes made.
 
@@ -39,14 +36,7 @@
 
 3. **Emit the Review Gate**
 
-   This block is the required output of `/review-code`. Callers branch on it — completing the review loop without emitting this block is not sufficient.
-
-   ```markdown
-   ## Review Gate
-   Rounds: [N]
-   Pre-flight: pass / fail / skipped — [reason]
-   Status: clean / blocked / user decision
-   ```
+   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
 
 4. **Summary** (standalone runs only — skip when called from another workflow)
    ```markdown

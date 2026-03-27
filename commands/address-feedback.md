@@ -1,7 +1,5 @@
 # /address-feedback - Address PR Review Feedback
 
-@/Users/joeli/opt/code/ai-toolkit/rules/code-review.md
-
 > **When**: A PR has review comments that need to be addressed.
 > **Produces**: Fixes committed, responses drafted or posted.
 
@@ -61,7 +59,15 @@ Triage is step 1, not the goal. The point is to fix things and respond, not to p
 
 5. **Draft Responses**
 
-   For each skipped or discussed item, draft a reply:
+   For each item, draft a reply based on verdict:
+
+   **Fixed items**: Short confirmation with commit reference.
+   ```markdown
+   ### Fixed: FB-1 (@alice — "Missing null check")
+   > Fixed in `abc1234` — added null guard for `getData()` return value.
+   ```
+
+   **Skipped / Discussed items**: Explanation with evidence.
    ```markdown
    ### Skipped: FB-2 (@bob — "Use a factory pattern")
    > Thanks for the suggestion. We're keeping the current approach since
@@ -95,6 +101,10 @@ Triage is step 1, not the goal. The point is to fix things and respond, not to p
    # Or post a general PR comment
    gh pr comment <number> --body "<response>"
    ```
+
+   **Auto-resolve bot threads**: After posting replies, resolve conversation threads from bot authors (accounts with `[bot]` suffix or `type: "Bot"` in the API response). These are mechanical checks — if the fix passes, the comment is definitively addressed.
+
+   **Leave human threads open**: Human reviewers may want to verify the fix themselves before resolving. Post the "Fixed in `<sha>`" reply but do not resolve the thread.
 
 8. **Summary**
    ```markdown

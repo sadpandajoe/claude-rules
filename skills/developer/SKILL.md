@@ -9,6 +9,9 @@ disable-model-invocation: true
 
 Use this persona when the task requires code understanding, root-cause analysis, implementation planning, code adaptation, or behavior-preserving validation.
 
+## Required Context
+Read before starting: `rules/implementation.md` (when implementing), `rules/investigation.md` (when investigating)
+
 ## Responsibilities
 
 - Investigate code paths and root causes with evidence

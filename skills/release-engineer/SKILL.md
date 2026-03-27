@@ -9,6 +9,9 @@ disable-model-invocation: true
 
 Use this persona when the task is primarily about safely moving changes between branches, preserving git state, and minimizing unnecessary user intervention.
 
+## Required Context
+Read before starting: `rules/cherry-picking.md`
+
 ## Responsibilities
 
 - Own git state safety and branch hygiene

@@ -1,13 +1,9 @@
 # /create-feature - End-to-End Feature Workflow
 
 @/Users/joeli/opt/code/ai-toolkit/rules/planning.md
-@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
 @/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
-@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 @/Users/joeli/opt/code/ai-toolkit/rules/orchestration.md
-@/Users/joeli/opt/code/ai-toolkit/skills/pm/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
 
 > **When**: You have a feature request or other planned non-bug work and want the repo-standard workflow to scope it, review it, implement it, and keep going until a real decision matters.
 > **Produces**: Feature brief, milestones, implementation plan, reviewed plan, implemented local changes, review and QA results, and a handoff before the final commit or PR action.
@@ -56,20 +52,11 @@ Then assess complexity:
 | New APIs / migrations | No | Yes |
 | Behavioral risk | Mechanical / cosmetic | Functional change |
 
-Emit the gate block **in conversation** (not just in a plan file):
-
-```markdown
-## Complexity Gate
-Classification: TRIVIAL / STANDARD
-Confidence: X/10
-Reason: [one line]
-```
+Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 **Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
 
 **Standard**: Continue to step 2. Make this decision yourself and continue automatically — do not ask the user whether to run review iterations, which reviewers to use, or whether the plan is "good enough." End-to-end commands own their internal loops.
-
-Do not silently decide — always emit the gate block above.
 
 ### 2. Plan Mode → Exploration + Design
 
@@ -144,9 +131,9 @@ If a meaningful decision surfaces during implementation, stop and present it cle
 
 Run `/review-code` on changed repo-tracked files as an internal loop. Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-`/review-code` must emit its Review Gate block (see `review-code.md` step 3).
+The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
 
-For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
+For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
 Do not skip this step when resuming from a pre-built plan.
 

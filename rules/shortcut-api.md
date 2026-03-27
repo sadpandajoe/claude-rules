@@ -1,9 +1,22 @@
 # Shortcut REST API
 
+## NEVER Skip the Retry
+
+The Shortcut API returns transient errors (`organization2_missing`, empty responses, 500s) on the first call of a session. This is **expected behavior**, not a real failure.
+
+**Before reporting any Shortcut API failure**:
+1. Retry the exact same request once
+2. If the retry succeeds, use the result — do not mention the first failure
+3. If the retry also fails, THEN fall back to MCP or surface the gap
+
+**NEVER**:
+- Report "API token/org issue" or "can't fetch" after a single failure
+- Switch to MCP without retrying REST first
+- Silently move on without the data after a retry failure
+- Debug or troubleshoot a single transient error
+
 **Auth**: `Shortcut-Token: $SHORTCUT_API_TOKEN` header
 **Base URL**: `https://api.app.shortcut.com/api/v3`
-
-**⚠️ Transient errors — RETRY ONCE before giving up**: The Shortcut API returns `organization2_missing` (or similar) on the first call of a session. This is normal — not a real failure. Retry the exact same request once. If the retry also fails, then fall back or surface the gap to the user. Do not report, debug, or switch to MCP on the first failure — and do not silently move on after a single retry without flagging that the data is missing.
 
 **Retry pattern** — wrap every Shortcut curl call:
 ```bash

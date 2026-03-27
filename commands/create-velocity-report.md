@@ -1,6 +1,5 @@
 # /create-velocity-report — Monthly Velocity Metrics
 
-@/Users/joeli/opt/code/ai-toolkit/rules/universal.md
 @/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
 
 > **When**: End of month (or anytime you need historical velocity metrics).

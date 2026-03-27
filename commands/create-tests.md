@@ -1,7 +1,5 @@
 # /create-tests - Create the First Meaningful Tests
 
-@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
 
 > **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
