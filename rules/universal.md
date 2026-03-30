@@ -112,6 +112,23 @@ Recurring workarounds or repeated feedback across conversations signal a missing
 ### Scope
 Rule updates are limited to the `rules/` directory in this toolkit. Do not modify project-level CLAUDE.md files or Anthropic system behavior. Rule changes should be proposed to the user during the summary phase, not applied silently mid-workflow.
 
+## Session Learning
+
+At the end of end-to-end workflows (`/fix-bug`, `/create-feature`), and optionally via `/update-project-file`, record which non-built-in commands and skills were used during the session.
+
+### What to track
+- Custom slash commands invoked (e.g., `/fix-bug`, `/create-feature`, `/review-code`, `/cherry-pick`)
+- Internal skills delegated to (e.g., `developer/investigate-bug`, `qa/triage-bug`, `core/check-existing-fix`)
+- Subagent invocations and their purposes
+
+### How to record
+Update the `usage_patterns` memory file with:
+- Date and top-level command
+- Skills and subcommands used
+- Session outcome (completed, blocked, checkpoint)
+
+Keep entries compact — one line per session, not a narrative. Over time this builds a picture of which workflows and skills get the most use, informing where to invest optimization and maintenance effort.
+
 ## Override Hierarchy
 
 1. **Universal principles** (this file) — always apply

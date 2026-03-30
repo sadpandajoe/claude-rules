@@ -169,6 +169,10 @@ Lead with the outcome, not the process. If the user gave you a ticket, answer wh
 </details>
 ```
 
+### 8. Session Learning
+
+As the last step, update the `usage_patterns` memory file with the commands and skills used during this session. See "Session Learning" in `rules/universal.md`.
+
 ## Non-Negotiable Gates
 
 Use this checklist to verify you haven't skipped a gate:

@@ -257,6 +257,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    </details>
    ```
 
+18. **Session Learning**
+
+    As the last step, update the `usage_patterns` memory file with the commands and skills used during this session. See "Session Learning" in `rules/universal.md`.
+
 ## PROJECT.md Update Discipline
 
 Update `PROJECT.md` at these points:
