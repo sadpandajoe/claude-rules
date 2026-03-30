@@ -2,6 +2,9 @@
 
 Use this phase when a workflow needs code-level RCA for a reported bug as an internal step rather than a standalone user-facing investigation command.
 
+## Required Context
+Read before starting: `rules/investigation.md`
+
 ## Goal
 
 Trace the likely failing path, identify the most plausible root cause with evidence, and hand back a compact RCA for validation.

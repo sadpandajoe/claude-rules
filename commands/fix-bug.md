@@ -1,11 +1,7 @@
 # /fix-bug - End-to-End Bug Workflow
 
-@/Users/joeli/opt/code/ai-toolkit/rules/investigation.md
-@/Users/joeli/opt/code/ai-toolkit/rules/implementation.md
 @/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
-@/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/SKILL.md
+@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
 
 > **When**: You have a bug report and want the repo-standard workflow to triage it, check whether it is already fixed upstream or pending in a PR, implement a safe fix when needed, and finish the local bug-fix flow end to end.
 > **Produces**: Triage notes, upstream-status decision, validated RCA, implemented fix when appropriate, review and QA results, and either an automatic `fix:` commit or a handoff to the user.
@@ -62,14 +58,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    | Fix type | Typo, config, off-by-one | Logic, architecture |
    | Regression risk | Isolated, testable | Cross-cutting |
 
-   State the classification explicitly using the action-gate format:
-
-   ```markdown
-   ## Complexity Gate
-   Classification: TRIVIAL / STANDARD
-   Confidence: X/10
-   Reason: [one line]
-   ```
+   Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
@@ -79,20 +68,17 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
       - **PARTIAL**: related checks ran but not the exact suite
       - **WEAK**: tests could not run locally (missing Docker, env, data) — note why
       `/review-code` inherits this assessment — do not re-discover the same limitation there.
-   4. `/review-code` — must produce Review Gate block (this is not optional)
+   4. `/review-code` — developer emits a Review Gate block per `rules/review-gate.md`
    5. Commit the fix (step 16)
    6. Update PROJECT.md (single update)
    7. Emit summary (step 17)
 
    The review gate at step 4 is mid-workflow — steps 5–7 must still execute. Do not stop after the review gate passes.
 
-   **Micro-fix** (subset of trivial): When the diff is ≤3 lines, pre-commit passes, test suite passes, and confidence is 10/10:
-   - `/review-code` may be collapsed to a single Review Gate block with `Status: micro-fix` and the diff inlined — no iterative loop needed
+   **Micro-fix** (subset of trivial): per the micro-fix rule in `rules/review-gate.md`, emit `Status: micro-fix` with the diff inlined — no iterative loop needed.
    - PROJECT.md update is optional if no PROJECT.md exists and the workflow completes in a single pass
 
    **Standard**: Continue to step 3.
-
-   Do not silently decide — always emit the gate block above.
 
 3. **Launch Early Lanes**
 
@@ -211,9 +197,9 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    If step 13 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
 
-   `/review-code` must emit its Review Gate block (see `review-code.md` step 3).
+   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
 
-   For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped — but the Review Gate block must still be emitted with `Status: skipped` and a reason.
+   For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
    Do not skip this step when resuming from a pre-built plan.
 
@@ -270,6 +256,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    </details>
    ```
+
+18. **Session Learning**
+
+    As the last step, update the `usage_patterns` memory file with the commands and skills used during this session. See "Session Learning" in `rules/universal.md`.
 
 ## PROJECT.md Update Discipline
 

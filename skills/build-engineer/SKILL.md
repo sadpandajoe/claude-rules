@@ -9,6 +9,9 @@ disable-model-invocation: true
 
 Use this persona when the task is primarily about CI, build, lint, test, dependency, or workflow failures.
 
+## Required Context
+Read before starting: `rules/implementation.md`
+
 ## Responsibilities
 
 - Own CI artifact intake and failure classification

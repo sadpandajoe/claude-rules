@@ -2,6 +2,9 @@
 
 Use this phase when the workflow is ready to apply a code change after investigation and any needed planning are complete.
 
+## Required Context
+Read before starting: `rules/implementation.md`, `rules/testing.md`
+
 ## Goal
 
 Implement the narrowest fix that resolves the validated issue, add the right regression protection, and hand the result back for review and QA validation.

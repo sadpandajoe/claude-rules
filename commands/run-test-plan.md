@@ -1,8 +1,6 @@
 # /run-test-plan - Standalone QA Validation
 
-@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
 @/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
-@/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/core/review-testplan/SKILL.md
 
 > **When**: You want to validate a feature area, story, PR, or existing test-plan doc without fixing code in the same workflow.

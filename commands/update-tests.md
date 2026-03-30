@@ -1,8 +1,5 @@
 # /update-tests - Improve an Existing Test Suite
 
-@/Users/joeli/opt/code/ai-toolkit/rules/testing.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/qa/SKILL.md
 @/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
 
 > **When**: You want to improve an existing test suite in a specific area, path, or function and have the workflow analyze gaps, update tests, verify, review, and auto-commit when confidence is strong.

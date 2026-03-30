@@ -1,9 +1,5 @@
 # /cherry-pick - Cherry-Pick One or More Changes
 
-@/Users/joeli/opt/code/ai-toolkit/rules/cherry-picking.md
-@/Users/joeli/opt/code/ai-toolkit/skills/release-engineer/SKILL.md
-@/Users/joeli/opt/code/ai-toolkit/skills/developer/SKILL.md
-
 > **When**: Moving one or more changes (bug fixes, isolated features) to another branch.
 > **Produces**: Ordered plan, clean cherry-picks with conflicts resolved where safe, and a per-change report documented in PROJECT.md.
 
@@ -92,6 +88,11 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    This phase owns validation depth, including stronger checks for dependency-manifest changes.
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
+
+   **Push after each successful cherry-pick**: After local validation passes, push immediately so CI runs against the change. CI matrices vary per repo (some include frontend, some don't) — early push gets that signal sooner rather than batching risk at the end.
+   ```bash
+   git push
+   ```
 
 6. **Document the Plan and Outcome**
 

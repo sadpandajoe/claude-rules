@@ -10,6 +10,7 @@
 - **End-to-end commands own their internal loops** — planning, review, and validation sub-phases should continue automatically until threshold or blocker; do not surface subcommands as the next user step unless the user explicitly chose them
 - **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
 - **Checkpoint when context is deep** — at chain boundaries and loop iterations, if context is above ~70%, save state and continue in a fresh conversation (see Context Management below)
+- **Rules evolve from usage** — when a rule is violated, strengthen it; when a rule is stale, update it; when a pattern recurs, extract it
 
 ## PROJECT.md Update Defaults
 
@@ -86,6 +87,48 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 - **Ask for clarification** — don't assume when unclear
 - **Request confirmation** — before destructive changes
 
+## Rule Maintenance
+
+Rules are living documents. Update them based on real-world usage:
+
+### When a rule is violated
+A rule that agents ignore is too weak. After observing a violation:
+- Strengthen the language (add NEVER lists, move critical instructions to top)
+- Add the failure pattern as a concrete example of what NOT to do
+- Consider whether the rule needs to load earlier or more prominently
+
+### When a rule is stale
+Rules drift from reality as code, APIs, and processes change. When you notice a mismatch:
+- Update the rule to match current behavior
+- Remove conditions or thresholds that no longer apply
+- Flag the update in your summary so the user knows
+
+### When a new pattern emerges
+Recurring workarounds or repeated feedback across conversations signal a missing rule. When you see a pattern:
+- Check if an existing rule covers it (update if partially covered)
+- Extract a new focused rule file if it's genuinely new
+- Keep it small — one concern per file, 20-40 lines
+
+### Scope
+Rule updates are limited to the `rules/` directory in this toolkit. Do not modify project-level CLAUDE.md files or Anthropic system behavior. Rule changes should be proposed to the user during the summary phase, not applied silently mid-workflow.
+
+## Session Learning
+
+At the end of end-to-end workflows (`/fix-bug`, `/create-feature`), and optionally via `/update-project-file`, record which non-built-in commands and skills were used during the session.
+
+### What to track
+- Custom slash commands invoked (e.g., `/fix-bug`, `/create-feature`, `/review-code`, `/cherry-pick`)
+- Internal skills delegated to (e.g., `developer/investigate-bug`, `qa/triage-bug`, `core/check-existing-fix`)
+- Subagent invocations and their purposes
+
+### How to record
+Update the `usage_patterns` memory file with:
+- Date and top-level command
+- Skills and subcommands used
+- Session outcome (completed, blocked, checkpoint)
+
+Keep entries compact — one line per session, not a narrative. Over time this builds a picture of which workflows and skills get the most use, informing where to invest optimization and maintenance effort.
+
 ## Override Hierarchy
 
 1. **Universal principles** (this file) — always apply
@@ -110,3 +153,6 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 | `shortcut-api.md` | Shortcut REST API: auth, endpoints, retry, query patterns |
 | `input-detection.md` | Route ticket/issue inputs to Shortcut or GitHub |
 | `pgm.md` | Program management: org context, audience tiers, data collection rules |
+| `review-gate.md` | Review Gate output contract: block format, status values, skip/micro-fix rules |
+| `complexity-gate.md` | Complexity classification: gate block format, trivial fast-path |
+| `stop-rules.md` | Universal stop conditions for iterative loops |
