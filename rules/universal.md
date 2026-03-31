@@ -36,6 +36,9 @@ These defaults apply to all commands unless the command specifies otherwise:
 | CI build failed | CI Remediation | `/fix-ci` |
 | Pre-commit quality pass | Self Review | `/review-code` |
 | PR has review comments | PR Feedback | `/address-feedback` |
+| One-off plan quality review | Plan Review | `/review-plan` |
+| Saving state before context clear | Checkpoint | `/checkpoint` |
+| Verifying changes pass tests | Verification | `/verify` |
 | Program health snapshot | PGM Report | `/create-status-report` |
 | Monthly velocity metrics | Velocity | `/create-velocity-report` |
 
@@ -52,26 +55,12 @@ Sub-invocations: when `/create-feature`, `/fix-bug`, `/update-tests`, or `/fix-c
 
 ### Save & Continue Protocol
 
-When context is ≥ 70%:
-1. Update PROJECT.md with the current workflow status before clearing context.
-2. Write a **continuation checkpoint** to PROJECT.md:
-   ```markdown
-   ## Continuation Checkpoint — [timestamp]
-   ### Workflow
-   - Top-level command: [the user-facing command to resume, e.g. `/cherry-pick ...`]
-   - Phase: [current internal phase, e.g. `plan`, `investigate`, `apply`, `validate`]
-   - Resume target: [current item, PR, SHA, file, or review round]
-   - Completed items: [items already finished in this workflow]
-   ### State
-   - [Key decisions made]
-   - [Current scores/results if in review loop]
-   - [Files modified so far]
-   - [Any pending issues or blockers]
-   ```
-3. Commit any uncommitted work if the workflow requires a durable checkpoint.
-4. Run `/clear` to reset conversation context.
-5. Run `/start` to reload PROJECT.md and pick up the checkpoint.
-6. `/start` resumes the saved top-level command at the saved phase and target automatically.
+When context is ≥ 70%, run `/checkpoint`. It handles the full protocol:
+1. Writes a continuation checkpoint to PROJECT.md (see `commands/checkpoint.md` for the canonical format)
+2. Commits any uncommitted work
+3. Runs `/clear` to reset conversation context
+
+After `/clear`, run `/start` to reload PROJECT.md and resume the saved workflow automatically.
 
 The user should not need to do anything — this is a seamless context refresh.
 

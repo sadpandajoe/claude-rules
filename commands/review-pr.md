@@ -1,118 +1,154 @@
 # /review-pr - Review GitHub Pull Request
 
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
+@{{TOOLKIT_DIR}}/rules/code-review.md
+
 > **When**: Asked to review someone else's GitHub PR.
-> **Produces**: Scored review with actionable feedback, optionally posted to GitHub.
+> **Produces**: Scored review with actionable feedback, posted to GitHub.
+
+Use `--draft` to show the review locally without posting.
 
 ## Usage
+
 ```
 /review-pr <pr-number-or-url>
+/review-pr <pr-number-or-url> --draft
 ```
 
 ## Steps
 
-1. **Gather PR Context**
-   ```bash
-   # Get PR metadata
-   gh pr view $ARGUMENTS --json title,body,author,baseRefName,headRefName,files,additions,deletions
+### 1. Gather PR Context
 
-   # Get the diff
-   gh pr diff $ARGUMENTS
+```bash
+# Metadata
+gh pr view $ARGUMENTS --json title,body,author,baseRefName,headRefName,files,additions,deletions
 
-   # Get list of changed files with full content for context
-   gh pr view $ARGUMENTS --json files -q '.files[].path'
-   ```
+# Diff
+gh pr diff $ARGUMENTS
 
-   Read the full content of changed files — review comments on changed lines, but understand the surrounding context.
+# Changed file paths
+gh pr view $ARGUMENTS --json files -q '.files[].path'
+```
 
-2. **Initial Assessment**
+Read the full content of changed files — review comments target changed lines, but the review must understand surrounding context.
 
-   - Purpose: What problem does this solve?
-   - Scope: Is it focused or sprawling?
-   - Risk: What could break?
+### 2. Complexity Gate
 
-3. **Score Using Framework**
+Classify the PR scope:
 
-   | Component | Score | Notes |
-   |-----------|-------|-------|
-   | Root Cause | /10 | Why was this change needed? |
-   | Solution | /10 | Efficient, maintainable? |
-   | Tests | /10 | Realistic, covering? |
-   | Code | /10 | Readable, consistent? |
-   | Docs | /10 | Clear, complete? |
+| Signal | Trivial | Standard |
+|--------|---------|----------|
+| Files changed | 1–5 | 6+ |
+| Lines changed | < 100 | 100+ |
+| Behavioral change | None / cosmetic | Functional |
+| Cross-cutting | No | Yes |
 
-4. **Tag Issues by Severity**
+Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-   For each issue:
-   - `[major]` - Must fix before merge (bugs, security, missing tests)
-   - `[minor]` - Should fix (naming, DRY, partial docs)
-   - `[nitpick]` - Optional (style, micro-optimizations)
+**Trivial + confidence 8/10+**: Streamlined review — score, post, summary. Skip deep investigation.
 
-   **Line number accuracy**: Use `gh api` to get diff hunks with positions. Map each issue to the correct diff line, not the file line number. This matters for posting review comments.
+### 3. Deep Review
 
-   ```bash
-   # Get diff with positions for accurate line commenting
-   gh api repos/{owner}/{repo}/pulls/{number}/files --paginate
-   ```
+Read full files for context around each changed section. For standard complexity, investigate:
+- Purpose: What problem does this solve?
+- Correctness: Could this break existing behavior?
+- Test coverage: Are new paths tested?
+- Consistency: Does it follow codebase patterns?
 
-5. **Present Review to User**
+Score using the framework from `rules/code-review.md`:
 
-   ```markdown
-   ## PR Review: #[number] - [title]
+| Component | Score | Notes |
+|-----------|-------|-------|
+| Root Cause | /10 | Why was this change needed? |
+| Solution | /10 | Efficient, maintainable? |
+| Tests | /10 | Realistic, covering? |
+| Code | /10 | Readable, consistent? |
+| Docs | /10 | Clear, complete? |
 
-   ### Summary
-   [1-2 sentence summary of what PR does]
+Tag issues by severity:
+- `[major]` — Must fix before merge (bugs, security, missing tests)
+- `[minor]` — Should fix (naming, DRY, partial docs)
+- `[nitpick]` — Optional (style, micro-optimizations)
 
-   ### Scores
-   | Component | Score | Notes |
-   |-----------|-------|-------|
-   | Root Cause | X/10 | |
-   | Solution | X/10 | |
-   | Tests | X/10 | |
-   | Code | X/10 | |
-   | Docs | X/10 | |
-   | **Overall** | **X/10** | |
+Use `gh api repos/{owner}/{repo}/pulls/{number}/files --paginate` for accurate diff positions when mapping issues to lines.
 
-   ### Issues
+### 4. Review Gate
 
-   #### [major]
-   - `file.py:42` — description
+Determine recommendation based on scores:
+- **Approve**: Overall 8/10+, zero `[major]` issues
+- **Request Changes**: Any `[major]` issue, or overall below 6/10
+- **Comment**: Overall 6-7/10, no `[major]` but notable `[minor]` issues
 
-   #### [minor]
-   - `file.py:87` — description
+### 5. Post to GitHub
 
-   #### [nitpick]
-   - `file.py:15` — description
+**Default**: Post the review to GitHub automatically.
+- If recommendation is `Approve` or `Comment`: post with inline comments
+- If recommendation is `Request Changes`: post with inline comments
 
-   ### Recommendation
-   **Approve** / **Request Changes** / **Comment**
-   [Reasoning]
-   ```
+```bash
+# Submit review with inline comments
+gh api repos/{owner}/{repo}/pulls/{number}/reviews \
+  -f event="REQUEST_CHANGES" \
+  -f body="Review summary" \
+  -f 'comments[]={ "path": "file.py", "line": 42, "body": "[major] description" }'
+```
 
-6. **Ask User: Post to GitHub?**
+**`--draft` flag**: Show the review in conversation only. Do not post to GitHub.
 
-   Options:
-   - **Post full review** — submit as GitHub review with inline comments
-   - **Post summary only** — single review comment with the summary
-   - **Don't post** — just show locally
+### 6. Summary
 
-   If posting inline comments:
-   ```bash
-   # Submit review with inline comments
-   gh api repos/{owner}/{repo}/pulls/{number}/reviews \
-     -f event="REQUEST_CHANGES" \
-     -f body="Review summary" \
-     -f 'comments[]={ "path": "file.py", "line": 42, "body": "[major] description" }'
-   ```
+```markdown
+## Review-PR Complete
+PR #[number]: [title] — [Approve / Request Changes / Comment]
 
-   If posting summary only:
-   ```bash
-   gh pr review $ARGUMENTS --request-changes --body "review body"
-   # or --approve or --comment
-   ```
+### Scores
+| Component | Score |
+|-----------|-------|
+| Root Cause | X/10 |
+| Solution | X/10 |
+| Tests | X/10 |
+| Code | X/10 |
+| Docs | X/10 |
+| **Overall** | **X/10** |
+
+### Issues Found
+- [N] major, [N] minor, [N] nitpick
+
+### Posted
+[Yes — link to review / No — draft mode]
+```
+
+## Non-Negotiable Gates
+
+- [ ] Full file context read (not just diff)
+- [ ] Complexity Gate block emitted
+- [ ] All issues tagged by severity
+- [ ] Review Gate recommendation determined
+- [ ] Summary emitted
+
+## PROJECT.md Update Discipline
+
+If a PROJECT.md exists, update after posting with PR number, recommendation, and key findings. Skip if no PROJECT.md exists and review completes without issues.
+
+## Continuation Checkpoint
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /review-pr <pr-reference>
+- Phase: gather / complexity-gate / review / gate / post / summarize
+- Resume target: PR #[number]
+- Completed items: [phases finished]
+### State
+- PR: [number] — [title]
+- Complexity: [trivial / standard]
+- Scores: [component: score, ...]
+- Recommendation: [approve / request-changes / comment / pending]
+- Posted: [yes / no / pending]
+```
 
 ## Notes
 - Read full files for context, only comment on changed lines
-- All `[major]` issues must be addressed before recommending approval
-- Score >= 8/10 needed for approval recommendation
-- Always ask before posting to GitHub
 - Use diff positions (not file line numbers) when posting inline comments
+- Default is auto-post; use `--draft` for local-only review
+- Score >= 8/10 with zero `[major]` needed for approval

@@ -96,7 +96,10 @@ ai-toolkit/
     ├── cherry-pick.md      # Cross-branch work
     ├── create-status-report.md   # Live program health report
     ├── create-velocity-report.md # Historical velocity report
-    ├── update-project-file.md    # Sync or checkpoint PROJECT.md
+    ├── checkpoint.md            # Save workflow state before /clear
+    ├── verify.md                # Run tests on changed files
+    ├── review-plan.md           # One-off plan review with iteration
+    ├── update-project-file.md   # Manual PROJECT.md status refresh
     ├── archive-project-file.md  # Archive completed work
     └── toolkit-doctor.md        # Structural health check
 ```
@@ -118,18 +121,21 @@ ai-toolkit/
 | `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
 | `/review-code` | Public wrapper over the developer review/fix loop |
+| `/review-plan` | One-off plan review with reviewer iteration to 8/10 |
+| `/verify` | Run tests on changed files and report verification strength |
 
 ### Review & Branch Workflows
 | Command | Purpose |
 |---------|---------|
-| `/review-pr` | Review third-party GitHub PRs with scoring framework |
-| `/address-feedback` | Triage PR review comments, fix valid items, draft replies |
+| `/review-pr` | Review GitHub PRs with scoring framework and auto-post |
+| `/address-feedback` | Investigate PR comments, fix valid items, post replies |
 | `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
 
 ### Project State
 | Command | Purpose |
 |---------|---------|
-| `/update-project-file` | Manually sync PROJECT.md or write a continuation checkpoint |
+| `/checkpoint` | Save workflow state to PROJECT.md and clear context |
+| `/update-project-file` | Manual PROJECT.md status refresh |
 | `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
 
 ### Reporting
@@ -182,18 +188,28 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 - iterate it with `review-testplan` until it reaches 8/10 or blockers stop execution
 - execute it through QA helpers and summarize findings locally
 
+### Plan Review
+```bash
+/review-plan                # Review plan in PROJECT.md with all applicable reviewers
+/review-plan --pm           # Include PM brief review
+```
+
+`/review-plan` is standalone plan quality review — the same reviewer iteration as `/create-feature` step 4, without the full workflow.
+
 ### PR Feedback Analysis
 ```bash
 /address-feedback 123       # Address review comments for PR 123
 /address-feedback <pr-url>  # Address review comments by URL
+/address-feedback 123 --draft  # Local only, don't post
 ```
 
-`/address-feedback` is action-first: investigate comments, fix valid issues, draft replies, then wait for user approval before push/post.
+`/address-feedback` is action-first: investigate comments, fix valid issues, post replies. Auto-pushes and auto-posts by default.
 
 ### GitHub PR Reviews
 ```bash
 /review-pr 123              # Review PR by number
 /review-pr https://github.com/owner/repo/pull/123  # Review by URL
+/review-pr 123 --draft      # Local only, don't post
 ```
 
 ## Workflow Rules
