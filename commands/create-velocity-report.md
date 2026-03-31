@@ -1,6 +1,6 @@
 # /create-velocity-report — Monthly Velocity Metrics
 
-@/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
+@{{TOOLKIT_DIR}}/rules/pgm.md
 
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.
@@ -34,13 +34,13 @@
 
 ### 1. Load Context
 
-- Read `/Users/joeli/opt/code/pgm/config.json` for current `month`, `date_range`, teams, members, repos
+- Read `$PGM_DIR/config.json` for current `month`, `date_range`, teams, members, repos
 - If `--month` provided and differs from config, tell the user to update `config.json` first (the pipeline reads config directly)
 - If `--summary-only`, skip to Step 5
 
 ### 2. Read Pipeline Instructions
 
-- Read `/Users/joeli/opt/code/pgm/run.md` for the full pipeline instructions
+- Read `$PGM_DIR/run.md` for the full pipeline instructions
 - Follow those instructions — they are the authoritative source for how the pipeline runs
 
 ### 3. Execute Pipeline
@@ -49,7 +49,7 @@ Follow the steps in `run.md`:
 
 **3a. Start GitHub collection in background:**
 ```bash
-cd /Users/joeli/opt/code/pgm && python3 collect_github.py
+cd $PGM_DIR && python3 collect_github.py
 ```
 This takes ~5-10 min. Continue to 3b while it runs.
 
@@ -78,9 +78,9 @@ Save to `data/{month}/`:
 
 **3d. Run processing pipeline sequentially:**
 ```bash
-cd /Users/joeli/opt/code/pgm && python3 collect_shortcut.py
-cd /Users/joeli/opt/code/pgm && python3 analyze.py
-cd /Users/joeli/opt/code/pgm && python3 report.py
+cd $PGM_DIR && python3 collect_shortcut.py
+cd $PGM_DIR && python3 analyze.py
+cd $PGM_DIR && python3 report.py
 ```
 
 ### 4. Validate Output
@@ -110,7 +110,7 @@ Suggest follow-up actions:
 
 ## Notes
 
-- This wraps the existing Python pipeline in `/Users/joeli/opt/code/pgm/`
+- This wraps the existing Python pipeline in `$PGM_DIR/`
 - The pipeline is the authoritative source for metric calculations — don't reimplement metrics manually
 - For live/current-state data, use `/create-status-report` instead
 - If the pipeline fails, read the error output and diagnose — don't silently skip steps

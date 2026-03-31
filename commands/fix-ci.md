@@ -1,6 +1,6 @@
 # /fix-ci - Fix CI Failures
 
-@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
 
 > **When**: A CI build has failed and you want the repo-standard workflow to diagnose it, apply safe fixes, verify locally, and stop before commit.
 > **Produces**: Failure classification, PROJECT.md update, safe fixes where appropriate, validation results, and a recommended commit action.

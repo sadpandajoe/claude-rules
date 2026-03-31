@@ -1,9 +1,9 @@
 # /create-feature - End-to-End Feature Workflow
 
-@/Users/joeli/opt/code/ai-toolkit/rules/planning.md
-@/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
-@/Users/joeli/opt/code/ai-toolkit/rules/orchestration.md
-@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
+@{{TOOLKIT_DIR}}/rules/planning.md
+@{{TOOLKIT_DIR}}/rules/input-detection.md
+@{{TOOLKIT_DIR}}/rules/orchestration.md
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
 
 > **When**: You have a feature request or other planned non-bug work and want the repo-standard workflow to scope it, review it, implement it, and keep going until a real decision matters.
 > **Produces**: Feature brief, milestones, implementation plan, reviewed plan, implemented local changes, review and QA results, and a handoff before the final commit or PR action.
@@ -168,10 +168,6 @@ Lead with the outcome, not the process. If the user gave you a ticket, answer wh
 
 </details>
 ```
-
-### 8. Session Learning
-
-As the last step, update the `usage_patterns` memory file with the commands and skills used during this session. See "Session Learning" in `rules/universal.md`.
 
 ## Non-Negotiable Gates
 

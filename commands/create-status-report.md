@@ -1,6 +1,6 @@
 # /create-status-report — Live Program Health Report
 
-@/Users/joeli/opt/code/ai-toolkit/rules/pgm.md
+@{{TOOLKIT_DIR}}/rules/pgm.md
 
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.
 > **Produces**: Program health report with epic progress, flow health, risks, blockers, and team state.
@@ -34,15 +34,15 @@
 
 ### 1. Load Context
 
-- Read `/Users/joeli/opt/code/pgm/config.json` for team UUIDs, member list, bot accounts, repo mapping
+- Read `$PGM_DIR/config.json` for team UUIDs, member list, bot accounts, repo mapping
 - Parse arguments: team filter, epic filter, or all teams
 - Set date context: today's date for "current state", last 14 days for "recently shipped"
 
 ### 2. Gather Data (Parallel Agents)
 
 Use the **Agent tool** to spawn 2-3 agents **in a single message** (this is critical — multiple Agent tool calls in one message run concurrently). Each agent prompt must include instructions to:
-- Read `/Users/joeli/opt/code/ai-toolkit/rules/pgm.md` for API patterns
-- Read `/Users/joeli/opt/code/pgm/config.json` for team UUIDs, members, bots
+- Read `{{TOOLKIT_DIR}}/rules/pgm.md` for API patterns
+- Read `$PGM_DIR/config.json` for team UUIDs, members, bots
 - Return structured JSON or markdown that the main context can synthesize
 
 **Agent 1 — Shortcut REST API** (via `curl` with `$SHORTCUT_API_TOKEN`):

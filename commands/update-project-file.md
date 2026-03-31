@@ -1,6 +1,6 @@
 # /update-project-file - Update PROJECT.md
 
-@/Users/joeli/opt/code/ai-toolkit/rules/planning.md
+@{{TOOLKIT_DIR}}/rules/planning.md
 
 > **When**: PROJECT.md needs a manual sync, checkpoint, or quick status refresh outside a command's normal workflow.
 > **Produces**: Updated PROJECT.md state with minimal ceremony.
@@ -129,10 +129,6 @@ For checkpointing:
 Will:
 - Write the continuation checkpoint in the standard format
 - Keep the rest of PROJECT.md untouched unless a status refresh is also needed
-
-7. **Session Learning** (optional)
-
-   When doing a checkpoint or end-of-session sync, also update the `usage_patterns` memory file with commands and skills used during the session. See "Session Learning" in `rules/universal.md`.
 
 ## Notes
 - Most commands should update PROJECT.md themselves before finishing

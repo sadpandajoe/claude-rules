@@ -1,7 +1,7 @@
 # /fix-bug - End-to-End Bug Workflow
 
-@/Users/joeli/opt/code/ai-toolkit/rules/input-detection.md
-@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
+@{{TOOLKIT_DIR}}/rules/input-detection.md
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
 
 > **When**: You have a bug report and want the repo-standard workflow to triage it, check whether it is already fixed upstream or pending in a PR, implement a safe fix when needed, and finish the local bug-fix flow end to end.
 > **Produces**: Triage notes, upstream-status decision, validated RCA, implemented fix when appropriate, review and QA results, and either an automatic `fix:` commit or a handoff to the user.
@@ -256,10 +256,6 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    </details>
    ```
-
-18. **Session Learning**
-
-    As the last step, update the `usage_patterns` memory file with the commands and skills used during this session. See "Session Learning" in `rules/universal.md`.
 
 ## PROJECT.md Update Discipline
 

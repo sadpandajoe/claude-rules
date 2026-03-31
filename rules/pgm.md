@@ -14,7 +14,7 @@ EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — f
 
 ### Member Resolution
 
-**Canonical source**: `/Users/joeli/opt/code/pgm/config.json`
+**Canonical source**: `$PGM_DIR/config.json`
 
 Always read `config.json` for the full member list with GitHub handles, Shortcut IDs, team assignments, and notes (QA, PM, Designer, EM roles). Do not hardcode member lists — the config is the source of truth.
 

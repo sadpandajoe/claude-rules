@@ -1,6 +1,6 @@
 # /create-tests - Create the First Meaningful Tests
 
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
+@{{TOOLKIT_DIR}}/skills/core/review-tests/SKILL.md
 
 > **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
 > **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.

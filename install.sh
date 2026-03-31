@@ -100,38 +100,38 @@ echo "  Claude Code Configuration Installer"
 echo "========================================"
 echo ""
 
-# Step 1: Generate CLAUDE.md with correct paths
-step "Generating CLAUDE.md with correct paths..."
+# Step 1: Build resolved files from templates
+# Source files use {{TOOLKIT_DIR}} as a portable placeholder.
+# This step replaces it with the actual repo path for the local install.
+step "Building resolved config and commands..."
 
-# Keep CLAUDE.md intentionally thin. Workflow-specific rules load on demand
-# from commands and skills.
-{
-    if [[ -f "$REPO_DIR/rules/universal.md" ]]; then
-        echo "@$REPO_DIR/rules/universal.md"
-    fi
-    if [[ -f "$REPO_DIR/rules/resource-management.md" ]]; then
-        echo "@$REPO_DIR/rules/resource-management.md"
-    fi
-} > "$REPO_DIR/config/CLAUDE.md"
+BUILD_DIR="$REPO_DIR/build"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR/config" "$BUILD_DIR/commands"
 
-info "Generated lightweight CLAUDE.md from:"
-for rule in "$REPO_DIR/rules/universal.md" "$REPO_DIR/rules/resource-management.md"; do
-    if [[ -f "$rule" ]]; then
-        echo "  $rule"
+# Resolve config/CLAUDE.md
+sed "s|{{TOOLKIT_DIR}}|$REPO_DIR|g" "$REPO_DIR/config/CLAUDE.md" > "$BUILD_DIR/config/CLAUDE.md"
+info "Resolved config/CLAUDE.md"
+
+# Resolve all command files
+for cmd in "$REPO_DIR/commands"/*.md; do
+    if [[ -f "$cmd" ]]; then
+        sed "s|{{TOOLKIT_DIR}}|$REPO_DIR|g" "$cmd" > "$BUILD_DIR/commands/$(basename "$cmd")"
     fi
 done
+info "Resolved $(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ') command files"
 
 # Step 2: Symlink universal configuration files
 step "Symlinking configuration files..."
 
 # Only symlink universal configs (CLAUDE.md)
 # settings.json and mcp-global.json are personal - users manage their own
-create_symlink "$REPO_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+create_symlink "$BUILD_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 
-# Step 3: Symlink commands directory
+# Step 3: Symlink commands directory (from build output)
 step "Symlinking commands directory..."
 
-create_symlink "$REPO_DIR/commands" "$CLAUDE_DIR/commands"
+create_symlink "$BUILD_DIR/commands" "$CLAUDE_DIR/commands"
 
 # Step 3b: Symlink skills directory
 step "Symlinking skills directory..."
@@ -191,10 +191,10 @@ echo "========================================"
 echo "  Installation Complete!"
 echo "========================================"
 echo ""
-COMMAND_COUNT=$(ls "$REPO_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
+COMMAND_COUNT=$(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 SKILL_COUNT=$(find "$REPO_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
-ls "$REPO_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
+ls "$BUILD_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
     echo "  /$cmd"
 done
 echo ""
