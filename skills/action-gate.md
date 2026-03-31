@@ -39,7 +39,7 @@ Default tier definitions:
 - **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command
 - **WEAK**: code review only, no local execution
 
-When `build-engineer/verify-fix.md` is in play, use that skill's expanded definitions instead.
+When `ci-verify-fix.md` is in play, use that skill's expanded definitions instead.
 
 ## Rating Guidance
 

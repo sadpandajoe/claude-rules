@@ -1,6 +1,6 @@
 # /create-velocity-report — Monthly Velocity Metrics
 
-@{{TOOLKIT_DIR}}/rules/pgm.md
+@{{TOOLKIT_DIR}}/extensions/pgm/rules/pgm.md
 
 > **When**: End of month (or anytime you need historical velocity metrics).
 > **Produces**: Full velocity report with throughput, cycle times, PR metrics, and team breakdowns.
@@ -56,7 +56,7 @@ This takes ~5-10 min. Continue to 3b while it runs.
 **3b. Collect Shortcut data (while GitHub runs in background):**
 
 Use the Shortcut REST API (preferred) via `curl` with `$SHORTCUT_API_TOKEN`.
-Follow `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
+Follow `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
 
 Run all team queries in **parallel bash calls** — each team's queries are independent:
 - **Completed stories** per team: `POST /stories/search` with `completed_at_start`/`completed_at_end` from config date range, `group_id`
@@ -97,7 +97,7 @@ Flag data quality issues:
 
 Read and present `data/{month}/report.md` to the user.
 
-If `--summary-only`: read `data/{month}/metrics.json` and produce a concise executive summary using `pgm/comms.md` with `executive` audience.
+If `--summary-only`: read `data/{month}/metrics.json` and produce a concise executive summary using `{{TOOLKIT_DIR}}/extensions/pgm/skills/pgm-comms.md` with `executive` audience.
 
 If `--audience <mode>` is provided, format the final output for that audience using the same internal PGM formatting skill.
 

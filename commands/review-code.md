@@ -15,7 +15,7 @@
 
 1. **Delegate the Review/Fix Loop to `developer`**
 
-   Use `developer/review-local-changes.md`. This helper owns:
+   Use `review-local-changes.md`. This helper owns:
    - changed-file discovery and scoping (uncommitted or committed mode)
    - code review against `rules/code-review.md`
    - finding normalization

@@ -166,16 +166,26 @@ verify_link() {
 verify_link "$CLAUDE_DIR/CLAUDE.md"
 verify_link "$CLAUDE_DIR/commands"
 verify_link "$CLAUDE_DIR/skills"
-verify_link "$CODEX_DIR/skills/build-engineer"
-verify_link "$CODEX_DIR/skills/core"
-verify_link "$CODEX_DIR/skills/developer"
-verify_link "$CODEX_DIR/skills/pm"
-verify_link "$CODEX_DIR/skills/pgm"
-verify_link "$CODEX_DIR/skills/qa"
-verify_link "$CODEX_DIR/skills/release-engineer"
-verify_link "$CODEX_DIR/skills/shared"
+# Verify a sample of Codex skill links (flat .md files)
+CODEX_LINK_COUNT=0
+for link in "$CODEX_DIR/skills"/*.md; do
+    if [[ -L "$link" ]]; then
+        CODEX_LINK_COUNT=$((CODEX_LINK_COUNT + 1))
+    fi
+done
+echo -e "  ${GREEN}✓${NC} Codex skills: $CODEX_LINK_COUNT linked"
 
 echo ""
+
+# Step 5: Install PGM extension (optional)
+if [[ -d "$REPO_DIR/extensions/pgm" ]]; then
+    if [[ "${1:-}" == "--with-pgm" ]]; then
+        step "Installing PGM extension..."
+        "$REPO_DIR/extensions/pgm/install.sh" "$REPO_DIR"
+    else
+        info "PGM extension available. Run with --with-pgm to install."
+    fi
+fi
 
 # Show backup info if backups were created
 if [[ -d "$BACKUP_DIR" ]]; then
@@ -192,16 +202,16 @@ echo "  Installation Complete!"
 echo "========================================"
 echo ""
 COMMAND_COUNT=$(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
-SKILL_COUNT=$(find "$REPO_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
 ls "$BUILD_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
     echo "  /$cmd"
 done
 echo ""
 info "Available skills ($SKILL_COUNT):"
-find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | while read dir; do
-    echo "  ${dir#$REPO_DIR/skills/}"
-done | sort
+find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" -exec basename {} .md \; 2>/dev/null | sort | while read skill; do
+    echo "  $skill"
+done
 echo ""
 info "Codex skill links:"
 find "$CODEX_DIR/skills" -maxdepth 1 -mindepth 1 -type l 2>/dev/null | xargs -I {} basename {} | sort | while read skill; do

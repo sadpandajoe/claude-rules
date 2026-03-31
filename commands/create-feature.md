@@ -64,9 +64,9 @@ Enter plan mode. Inside plan mode, do all of the following:
 
 **a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
 
-**b. Create the feature brief**: If PM planning is needed, use `pm/create-feature-brief.md` with milestones via `pm/plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
+**b. Create the feature brief**: If PM planning is needed, use `pm-create-feature-brief.md` with milestones via `pm-plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
 
-**c. Create the technical plan**: Use `developer/plan-feature.md` to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
+**c. Create the technical plan**: Use `plan-feature.md` to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 
 Exit plan mode when you have a draft feature brief and technical plan. These do not need to be polished — review iterations in step 4 will refine them.
 
@@ -91,22 +91,22 @@ This gate ensures the plan is durable before review iterations begin. If the pla
 
 Now in normal mode, iterate the plan using reviewer agents. This is the main quality gate.
 
-**a. PM brief review** (if PM planning was used): Run `core/review-feature-brief` and revise until 8/10.
+**a. PM brief review** (if PM planning was used): Run `review-feature-brief` and revise until 8/10.
 
 **b. Technical plan review**: Always run these reviewers:
-- `core/review-architecture`
-- `core/review-implementation`
-- `core/review-testplan`
+- `review-architecture`
+- `review-implementation`
+- `review-testplan`
 
 Add when the plan needs them:
-- `core/review-frontend`
-- `core/review-backend`
+- `review-frontend`
+- `review-backend`
 
 Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input.
 
-**c. Cold read**: Use `core/finalize-plan` as a fresh-eyes final check. If it finds a blocking issue, revise and re-run.
+**c. Cold read**: Use `finalize-plan` as a fresh-eyes final check. If it finds a blocking issue, revise and re-run.
 
-**d. Action gate**: Run `skills/shared/action-gate.md`. Auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
+**d. Action gate**: Run `action-gate.md`. Auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
 
 Update PROJECT.md with final review scores after this step.
 

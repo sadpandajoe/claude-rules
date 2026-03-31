@@ -13,7 +13,7 @@
 /review-plan --pm
 ```
 
-`--pm`: Include PM brief review (`core/review-feature-brief`) in addition to technical reviewers.
+`--pm`: Include PM brief review (`review-feature-brief`) in addition to technical reviewers.
 
 ## Steps
 
@@ -29,14 +29,14 @@ If no plan content found, stop: `"No plan found in PROJECT.md. Write a plan firs
 ### 2. Detect Applicable Reviewers
 
 **Always run:**
-- `core/review-architecture`
-- `core/review-implementation`
-- `core/review-testplan`
+- `review-architecture`
+- `review-implementation`
+- `review-testplan`
 
 **Conditional:**
-- `core/review-frontend` — if plan touches frontend (React, CSS, UI components)
-- `core/review-backend` — if plan touches backend (API, database, migrations)
-- `core/review-feature-brief` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
+- `review-frontend` — if plan touches frontend (React, CSS, UI components)
+- `review-backend` — if plan touches backend (API, database, migrations)
+- `review-feature-brief` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
 
 State which reviewers are selected and why before launching.
 
@@ -55,7 +55,7 @@ After collecting scores:
 
 ### 4. Cold Read
 
-Run `core/finalize-plan` as a fresh-eyes final check:
+Run `finalize-plan` as a fresh-eyes final check:
 - If **Go** → proceed to step 5
 - If **No-Go** with blocking issues → revise the plan and re-run finalize-plan
 - If **No-Go** after two revisions → stop and surface the blocking issues to the user

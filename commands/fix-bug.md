@@ -83,10 +83,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 3. **Launch Early Lanes**
 
    These tracks are independent and can run together:
-   - `qa/triage-bug.md` for first-pass triage and repro requirements
-   - `developer/investigate-bug.md`
-   - `core/check-existing-fix.md`
-   - `developer/prepare-environment.md` when UI or workflow validation is likely
+   - `qa-triage-bug.md` for first-pass triage and repro requirements
+   - `investigate-bug.md`
+   - `check-existing-fix.md`
+   - `prepare-environment.md` when UI or workflow validation is likely
 
    Determine whether to spin up subagents (via the Agent tool) for parallel investigation or run the lanes sequentially in the main thread. Subagents are worth it when multiple lanes involve non-trivial work (e.g., code investigation + upstream scan + environment prep). For simpler bugs, sequential in the main thread is fine.
 
@@ -174,11 +174,11 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    Before removing or renaming any public function, method, class, or API endpoint, check for callers outside the immediate fix scope. Removing a method that other code depends on is a breaking change — raise it as a decision for the user rather than treating it as cleanup.
 
    For direct fixes:
-   - use `developer/implement-change.md`
+   - use `implement-change.md`
 
    For non-trivial fixes:
-   - use `developer/plan-change.md`
-   - then continue with `developer/implement-change.md`
+   - use `plan-change.md`
+   - then continue with `implement-change.md`
 
 13. **Expand Regression Coverage** (gate)
 
@@ -208,7 +208,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 15. **Validate the Fix With QA When Needed**
 
    For UI, workflow, or live-behavior bugs:
-   - run `qa/validate-fix.md` when the app is runnable locally or in a suitable environment
+   - run `qa-validate-fix.md` when the app is runnable locally or in a suitable environment
    - use Playwright MCP as the default UI repro and validation path when available
 
    If the app cannot be run locally (missing Docker, env dependencies, or data requirements), note the blocker in PROJECT.md and skip QA validation. Check prerequisites before attempting — don't discover the failure experimentally.

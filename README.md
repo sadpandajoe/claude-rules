@@ -59,7 +59,9 @@ ai-toolkit/
 ├── rules/
 │   ├── universal.md        # Core principles (loaded first)
 │   ├── orchestration.md    # Multi-agent workflow rules
-│   ├── planning.md         # Project planning
+│   ├── planning.md         # Project planning + PROJECT.md defaults
+│   ├── context-management.md   # Context depth thresholds and checkpoint protocol
+│   ├── rule-maintenance.md     # How to strengthen, update, or extract rules
 │   ├── investigation.md    # Debugging & root cause
 │   ├── implementation.md   # Code development
 │   ├── testing.md          # Test strategy
@@ -71,17 +73,29 @@ ai-toolkit/
 │   ├── review-gate.md      # Review gate output contract
 │   ├── stop-rules.md       # Universal stop conditions for iterative loops
 │   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
-│   ├── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
-│   └── pgm.md              # Program reporting rules
-├── skills/
-│   ├── build-engineer/     # CI diagnosis and remediation persona
-│   ├── core/               # Shared reviewers and helpers like review-rca and existing-fix checks
-│   ├── developer/          # Investigation, implementation, review, and adaptation persona
-│   ├── pgm/                # Program management reporting persona
-│   ├── pm/                 # Feature scoping, acceptance criteria, and milestone persona
-│   ├── qa/                 # Bug triage, scenario expansion, and validation persona
-│   ├── release-engineer/   # Cherry-pick and branch-movement persona
-│   └── shared/             # Reusable execution gates and shared workflow helpers
+│   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
+├── skills/                  # Flat directory — all skills at top level
+│   ├── review-*.md          # Shared reviewers (architecture, backend, frontend, implementation, testplan, tests, rca, feature-brief, local-changes)
+│   ├── finalize-plan.md     # Fresh-eyes final plan review
+│   ├── check-existing-fix.md   # Upstream fix check
+│   ├── action-gate.md       # Shared proceed/stop decision helper
+│   ├── shortcut-fetch.md    # Shortcut API retry wrapper
+│   ├── cherry-pick-*.md     # Cherry-pick phases (adapt, apply, investigate, plan, validate)
+│   ├── ci-*.md              # CI/build tasks (classify-failure, verify-fix)
+│   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
+│   ├── qa-*.md              # QA tasks (analyze-use-cases, capture-evidence, execute/expand, file-bug, report-shortcut-results, triage-bug, validate-fix)
+│   ├── implement-change.md  # Focused implementation
+│   ├── investigate-*.md     # Investigation phases (bug, change)
+│   ├── plan-*.md            # Planning phases (change, feature)
+│   ├── prepare-environment.md   # Local environment setup
+│   ├── create-tests.md      # First-suite test creation
+│   └── update-tests.md      # Existing suite maintenance
+├── extensions/
+│   └── pgm/                 # Program management (optional, install with --with-pgm)
+│       ├── commands/         # /create-status-report, /create-velocity-report
+│       ├── skills/           # pgm-comms.md
+│       ├── rules/            # pgm.md (org-specific context)
+│       └── install.sh        # Extension installer
 └── commands/
     ├── start.md            # Start or resume session
     ├── fix-bug.md          # End-to-end bug workflow
@@ -94,8 +108,6 @@ ai-toolkit/
     ├── review-pr.md        # Review GitHub PRs
     ├── address-feedback.md # Address PR feedback
     ├── cherry-pick.md      # Cross-branch work
-    ├── create-status-report.md   # Live program health report
-    ├── create-velocity-report.md # Historical velocity report
     ├── checkpoint.md            # Save workflow state before /clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
@@ -138,11 +150,11 @@ ai-toolkit/
 | `/update-project-file` | Manual PROJECT.md status refresh |
 | `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
 
-### Reporting
+### Extension (PGM)
 | Command | Purpose |
 |---------|---------|
-| `/create-status-report` | Create a live program health report, optionally formatted for a target audience |
-| `/create-velocity-report` | Create a historical velocity report, optionally formatted for a target audience |
+| `/create-status-report` | Create a live program health report (install with `--with-pgm`) |
+| `/create-velocity-report` | Create a historical velocity report (install with `--with-pgm`) |
 
 ### Toolkit Maintenance
 | Command | Purpose |
@@ -173,7 +185,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 
 `/create-feature` owns the full planning loop:
 - PM planning is conditional and iterates to 8/10 when scope or milestones need it
-- Developer planning iterates to 8/10 with shared reviewers from `skills/core`
+- Developer planning iterates to 8/10 with shared reviewers from `skills/`
 - The internal finalize-plan skill is the last cold-read before implementation continues automatically
 
 ### Standalone Validation
@@ -219,6 +231,8 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
 | `rules/planning.md` | `/create-feature`, `/update-project-file` |
+| `rules/context-management.md` | Always (checkpoint protocol, loaded via CLAUDE.md) |
+| `rules/rule-maintenance.md` | When proposing rule changes |
 | `rules/investigation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` when RCA matters |
 | `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/update-tests`, `/run-test-plan` |
@@ -228,9 +242,8 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/complexity-gate.md` | `/create-feature`, `/fix-bug` (trivial vs standard routing) |
 | `rules/review-gate.md` | `/review-code`, `/create-feature`, `/fix-bug` (review output contract) |
 | `rules/stop-rules.md` | Any iterative loop (universal stop conditions) |
-| `rules/shortcut-api.md` | PGM commands that query Shortcut REST API |
+| `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
-| `rules/pgm.md` | `/create-status-report`, `/create-velocity-report` |
 
 ## Updating
 
@@ -276,9 +289,17 @@ Claude Code:
 1. Rules auto-loaded via CLAUDE.md @-includes
 2. Reads commands/create-feature.md for workflow steps
 3. Builds PM and developer plans in PROJECT.md
-4. Uses shared reviewers in skills/core to iterate planning to 8/10
+4. Uses shared reviewers in skills/ to iterate planning to 8/10
 5. Runs the internal finalize-plan skill, then continues into implementation unless a decision matters
 ```
 
 **Claude Code** = workflow orchestrator, planner, and implementer
-**Persona skills** = focused helper roles for QA, development, branch work, and reporting
+**Skills** = focused helpers for QA, development, review, branch work, and reporting
+
+## Extensions
+
+Extensions add domain-specific commands, skills, and rules. They are not installed by default.
+
+| Extension | Purpose | Install |
+|-----------|---------|---------|
+| `extensions/pgm/` | Program management reports (status, velocity) | `./install.sh --with-pgm` |

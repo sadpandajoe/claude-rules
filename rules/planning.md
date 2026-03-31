@@ -17,3 +17,10 @@
 - Approach validated
 - Risks assessed
 - Dependencies confirmed
+
+## PROJECT.md Update Defaults
+
+These defaults apply to all commands unless the command specifies otherwise:
+
+- **Trivial path**: single update after implementation and validation complete
+- **No PROJECT.md**: if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required — note the skip in the summary

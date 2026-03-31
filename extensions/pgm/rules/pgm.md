@@ -2,7 +2,7 @@
 
 ## Org Structure
 
-EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — frame everything around WIP, cycle time, throughput, and blockers. Not sprints.
+ EM running 3 teams on kanban across 3 repos. Teams use flow-based delivery — frame everything around WIP, cycle time, throughput, and blockers. Not sprints.
 
 ### Teams
 
@@ -24,13 +24,13 @@ Bot accounts to filter from metrics: listed in `config.json` under `bots`.
 
 | Repo | Strategy | Local Path |
 |------|----------|------------|
-| `apache/superset` | `per_member` — query by team member GitHub handles | `/Users/joeli/opt/code/superset-release` |
-| `preset-io/superset-shell` | `all_prs` — query all PRs in date range | `/Users/joeli/opt/code/superset-shell` |
-| `preset-io/manager` | `all_prs` — query all PRs in date range | `/Users/joeli/opt/code/manager` |
+| `apache/superset` | `per_member` — query by team member GitHub handles | See `$PGM_DIR/config.json` repos section |
+| `preset-io/superset-shell` | `all_prs` — query all PRs in date range | See `$PGM_DIR/config.json` repos section |
+| `preset-io/manager` | `all_prs` — query all PRs in date range | See `$PGM_DIR/config.json` repos section |
 
 ## API Reference
 
-Subagents read `rules/shortcut-api.md` when making Shortcut API calls. See `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
+Subagents read `rules/shortcut-api.md` when making Shortcut API calls. See `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
 
 ## Parallel Agent Pattern
 
@@ -57,7 +57,7 @@ Agent 3 (Notion MCP, optional):
 
 Each agent should:
 - Read `config.json` for team/member context
-- Read `skills/shared/shortcut-fetch.md` for Shortcut API operational patterns (Agent 1)
+- Read `shortcut-fetch.md` for Shortcut API operational patterns (Agent 1)
 - Filter out bot accounts
 - Return structured data for synthesis
 

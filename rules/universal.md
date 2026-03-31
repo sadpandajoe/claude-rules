@@ -9,65 +9,8 @@
 - **TDD and YAGNI** — test first, build only what's needed now
 - **End-to-end commands own their internal loops** — planning, review, and validation sub-phases should continue automatically until threshold or blocker; do not surface subcommands as the next user step unless the user explicitly chose them
 - **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
-- **Checkpoint when context is deep** — at chain boundaries and loop iterations, if context is above ~70%, save state and continue in a fresh conversation (see Context Management below)
-- **Rules evolve from usage** — when a rule is violated, strengthen it; when a rule is stale, update it; when a pattern recurs, extract it
-
-## PROJECT.md Update Defaults
-
-These defaults apply to all commands unless the command specifies otherwise:
-
-- **Trivial path**: single update after implementation and validation complete
-- **No PROJECT.md**: if no `PROJECT.md` exists and the workflow completes in a single pass without blockers, creating one is not required — note the skip in the summary
-
-## Workflow Selection
-
-| Situation | Workflow | Command |
-|-----------|----------|---------|
-| Building something new | New Feature | `/create-feature` |
-| Something's broken | Bug Fix | `/fix-bug` |
-| Reviewing someone's PR | Code Review | `/review-pr` |
-| Improving existing code | Refactoring | `/create-feature` |
-| Improving an existing test suite | Test Maintenance | `/update-tests` |
-| Creating first tests for untested area | First Tests | `/create-tests` |
-| Validating a story, PR, or environment | Test Plan Execution | `/run-test-plan` |
-| Cross-branch work (single) | Cherry-Pick | `/cherry-pick` |
-| Cross-branch work (batch) | Cherry-Pick | `/cherry-pick <multiple> [--plan-only]` |
-| System in bad state | Recovery | See troubleshooting rules |
-| CI build failed | CI Remediation | `/fix-ci` |
-| Pre-commit quality pass | Self Review | `/review-code` |
-| PR has review comments | PR Feedback | `/address-feedback` |
-| One-off plan quality review | Plan Review | `/review-plan` |
-| Saving state before context clear | Checkpoint | `/checkpoint` |
-| Verifying changes pass tests | Verification | `/verify` |
-| Program health snapshot | PGM Report | `/create-status-report` |
-| Monthly velocity metrics | Velocity | `/create-velocity-report` |
-
-## Context Management
-
-At every **chain boundary** or **loop iteration**, check context depth:
-
-- **Below ~70%**: Continue automatically. Don't pause.
-- **At or above ~70%**: Save state and continue in a fresh conversation. Don't ask — just do it.
-
-Chain boundaries: `/fix-bug` internal phase transitions, `/create-feature` planning → implementation, `/create-feature` implementation → review, etc.
-Loop iterations: each `/create-feature` planning round, each `/review-code` round.
-Sub-invocations: when `/create-feature`, `/fix-bug`, `/update-tests`, or `/fix-ci` calls `/review-code`.
-
-### Save & Continue Protocol
-
-When context is ≥ 70%, run `/checkpoint`. It handles the full protocol:
-1. Writes a continuation checkpoint to PROJECT.md (see `commands/checkpoint.md` for the canonical format)
-2. Commits any uncommitted work
-3. Runs `/clear` to reset conversation context
-
-After `/clear`, run `/start` to reload PROJECT.md and resume the saved workflow automatically.
-
-The user should not need to do anything — this is a seamless context refresh.
-
-Do not rely on chat memory after `/clear`. The checkpoint in PROJECT.md is the source of truth for where execution resumes.
-
-### Why This Matters
-Auto-compaction silently drops earlier context, which can cause Claude to lose track of decisions, review scores, or chain state mid-workflow. Checkpointing preserves full fidelity.
+- **Checkpoint when context is deep** — see `rules/context-management.md` for thresholds and protocol
+- **Rules evolve from usage** — see `rules/rule-maintenance.md` for how to strengthen, update, or extract rules
 
 ## Communication Rules
 - **Be direct about errors** — no unnecessary apologies
@@ -76,31 +19,6 @@ Auto-compaction silently drops earlier context, which can cause Claude to lose t
 - **Ask for clarification** — don't assume when unclear
 - **Request confirmation** — before destructive changes
 
-## Rule Maintenance
-
-Rules are living documents. Update them based on real-world usage:
-
-### When a rule is violated
-A rule that agents ignore is too weak. After observing a violation:
-- Strengthen the language (add NEVER lists, move critical instructions to top)
-- Add the failure pattern as a concrete example of what NOT to do
-- Consider whether the rule needs to load earlier or more prominently
-
-### When a rule is stale
-Rules drift from reality as code, APIs, and processes change. When you notice a mismatch:
-- Update the rule to match current behavior
-- Remove conditions or thresholds that no longer apply
-- Flag the update in your summary so the user knows
-
-### When a new pattern emerges
-Recurring workarounds or repeated feedback across conversations signal a missing rule. When you see a pattern:
-- Check if an existing rule covers it (update if partially covered)
-- Extract a new focused rule file if it's genuinely new
-- Keep it small — one concern per file, 20-40 lines
-
-### Scope
-Rule updates are limited to the `rules/` directory in this toolkit. Do not modify project-level CLAUDE.md files or Anthropic system behavior. Rule changes should be proposed to the user during the summary phase, not applied silently mid-workflow.
-
 ## Override Hierarchy
 
 1. **Universal principles** (this file) — always apply
@@ -108,23 +26,3 @@ Rule updates are limited to the `rules/` directory in this toolkit. Do not modif
 3. **Domain-specific rules** — testing, investigation, etc.
 4. **Project-specific CLAUDE.md** — project context
 5. **PROJECT.md current state** — most immediate context
-
-## Rules Files
-
-| File | Purpose |
-|------|---------|
-| `orchestration.md` | Tool roles, delegation framework |
-| `planning.md` | Documentation, PROJECT.md workflow |
-| `investigation.md` | Root cause analysis, debugging |
-| `implementation.md` | Code development, TDD, patterns |
-| `testing.md` | Test strategy, mocking, over-mocking signals |
-| `troubleshooting.md` | Emergency recovery |
-| `resource-management.md` | Docker limits, test worker scaling |
-| `cherry-picking.md` | Cross-branch work |
-| `code-review.md` | Review guidelines, scoring |
-| `shortcut-api.md` | Shortcut REST API: auth, endpoints, retry, query patterns |
-| `input-detection.md` | Route ticket/issue inputs to Shortcut or GitHub |
-| `pgm.md` | Program management: org context, audience tiers, data collection rules |
-| `review-gate.md` | Review Gate output contract: block format, status values, skip/micro-fix rules |
-| `complexity-gate.md` | Complexity classification: gate block format, trivial fast-path |
-| `stop-rules.md` | Universal stop conditions for iterative loops |

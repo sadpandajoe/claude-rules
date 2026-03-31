@@ -50,7 +50,7 @@ This file describes per-change investigation. When investigating multiple indepe
 
 ## Risk Assessment
 
-Use `skills/shared/action-gate.md` for the final proceed/stop decision.
+Use `action-gate.md` for the final proceed/stop decision.
 
 Always end with the shared execution gate block — this is required even for LOW/Auto changes:
 

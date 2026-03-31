@@ -1,6 +1,6 @@
 # /create-status-report — Live Program Health Report
 
-@{{TOOLKIT_DIR}}/rules/pgm.md
+@{{TOOLKIT_DIR}}/extensions/pgm/rules/pgm.md
 
 > **When**: Before meetings, weekly check-ins, or anytime you need a current snapshot of program health.
 > **Produces**: Program health report with epic progress, flow health, risks, blockers, and team state.
@@ -41,12 +41,12 @@
 ### 2. Gather Data (Parallel Agents)
 
 Use the **Agent tool** to spawn 2-3 agents **in a single message** (this is critical — multiple Agent tool calls in one message run concurrently). Each agent prompt must include instructions to:
-- Read `{{TOOLKIT_DIR}}/rules/pgm.md` for API patterns
+- Read `{{TOOLKIT_DIR}}/extensions/pgm/rules/pgm.md` for API patterns
 - Read `$PGM_DIR/config.json` for team UUIDs, members, bots
 - Return structured JSON or markdown that the main context can synthesize
 
 **Agent 1 — Shortcut REST API** (via `curl` with `$SHORTCUT_API_TOKEN`):
-Follow `skills/shared/shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
+Follow `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
 
 Run all team queries in **parallel bash calls** (each team's queries are independent):
 - **WIP stories** per team: `POST /stories/search` with `workflow_state_types: ["started"]` and `group_id`
@@ -138,7 +138,7 @@ Per team:
 
 Present the report.
 
-If `--audience <mode>` is provided, format the final output for that audience using `pgm/comms.md`.
+If `--audience <mode>` is provided, format the final output for that audience using `{{TOOLKIT_DIR}}/extensions/pgm/skills/pgm-comms.md`.
 
 Otherwise, present the default detailed report and suggest follow-up actions:
 
