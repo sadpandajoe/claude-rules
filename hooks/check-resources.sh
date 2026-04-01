@@ -29,10 +29,14 @@ if echo "$COMMAND" | grep -qE '\-\-maxWorkers|\-n [0-9]|\-w [0-9]|--workers'; th
     exit 0
 fi
 
-# Check Docker container count
+# Check Docker container count (bounded probe — avoid hanging on wedged daemon)
 DOCKER_COUNT=0
 if command -v docker &>/dev/null; then
-    DOCKER_COUNT=$(docker ps -q 2>/dev/null | wc -l | tr -d ' ') || DOCKER_COUNT=0
+    TIMEOUT_CMD=""
+    if command -v gtimeout &>/dev/null; then TIMEOUT_CMD="gtimeout 2"
+    elif command -v timeout &>/dev/null; then TIMEOUT_CMD="timeout 2"
+    fi
+    DOCKER_COUNT=$($TIMEOUT_CMD docker ps -q 2>/dev/null | wc -l | tr -d ' ') || DOCKER_COUNT=0
 fi
 
 # Warn if Docker is heavy

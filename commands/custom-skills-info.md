@@ -39,7 +39,7 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Project State
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/checkpoint` | Save state to PROJECT.md, commit, clear context | Context getting deep | — |
+| `/checkpoint` | Save state to PROJECT.md (add `--commit --clear` for full protocol) | Context getting deep | — |
 | `/update-project-file` | Manual PROJECT.md refresh | Need to update status | — |
 | `/archive-project-file` | Move completed work to archive | PROJECT.md is cluttered | — |
 

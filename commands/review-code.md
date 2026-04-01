@@ -17,7 +17,7 @@
 
 ### 1. Gather Changed Files
 
-- **Uncommitted** (default): `git diff --name-only` (unstaged + staged)
+- **Uncommitted** (default): `git diff --name-only` + `git diff --cached --name-only` (deduplicated — captures both unstaged and staged changes)
 - **Committed** (`--committed`): `git diff base..HEAD --name-only`
 - Apply path filtering if specified
 

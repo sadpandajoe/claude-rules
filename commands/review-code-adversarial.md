@@ -17,7 +17,7 @@
 
 ### 1. Discover Changed Files
 
-- Default: uncommitted changes via `git diff --name-only`
+- Default: uncommitted changes via `git diff --name-only` + `git diff --cached --name-only` (deduplicated)
 - `--committed`: committed changes via `git diff base..HEAD --name-only`
 - Path argument: filter to matching files
 
