@@ -8,7 +8,7 @@
 - **Document decisions and reasoning** — future maintainers need context
 - **TDD and YAGNI** — test first, build only what's needed now
 - **End-to-end commands own their internal loops** — planning, review, and validation sub-phases should continue automatically until threshold or blocker; do not surface subcommands as the next user step unless the user explicitly chose them
-- **Update PROJECT.md before completing any workflow** — every command that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
+- **Update PROJECT.md before completing any workflow** — every command or ad-hoc work session that produces results must write current status, what was done, and remaining items to PROJECT.md before finishing
 - **Checkpoint when context is deep** — see `rules/context-management.md` for thresholds and protocol
 - **Rules evolve from usage** — see `rules/rule-maintenance.md` for how to strengthen, update, or extract rules
 
