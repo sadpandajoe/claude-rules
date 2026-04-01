@@ -48,17 +48,19 @@ For each review comment:
 - Check if handled elsewhere (guard clause, try/catch, middleware)
 - Check git blame for context on why the code exists
 
-Triage each item:
+Triage each item with full reasoning — present to the user BEFORE taking action:
 
-| # | Reviewer | Comment | Verdict | Evidence |
-|---|----------|---------|---------|----------|
-| 1 | @user | ... | Fix | [evidence] |
-| 2 | @user | ... | Skip | [evidence] |
-| 3 | @user | ... | Discuss | [evidence] |
+| # | Reviewer | Comment | Verdict | Reasoning | Confidence |
+|---|----------|---------|---------|-----------|------------|
+| 1 | @user | ... | Fix | [why this should be fixed — what's the actual risk] | 9/10 |
+| 2 | @user | ... | Skip | [why this is not valid — evidence from code, git blame, existing patterns] | 7/10 |
+| 3 | @user | ... | Discuss | [why this is ambiguous — what are the trade-offs] | 5/10 |
 
 - **Fix**: bugs, security issues, missing error handling, project standards
 - **Skip**: style preferences, out of scope, misunderstanding, incorrect assessment
 - **Discuss**: architectural disagreements, ambiguous requirements, trade-offs
+
+**User confirmation gate**: Present the triage table with reasoning and wait for the user to confirm, adjust verdicts, or override. Do not start fixing or posting until the user approves the triage. This prevents wasted work on items the user disagrees with and catches cases where the reviewer's comment is actually correct but Claude mistriaged it.
 
 ### 3. Fix
 

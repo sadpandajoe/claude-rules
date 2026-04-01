@@ -1,7 +1,9 @@
-# /review-code - Wrapper Around Built-In /review
+# /review-code - Adaptive Team Code Review
 
-> **When**: You have local changes (uncommitted or already committed) and want a quality pass.
-> **Produces**: Built-in `/review` findings translated into the repo-standard developer review/fix loop, with validation and a summary of changes made.
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
+
+> **When**: You have local changes (uncommitted or committed) and want a quality pass with the right reviewers for the change type.
+> **Produces**: Team-reviewed findings, fixes, test coverage assessment, and a Review Gate block.
 
 ## Usage
 ```
@@ -13,51 +15,105 @@
 
 ## Steps
 
-1. **Delegate the Review/Fix Loop to `developer`**
+### 1. Gather Changed Files
 
-   Use `review-local-changes.md`. This helper owns:
-   - changed-file discovery and scoping (uncommitted or committed mode)
-   - code review against `rules/code-review.md`
-   - finding normalization
-   - fix + verify loops
-   - stop rules
+- **Uncommitted** (default): `git diff --name-only` (unstaged + staged)
+- **Committed** (`--committed`): `git diff base..HEAD --name-only`
+- Apply path filtering if specified
 
-2. **Run Pre-flight Checks**
+If no changes found, stop: `"No changes to review."`
 
-   Before declaring the review complete, run the repo's standard checks against the changed files. Discover commands from `package.json` scripts, `Makefile` targets, `pyproject.toml`, or the repo's CI config:
-   - **Build**: e.g., `npm run build`, `make build`
-   - **Type check**: `tsc --noEmit` (TypeScript) or equivalent
-   - **Lint**: e.g., `npm run lint`, `make lint`
-   - **Tests**: covering the changed files
+### 2. Complexity Gate
 
-   If any check fails, fix the issue and return to step 1 for another review round.
+Classify the change scope:
 
-   If the local environment cannot run the checks (missing toolchain, requires CI-only infrastructure, etc.), record `Pre-flight: skipped` with a reason. Do not invent a pass — the caller and the summary must reflect that pre-flight was not verified locally.
+| Signal | Trivial | Standard |
+|--------|---------|----------|
+| Files changed | 1-3 | 4+ |
+| Lines changed | < 50 | 50+ |
+| Logic changes | None / cosmetic | Functional |
+| Cross-cutting | No | Yes |
 
-3. **Emit the Review Gate**
+Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
+- **Trivial**: Code quality reviewer only (step 3). No team.
+- **Standard**: Code quality + adaptive team (step 4).
 
-4. **Summary** (standalone runs only — skip when called from another workflow)
-   ```markdown
-   ## Review-Code Complete
-   Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
+Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the review loop entirely.
 
-   ### Reviewed
-   - [What was checked and why it's safe — e.g., "e.currentTarget correctness (synthetic event contract guarantees non-null)"]
-   - [Edge cases explicitly verified — e.g., "page boundary after delete: clamped to last valid page" or "async ordering: setState before await checked"]
+### 3. Code Quality Review (always runs)
 
-   ### Not reviewed
-   - [What was deliberately out of scope — e.g., "other e.target patterns in codebase (grepped, none found)" or "ColorPicker test coverage (out of scope)"]
+Delegate to `review-code-quality.md`. This skill owns:
+- Code review against `rules/code-review.md`
+- Finding normalization (`[major]`, `[minor]`, `[nitpick]`)
+- Fix + verify loop
+- **Test check**: detects whether tests exist for changed logic
+  - No tests → triggers test suggestion (`review-testplan.md`)
+  - Tests found → triggers test quality review (`review-tests.md`) + suggestions for additional coverage
 
-   ### Fixed
-   - [Issues fixed, grouped by file — or "none"]
+### 4. Adaptive Team (Standard complexity only)
 
-   ### Remaining
-   - [Nitpicks left unfixed, or blockers requiring user decision — or "none"]
-   ```
+Analyze the diff to select additional reviewers:
+
+| Reviewer | Trigger | Focus |
+|----------|---------|-------|
+| Architecture (`review-architecture.md`) | Source files with logic changes | Right file? Right layer? Duplicate function? |
+
+Launch selected reviewers as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context.
+
+Merge all findings with the code quality findings. Deduplicate.
+
+### 5. Run Pre-flight Checks
+
+Before declaring complete, run the repo's standard checks:
+- Build, type check, lint, tests covering changed files
+- If checks fail, fix and return to step 3
+- If environment can't run checks: `Pre-flight: skipped` with reason
+
+### 6. Emit Review Gate
+
+```markdown
+## Review Gate
+Rounds: [N]
+Pre-flight: [pass/fail/skipped]
+Status: [clean/blocked/user decision/skipped/micro-fix]
+```
+
+### 7. Adversarial Suggestion
+
+If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
+> Consider running `/review-code-adversarial` for security-focused review.
+
+### 8. Summary
+
+```markdown
+## Review-Code Complete
+Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
+
+### Team Selected
+| Reviewer | Why |
+|----------|-----|
+| Code quality | Always |
+| [additional] | [reason] |
+
+### Reviewed
+- [What was checked — specific behaviors, edge cases verified]
+
+### Not Reviewed
+- [Deliberately out of scope]
+
+### Fixed
+- [Issues fixed, grouped by file — or "none"]
+
+### Test Coverage
+- [Tests found/missing, suggestions made]
+
+### Remaining
+- [Nitpicks or blockers — or "none"]
+```
 
 ## Notes
-- This command is used standalone (`/review-code`) and also invoked by `/create-feature`, `/fix-bug`, and `/fix-ci`
-- The review/fix loop lives under the `developer` persona so other workflows can reuse it without duplicating logic
-- When invoked from another top-level workflow, that workflow owns the next step after the review loop finishes
+- This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`
+- The team composition is adaptive — show it in the summary so the user can `/learn` to correct bad selections
+- For a second model's perspective, use `/review-code-codex`
+- For security/adversarial review, use `/review-code-adversarial`

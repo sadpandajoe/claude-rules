@@ -75,7 +75,7 @@ ai-toolkit/
 │   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
 ├── skills/                  # Flat directory — all skills at top level
-│   ├── review-*.md          # Shared reviewers (architecture, backend, frontend, implementation, testplan, tests, rca, feature-brief, local-changes)
+│   ├── review-*.md          # Shared reviewers (adversarial, architecture, backend, code-quality, feature-brief, frontend, implementation, rca, testplan, tests)
 │   ├── finalize-plan.md     # Fresh-eyes final plan review
 │   ├── check-existing-fix.md   # Upstream fix check
 │   ├── action-gate.md       # Shared proceed/stop decision helper
@@ -113,6 +113,10 @@ ai-toolkit/
     ├── address-feedback.md # Address PR feedback
     ├── cherry-pick.md      # Cross-branch work
     ├── learn.md                 # Memory management — add, list, review, prune, propose rules
+    ├── create-pr.md             # Generate PR title + description from diff/commits
+    ├── review-code-codex.md     # Codex second-opinion review with optional fix chain
+    ├── review-code-adversarial.md # Red-team review for security and edge cases
+    ├── custom-skills-info.md    # Print toolkit reference card
     ├── checkpoint.md            # Save workflow state before /clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
@@ -137,16 +141,19 @@ ai-toolkit/
 | `/update-tests` | End-to-end workflow for improving an existing suite, reviewing it, and auto-committing when ready |
 | `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
-| `/review-code` | Public wrapper over the developer review/fix loop |
+| `/review-code` | Adaptive team review: code quality + architecture + test check |
+| `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) |
+| `/review-code-codex` | Codex (GPT-5.4) second-opinion review with optional fix chain |
 | `/review-plan` | One-off plan review with reviewer iteration to 8/10 |
 | `/verify` | Run tests on changed files and report verification strength |
 
 ### Review & Branch Workflows
 | Command | Purpose |
 |---------|---------|
-| `/review-pr` | Review GitHub PRs with scoring framework and auto-post |
+| `/review-pr` | Adaptive team PR review: patterns, tests, architecture, RCA, auto-approve |
 | `/address-feedback` | Investigate PR comments, fix valid items, post replies |
 | `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
+| `/create-pr` | Generate PR title + description from diff, commits, and PROJECT.md |
 
 ### Project State
 | Command | Purpose |
@@ -174,6 +181,7 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/toolkit-doctor` | Validate symlinks, build output, imports, path portability, and README accuracy |
+| `/custom-skills-info` | Print reference card of all commands with gates |
 
 Claude's built-in `/review` is still available for review-only output; `/review-code` is the repo-standard wrapper when you want fix + verify loops.
 
