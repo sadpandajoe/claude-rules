@@ -11,10 +11,12 @@ Sub-invocations: when `/create-feature`, `/fix-bug`, `/update-tests`, or `/fix-c
 
 ## Save & Continue Protocol
 
-When context is ≥ 70%, run `/checkpoint`. It handles the full protocol:
+When context is ≥ 70%, run `/checkpoint --commit --clear`. This performs the full protocol:
 1. Writes a continuation checkpoint to PROJECT.md (see `commands/checkpoint.md` for the canonical format)
-2. Commits any uncommitted work
-3. Runs `/clear` to reset conversation context
+2. Commits any uncommitted work (`--commit`)
+3. Runs `/clear` to reset conversation context (`--clear`)
+
+The `--commit --clear` flags are required for the seamless auto-flow. Without them, `/checkpoint` only writes the checkpoint to PROJECT.md (safe default for manual use).
 
 After `/clear`, run `/start` to reload PROJECT.md and resume the saved workflow automatically.
 

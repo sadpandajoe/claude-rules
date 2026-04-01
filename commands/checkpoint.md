@@ -1,18 +1,26 @@
 # /checkpoint - Save Workflow State
 
-> **When**: Context depth is at or above ~70%, or before running `/clear` mid-workflow.
-> **Produces**: Continuation checkpoint in PROJECT.md, optional commit, then `/clear`.
+> **When**: Context depth is at or above ~70%, or you want to save progress mid-workflow.
+> **Produces**: Continuation checkpoint in PROJECT.md. Optionally commits work and/or clears context.
 
 No `@`-imports — lightweight utility that must work in any context state.
 
 ## Usage
 
 ```
-/checkpoint
-/checkpoint "review-iterations" "PR #42"
+/checkpoint                                    # Write checkpoint only (safe default)
+/checkpoint --commit                           # Write checkpoint + commit uncommitted work
+/checkpoint --clear                            # Write checkpoint + clear context
+/checkpoint --commit --clear                   # Full protocol: checkpoint + commit + clear
+/checkpoint "review-iterations" "PR #42"       # With phase/target hints
 ```
 
-Arguments are optional hints to override autodetection:
+**Flags**:
+- `--commit`: Stage and commit uncommitted work after writing the checkpoint
+- `--clear`: Run `/clear` to reset conversation context after writing the checkpoint
+- Flags can be combined. Without flags, only the checkpoint is written to PROJECT.md.
+
+**Arguments** (positional, optional): hints to override autodetection:
 - First argument: current phase
 - Second argument: resume target
 
@@ -51,7 +59,9 @@ If no PROJECT.md exists, create one with just the checkpoint section.
 
 Also update the `## Current Status` section if it exists — refresh **In Progress** and **Next** to reflect the checkpoint state.
 
-### 3. Commit Uncommitted Work
+### 3. Commit Uncommitted Work (only with `--commit`)
+
+Skip this step unless `--commit` was specified.
 
 If there are uncommitted changes relevant to the current workflow:
 - Stage the changed files
@@ -60,14 +70,18 @@ If there are uncommitted changes relevant to the current workflow:
 
 Do not commit PROJECT.md (it must never be committed to git).
 
-### 4. Clear Context
+### 4. Clear Context (only with `--clear`)
+
+Skip this step unless `--clear` was specified.
 
 Run `/clear` to reset conversation context.
 
 The user resumes by running `/start`, which reads the checkpoint from PROJECT.md and automatically continues the saved workflow.
 
 ## Notes
-- This command saves state and clears — it does NOT resume. `/start` handles resume.
+- Without flags, this command only writes the checkpoint — safe to run at any time.
+- With `--commit --clear`, this command performs the full save-commit-clear protocol.
+- This command does NOT resume. `/start` handles resume.
 - The checkpoint format above is the canonical definition. Other commands reference it but should not duplicate it.
 - Only one checkpoint exists at a time — writing a new one replaces the previous.
 - PROJECT.md must never be committed to git.
