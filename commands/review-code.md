@@ -79,12 +79,31 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-### 7. Adversarial Suggestion
+### 7. Codex Second Opinion (Standard only, if available)
+
+Skip this step for Trivial complexity.
+
+Check if the Codex plugin is available (i.e., `/codex:setup` is a recognized command). If unavailable, skip silently and note "Codex: skipped (plugin not available)" in the summary.
+
+If available:
+
+1. Detect the base branch: check for `main`, `master`, or query `gh repo view --json defaultBranchRef`
+2. Launch Codex in background: `/codex:review --background --base <base-branch>`
+3. Collect findings via `/codex:result`
+4. Translate to toolkit severity:
+   - Codex "must fix" / critical → `[major]`
+   - Codex "should fix" / improvement → `[minor]`
+   - Codex style/preference → `[nitpick]`
+5. Merge with existing findings, marking source as "Codex" for any new issues
+6. If Codex surfaces new `[major]` issues not caught by Claude, fix and re-run pre-flight (step 5)
+7. Include Codex scores in summary (Implementation Quality, Test Signal, Regression Protection)
+
+### 8. Adversarial Suggestion
 
 If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
 > Consider running `/review-code-adversarial` for security-focused review.
 
-### 8. Summary
+### 9. Summary
 
 ```markdown
 ## Review-Code Complete
@@ -94,6 +113,7 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 | Reviewer | Why |
 |----------|-----|
 | Code quality | Always |
+| Codex (GPT-5.4) | Standard complexity (or: skipped — plugin not available) |
 | [additional] | [reason] |
 
 ### Reviewed
@@ -108,6 +128,13 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 ### Test Coverage
 - [Tests found/missing, suggestions made]
 
+### Codex Scores (if ran)
+| Component | Score |
+|-----------|-------|
+| Implementation Quality | X/10 |
+| Test Signal | X/10 |
+| Regression Protection | X/10 |
+
 ### Remaining
 - [Nitpicks or blockers — or "none"]
 ```
@@ -116,5 +143,5 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 - This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`
 - Internal callers invoke `/review-code` as an internal review phase. This is an allowed composition pattern alongside `/checkpoint` and `/verify` — see `rules/orchestration.md`
 - The team composition is adaptive — show it in the summary so the user can `/learn` to correct bad selections
-- For a second model's perspective, use `/review-code-codex`
+- Codex second opinion runs automatically for Standard complexity when the plugin is available
 - For security/adversarial review, use `/review-code-adversarial`

@@ -23,7 +23,6 @@ Print the reference card below and stop. No investigation, no file reading — j
 |---------|-------------|-------------|-------|
 | `/review-code` | Adaptive team review: code quality + architecture + test check | Before commit, quality pass | Complexity, Review Gate |
 | `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) | Security-sensitive changes | Adversarial Rating, Review Gate |
-| `/review-code-codex` | Codex (GPT-5.4) second-opinion, optional fix chain | Want a different model's perspective | Review Gate |
 | `/review-plan` | Iterate plan reviewers to 8/10 | One-off plan quality check | All reviewers 8/10, Cold Read |
 | `/create-tests` | Create first meaningful tests for untested area | No tests exist yet | Review Gate |
 | `/update-tests` | Improve an existing test suite | Tests exist but need work | Review Gate |

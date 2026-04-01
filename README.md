@@ -114,7 +114,6 @@ ai-toolkit/
     ├── cherry-pick.md      # Cross-branch work
     ├── learn.md                 # Memory management — add, list, review, prune, propose rules
     ├── create-pr.md             # Generate PR title + description from diff/commits
-    ├── review-code-codex.md     # Codex second-opinion review with optional fix chain
     ├── review-code-adversarial.md # Red-team review for security and edge cases
     ├── custom-skills-info.md    # Print toolkit reference card
     ├── checkpoint.md            # Save workflow state before /clear
@@ -141,9 +140,8 @@ ai-toolkit/
 | `/update-tests` | End-to-end workflow for improving an existing suite, reviewing it, and auto-committing when ready |
 | `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
-| `/review-code` | Adaptive team review: code quality + architecture + test check |
+| `/review-code` | Adaptive team review: code quality + architecture + test check + Codex second opinion |
 | `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) |
-| `/review-code-codex` | Codex (GPT-5.4) second-opinion review with optional fix chain |
 | `/review-plan` | One-off plan review with reviewer iteration to 8/10 |
 | `/verify` | Run tests on changed files and report verification strength |
 
