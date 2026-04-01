@@ -97,6 +97,23 @@ Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP
 
 All checks in this section are DRIFT (recommendations), never FAIL.
 
+#### H. Runtime Capabilities
+
+Check for optional external tools that specific commands depend on. All checks are **DRIFT** (never FAIL) since these are optional capabilities.
+
+| Capability | How to check | Commands that need it |
+|------------|-------------|----------------------|
+| **GitHub CLI** | `gh auth status` succeeds | `/review-pr`, `/address-feedback`, `/create-pr` |
+| **Codex plugin** | `/codex:setup` is a recognized command in the session | `/review-code-codex`, `/review-code-adversarial`, `/review-pr` (Lane 2) |
+| **jq** | `command -v jq` succeeds | `install-hooks.sh`, hooks |
+| **Playwright MCP** | Playwright MCP tools are available in the session | `/run-test-plan` (UI testing) |
+
+For each capability:
+- If available: `[PASS] {name}`
+- If unavailable: `[DRIFT] {name} — not available. Needed by: {commands}. Install: {instructions}`
+
+If none of the checks can be performed (e.g., running outside a live session), emit `[SKIP] Runtime capabilities — cannot verify outside a live session`.
+
 ### 3. Summary
 
 Count results by category and emit:

@@ -15,6 +15,16 @@ This command uses the Codex plugin (`/codex:review`) to get an independent revie
 
 ## Steps
 
+### 0. Check Codex Plugin Availability
+
+Before doing anything, verify the Codex plugin is available by checking if `/codex:setup` is a recognized command in the current session.
+
+If unavailable, stop with a clear message:
+```
+"Codex plugin not available. This command requires the Codex Claude Code plugin (/codex:* commands).
+Run /codex:setup to configure, or use /review-code for a Claude-only review."
+```
+
 ### 1. Discover Changed Files
 
 Same as `/review-code`:

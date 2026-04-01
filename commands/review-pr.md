@@ -14,6 +14,7 @@ Use `--draft` to show the review locally without posting.
 /review-pr <pr-number-or-url>
 /review-pr <pr-number-or-url> --draft
 /review-pr <pr-number-or-url> --adversarial
+/review-pr <pr-number-or-url> --auto
 ```
 
 ## Steps
@@ -76,11 +77,11 @@ Analyze the PR diff to select reviewers:
 **Lane 1 — Regular team** (foreground subagents, `model: "opus"`):
 Each reviewer gets the PR diff + full file context, applies its lens, returns severity-tagged findings.
 
-**Lane 2 — Codex second opinion** (background):
-Launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete.
+**Lane 2 — Codex second opinion** (background, if available):
+Check if the Codex plugin is available. If yes, launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
 
 **Lane 3 — Adversarial** (background, only with `--adversarial` flag or auto-suggested):
-Launch Claude adversarial + `/codex:adversarial-review --background`. Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected.
+Launch Claude adversarial + `/codex:adversarial-review --background` (if Codex available). Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected. Falls back to Claude-only adversarial if Codex unavailable.
 
 ### 6. Pattern Analysis (Standard)
 
@@ -125,15 +126,21 @@ Determine recommendation:
 
 ### 9. Post to GitHub
 
-**Default**: Post automatically. Detail level scales with complexity and findings.
+Detail level scales with complexity and findings.
 
 **Trivial + clean**: Silent approve — no comments, no report, no user pause.
 
-**Standard + clean (8/10+, zero findings)**: Auto-approve with brief summary.
+**Standard + clean (8/10+, zero findings)**: Pause with one-line confirmation before approving:
+```
+"Clean review (9/10, zero findings). Approve and post? [Y/n]"
+```
+Proceed on confirmation. If declined, show the full review in conversation only.
 
 **Any findings**: User has already reviewed and adjusted the findings in step 7. Post only the user-confirmed findings with their adjusted severities. The reasoning/confidence/evidence shown to the user is NEVER posted — only the clean finding descriptions go to GitHub.
 
 **`--draft` flag**: Show the review in conversation only. Do not post.
+
+**`--auto` flag**: Skip all confirmations — auto-approve and auto-post (original behavior for scripted or batch use).
 
 ### 10. Adversarial Suggestion
 
