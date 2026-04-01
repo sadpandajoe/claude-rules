@@ -17,6 +17,10 @@ Use `--draft` to show the review locally without posting.
 /review-pr <pr-number-or-url> --auto
 ```
 
+## Orchestration Model
+
+The main thread is the **orchestrator** — it gathers PR context, dispatches reviewer subagents, collects their findings, synthesizes the result, and handles GitHub interaction. The main thread does not review code itself. All review judgment comes from subagents running with fresh context.
+
 ## Steps
 
 ### 1. Gather PR Context

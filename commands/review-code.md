@@ -13,6 +13,10 @@
 /review-code --committed        # Review committed changes (diff base..HEAD)
 ```
 
+## Orchestration Model
+
+The main thread is the **orchestrator** — it gathers context, dispatches reviewer subagents, collects their findings, and synthesizes the result. The main thread does not review code itself. All review judgment comes from subagents running with fresh context.
+
 ## Steps
 
 ### 1. Gather Changed Files
@@ -20,6 +24,7 @@
 - **Uncommitted** (default): `git diff --name-only` + `git diff --cached --name-only` (deduplicated — captures both unstaged and staged changes)
 - **Committed** (`--committed`): `git diff base..HEAD --name-only`
 - Apply path filtering if specified
+- Read the full content of each changed file
 
 If no changes found, stop: `"No changes to review."`
 
@@ -36,14 +41,14 @@ Classify the change scope:
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-- **Trivial**: Code quality reviewer only (step 3). No team.
-- **Standard**: Code quality + adaptive team (step 4).
+- **Trivial**: Code quality reviewer only.
+- **Standard**: Full review team.
 
 Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the review loop entirely.
 
 ### 3. Launch Review Team
 
-All reviewers run as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context, applies its lens independently, and returns severity-tagged findings. This ensures every reviewer sees the code fresh — no reviewer is influenced by the main thread's context.
+Dispatch all reviewers as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context, applies its lens independently, and returns severity-tagged findings.
 
 | Reviewer | Trigger | Focus |
 |----------|---------|-------|
@@ -55,7 +60,7 @@ All reviewers run as **parallel subagents** (`model: "opus"`). Each gets the dif
 **Trivial**: Code quality subagent only.
 **Standard**: Code quality + all triggered reviewers in parallel.
 
-Merge all findings. Deduplicate. Apply fix + verify loop for any `[major]` or `[minor]` issues.
+Collect all findings. Deduplicate. Apply fix + verify loop for any `[major]` or `[minor]` issues.
 
 ### 4. Run Pre-flight Checks
 
