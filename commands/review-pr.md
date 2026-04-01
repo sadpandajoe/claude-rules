@@ -75,7 +75,11 @@ Analyze the PR diff to select reviewers:
 **Standard**: Launch all review lanes in parallel:
 
 **Lane 1 — Regular team** (foreground subagents, `model: "opus"`):
-Each reviewer gets the PR diff + full file context, applies its lens, returns severity-tagged findings.
+Each reviewer gets the PR diff + full file context, applies its lens, returns severity-tagged findings. The team includes:
+- Code quality (always)
+- Architecture (if logic changes in source files)
+- Tests (`review-tests.md`) or Test Plan (`review-testplan.md`) — like an SDET reviewing whether the test suite provides real regression protection
+- Pattern analysis (step 6)
 
 **Lane 2 — Codex second opinion** (background, if available):
 Check if the Codex plugin is available. If yes, launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.

@@ -41,36 +41,30 @@ Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the review loop entirely.
 
-### 3. Code Quality Review (always runs)
+### 3. Launch Review Team
 
-Delegate to `review-code-quality.md`. This skill owns:
-- Code review against `rules/code-review.md`
-- Finding normalization (`[major]`, `[minor]`, `[nitpick]`)
-- Fix + verify loop
-- **Test check**: detects whether tests exist for changed logic
-  - No tests → triggers test suggestion (`review-testplan.md`)
-  - Tests found → triggers test quality review (`review-tests.md`) + suggestions for additional coverage
-
-### 4. Adaptive Team (Standard complexity only)
-
-Analyze the diff to select additional reviewers:
+All reviewers run as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context, applies its lens independently, and returns severity-tagged findings. This ensures every reviewer sees the code fresh — no reviewer is influenced by the main thread's context.
 
 | Reviewer | Trigger | Focus |
 |----------|---------|-------|
-| Architecture (`review-architecture.md`) | Source files with logic changes | Right file? Right layer? Duplicate function? |
+| Code quality (`review-code-quality.md`) | Always | Code review against `rules/code-review.md`, finding normalization, fix suggestions |
+| Architecture (`review-architecture.md`) | Standard + logic changes | Right file? Right layer? Duplicate function? |
+| Tests (`review-tests.md`) | Standard + tests exist | Behavioral coverage, weak tests, production failure scenarios, blind spots |
+| Test Plan (`review-testplan.md`) | Standard + no tests exist | Coverage approach, test layers, edge cases, what tests to write |
 
-Launch selected reviewers as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context.
+**Trivial**: Code quality subagent only.
+**Standard**: Code quality + all triggered reviewers in parallel.
 
-Merge all findings with the code quality findings. Deduplicate.
+Merge all findings. Deduplicate. Apply fix + verify loop for any `[major]` or `[minor]` issues.
 
-### 5. Run Pre-flight Checks
+### 4. Run Pre-flight Checks
 
 Before declaring complete, run the repo's standard checks:
 - Build, type check, lint, tests covering changed files
 - If checks fail, fix and return to step 3
 - If environment can't run checks: `Pre-flight: skipped` with reason
 
-### 6. Emit Review Gate
+### 5. Emit Review Gate
 
 ```markdown
 ## Review Gate
@@ -79,7 +73,7 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-### 7. Codex Second Opinion (Standard only, if available)
+### 6. Codex Second Opinion (Standard only, if available)
 
 Skip this step for Trivial complexity.
 
@@ -95,15 +89,15 @@ If available:
    - Codex "should fix" / improvement → `[minor]`
    - Codex style/preference → `[nitpick]`
 5. Merge with existing findings, marking source as "Codex" for any new issues
-6. If Codex surfaces new `[major]` issues not caught by Claude, fix and re-run pre-flight (step 5)
+6. If Codex surfaces new `[major]` issues not caught by Claude, fix and re-run pre-flight (step 4)
 7. Include Codex scores in summary (Implementation Quality, Test Signal, Regression Protection)
 
-### 8. Adversarial Suggestion
+### 7. Adversarial Suggestion
 
 If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
 > Consider running `/review-code-adversarial` for security-focused review.
 
-### 9. Summary
+### 8. Summary
 
 ```markdown
 ## Review-Code Complete
@@ -113,8 +107,9 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 | Reviewer | Why |
 |----------|-----|
 | Code quality | Always |
+| Tests / Test plan | Tests exist → review-tests.md; no tests → review-testplan.md |
+| Architecture | Logic changes in source files |
 | Codex (GPT-5.4) | Standard complexity (or: skipped — plugin not available) |
-| [additional] | [reason] |
 
 ### Reviewed
 - [What was checked — specific behaviors, edge cases verified]
