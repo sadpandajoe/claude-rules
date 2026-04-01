@@ -86,7 +86,7 @@ Each reviewer gets the PR diff + full file context, applies its lens, returns se
 - Pattern analysis (step 6)
 
 **Lane 2 — Codex second opinion** (background, if available):
-Check if the Codex plugin is available. If yes, fetch the PR head ref first (`gh pr checkout <number> --detach` or `git fetch origin pull/<number>/head`) so Codex reviews the actual PR diff, not the current local checkout. Then launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
+Check if the Codex plugin is available. If yes, check out the PR head so Codex reviews the actual PR diff: `gh pr checkout <number> --detach`. Then launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. Restore the original branch after Codex completes. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
 
 **Lane 3 — Adversarial** (background, only with `--adversarial` flag or auto-suggested):
 Launch Claude adversarial + `/codex:adversarial-review --background` (if Codex available). Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected. Falls back to Claude-only adversarial if Codex unavailable.
@@ -125,10 +125,10 @@ This lets the user adjust severities, remove false positives, or escalate missed
 
 Use `gh api repos/{owner}/{repo}/pulls/{number}/files --paginate` for accurate diff positions.
 
-### 8. Review Gate + Auto-Approve
+### 8. Determine Review Recommendation
 
-Determine recommendation:
-- **Approve**: Overall 8/10+, zero `[major]` → auto-approve with `gh api ... -f event="APPROVE"`
+Determine the recommendation — do NOT post or approve yet (step 9 handles that):
+- **Approve**: Overall 8/10+, zero `[major]`
 - **Request Changes**: Any `[major]` issue, or overall below 6/10
 - **Comment**: Overall 6-7/10, no `[major]` but notable `[minor]` issues
 

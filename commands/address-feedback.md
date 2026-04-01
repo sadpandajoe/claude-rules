@@ -63,6 +63,8 @@ Triage each item with full reasoning — present to the user BEFORE taking actio
 
 **User confirmation gate**: Present the triage table with reasoning and wait for the user to confirm, adjust verdicts, or override. Do not start fixing or posting until the user approves the triage. This prevents wasted work on items the user disagrees with and catches cases where the reviewer's comment is actually correct but Claude mistriaged it.
 
+**`--auto` flag**: Skip the confirmation gate and proceed immediately with the triage as determined. The triage table is still shown in the summary for transparency, but execution is not paused.
+
 ### 3. Fix
 
 Address fixes by priority:

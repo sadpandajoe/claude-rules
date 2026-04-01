@@ -63,11 +63,13 @@ Present unified findings:
 
 ### 4. Fix + Verify Loop
 
-For each confirmed finding:
+For each finding (confirmed by both models OR reported by a single model):
 1. Implement the fix
 2. Run pre-flight checks (build, lint, tests)
 3. Re-review the fix through the adversarial lens
 4. Iterate until findings are resolved or only accepted risks remain
+
+Single-model findings are fixed at normal confidence — they may be false positives, but a real vulnerability found by only one lane must still be remediated and verified. When running in Claude-only fallback mode (Codex unavailable), all findings come from one model and all get fixed.
 
 ### 5. Emit Review Gate
 
