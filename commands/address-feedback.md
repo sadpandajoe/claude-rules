@@ -15,6 +15,7 @@ Always investigate before triaging — read the actual code, verify claims, chec
 ```
 /address-feedback <pr-number-or-url>
 /address-feedback <pr-number-or-url> --draft
+/address-feedback <pr-number-or-url> --auto
 ```
 
 ## Steps
@@ -101,8 +102,6 @@ Good question — auth is handled by middleware upstream. The changes here opera
 
 ### 6. Push + Post
 
-**Default**: Push commits and post replies automatically.
-
 ```bash
 git push
 
@@ -111,7 +110,20 @@ gh api repos/<owner>/<repo>/pulls/comments/<comment-id>/replies \
   -f body="<response>"
 ```
 
-**Stop conditions** (present to user instead of auto-posting):
+**All-mechanical fixes** (typo, config, lint, formatting): Push and post replies automatically. No confirmation needed.
+
+**Substantive fixes** (logic changes, refactors, behavioral changes): Pause with a summary before pushing:
+```
+"Ready to push [N] commits and reply to [N] threads:
+- Fixed: [list]
+- Skipped: [list]
+Push and post? [Y/n]"
+```
+Proceed on confirmation.
+
+**`--auto` flag**: Skip all confirmations — push and post immediately (original behavior for scripted use).
+
+**Stop conditions** (present to user instead of pushing):
 - `--draft` flag was used
 - Any "Discuss" item has genuine ambiguity needing user input before posting
 - Push would fail (diverged branch, protected branch)
