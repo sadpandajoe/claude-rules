@@ -187,6 +187,12 @@ if [[ -d "$REPO_DIR/extensions/pgm" ]]; then
     fi
 fi
 
+# Step 6: Hooks advisory
+if [[ -d "$REPO_DIR/hooks" ]]; then
+    info "Hooks available (PROJECT.md protection, resource checks)."
+    info "Install with: ./install-hooks.sh"
+fi
+
 # Show backup info if backups were created
 if [[ -d "$BACKUP_DIR" ]]; then
     warn "Previous configs backed up to: $BACKUP_DIR"

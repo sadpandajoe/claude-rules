@@ -83,6 +83,20 @@ Compare README.md content against the actual filesystem. Each mismatch is DRIFT,
 2. **Extension self-containment**: If `extensions/pgm/` exists, verify its files only reference their own tree or core paths (not other extensions).
 3. **PGM install state**: If PGM is installed (commands exist in `build/commands/`), verify the extension commands resolve. If not installed, verify no PGM commands appear in `build/commands/`.
 
+#### G. Permission Health
+
+Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP] Permission health — no settings.json found` and move on.
+
+1. **Core permissions**: Check that the `permissions.allow` array contains these commonly needed entries. Emit DRIFT for each missing entry:
+   - `Bash(git commit:*)` — needed by all commit workflows
+   - `Bash(git add:*)` — needed by all staging workflows
+   - `Bash(gh pr:*)` — needed by `/review-pr`, `/address-feedback`
+   - `Bash(gh api:*)` — needed by PR and issue operations
+
+2. **Hook status**: If `$REPO_DIR/hooks/` directory exists but `settings.json` has no `hooks` key, emit DRIFT: `"Hooks available but not installed. Run ./install-hooks.sh"`
+
+All checks in this section are DRIFT (recommendations), never FAIL.
+
 ### 3. Summary
 
 Count results by category and emit:

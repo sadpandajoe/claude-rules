@@ -90,12 +90,16 @@ ai-toolkit/
 │   ├── prepare-environment.md   # Local environment setup
 │   ├── create-tests.md      # First-suite test creation
 │   └── update-tests.md      # Existing suite maintenance
+├── hooks/
+│   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
+│   └── check-resources.sh         # Warn on constrained resources before tests
 ├── extensions/
 │   └── pgm/                 # Program management (optional, install with --with-pgm)
 │       ├── commands/         # /create-status-report, /create-velocity-report
 │       ├── skills/           # pgm-comms.md
 │       ├── rules/            # pgm.md (org-specific context)
 │       └── install.sh        # Extension installer
+├── install-hooks.sh          # Install hooks into settings.json (optional)
 └── commands/
     ├── start.md            # Start or resume session
     ├── fix-bug.md          # End-to-end bug workflow
@@ -108,6 +112,7 @@ ai-toolkit/
     ├── review-pr.md        # Review GitHub PRs
     ├── address-feedback.md # Address PR feedback
     ├── cherry-pick.md      # Cross-branch work
+    ├── learn.md                 # Memory management — add, list, review, prune, propose rules
     ├── checkpoint.md            # Save workflow state before /clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
@@ -149,6 +154,15 @@ ai-toolkit/
 | `/checkpoint` | Save workflow state to PROJECT.md and clear context |
 | `/update-project-file` | Manual PROJECT.md status refresh |
 | `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
+
+### Learning & Memory
+| Command | Purpose |
+|---------|---------|
+| `/learn` | Add a memory — capture workflow patterns, preferences, knowledge |
+| `/learn list` | Show all memories with type, description, and staleness |
+| `/learn review` | Assess memories for accuracy, staleness, and duplication |
+| `/learn prune` | Remove outdated or redundant memories |
+| `/learn propose-rule` | Extract a recurring pattern into a draft rule |
 
 ### Extension (PGM)
 | Command | Purpose |
@@ -232,7 +246,6 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
 | `rules/planning.md` | `/create-feature`, `/update-project-file` |
 | `rules/context-management.md` | Always (checkpoint protocol, loaded via CLAUDE.md) |
-| `rules/rule-maintenance.md` | When proposing rule changes |
 | `rules/investigation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` when RCA matters |
 | `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/update-tests`, `/run-test-plan` |
@@ -244,6 +257,21 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/stop-rules.md` | Any iterative loop (universal stop conditions) |
 | `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
+| `rules/rule-maintenance.md` | `/learn propose-rule`, rule editing |
+
+## Hooks (optional)
+
+Hooks enforce toolkit rules at runtime via Claude Code's hook system. They are separate from `install.sh` because they modify `settings.json`.
+
+| Hook | Event | Behavior |
+|------|-------|----------|
+| `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks `git commit` if PROJECT.md is staged |
+| `check-resources.sh` | PreToolUse (Bash) | Warns when running tests with constrained resources |
+
+```bash
+./install-hooks.sh           # Install hooks
+./install-hooks.sh --remove  # Remove hooks
+```
 
 ## Updating
 

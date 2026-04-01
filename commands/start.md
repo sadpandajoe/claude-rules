@@ -65,6 +65,7 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
    - Creating the first meaningful tests → `/create-tests`
    - Validating a story, PR, or environment without fixing it → `/run-test-plan`
    - Cherry-picking → `/cherry-pick`
+   - Capturing a pattern or reviewing memories → `/learn`
    - Completed phases cluttering PROJECT.md → `/archive-project-file`
 
 4. **Recommend Archiving When Useful**
