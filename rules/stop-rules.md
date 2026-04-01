@@ -16,4 +16,4 @@ Stop the current loop when any of these are true:
 
 ## Scope
 
-This rule applies to review/fix loops (`review-local-changes.md`), plan review iterations, and any other iterative quality loop. It does not override command-specific stop conditions that are stricter.
+This rule applies to review/fix loops (`review-code-quality.md`), plan review iterations, and any other iterative quality loop. It does not override command-specific stop conditions that are stricter.

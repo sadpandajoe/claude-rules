@@ -113,7 +113,8 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 ```
 
 ## Notes
-- This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`
+- This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`
+- Internal callers invoke `/review-code` as an internal review phase. This is an allowed composition pattern alongside `/checkpoint` and `/verify` — see `rules/orchestration.md`
 - The team composition is adaptive — show it in the summary so the user can `/learn` to correct bad selections
 - For a second model's perspective, use `/review-code-codex`
 - For security/adversarial review, use `/review-code-adversarial`

@@ -25,3 +25,7 @@ Subagents load their own domain rules — commands should not `@import` rules th
 - **Commands tell subagents which files to read**: include the rule file path in the Agent tool prompt
 
 Never load the same rule in both contexts.
+
+## Command Composition
+
+Commands orchestrate skills as their primary workers. A small set of utility commands (`/review-code`, `/checkpoint`, `/verify`) may be invoked as internal phases by end-to-end commands. This is intentional — these commands contain adaptive logic (team selection, flag handling) that would be duplicated if extracted into skills.
