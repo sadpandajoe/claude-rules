@@ -139,6 +139,15 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 
 ### Remaining
 - [Nitpicks or blockers — or "none"]
+
+### Suggested Next Steps
+[Pick based on current state:]
+- **Blocked**: Fix the blockers, then re-run `/review-code` to iterate
+- **Clean + uncommitted**: Commit your changes, then `/create-pr` when ready
+- **Clean + committed**: `/create-pr` to open the PR
+- **Security-sensitive areas detected**: `/review-code-adversarial` for red-team review
+- **Test gaps identified**: `/create-tests` or `/update-tests` to fill coverage
+- **Part of a larger workflow**: Continue to next phase (the calling command owns next steps)
 ```
 
 ## Notes

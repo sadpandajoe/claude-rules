@@ -143,8 +143,13 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - **Skipped**: [count] items (responses posted)
 - **Discussed**: [count] items (responses posted / awaiting user input)
 
-### What to do next
-- Request re-review if fixes were made
+### Suggested Next Steps
+[Pick based on current state:]
+- **All fixed, pushed**: Request re-review from the reviewer
+- **Discuss items pending**: Resolve the open questions, then re-run `/address-feedback`
+- **Draft mode**: Push and post with `/address-feedback <number>` (without `--draft`) when ready
+- **Reviewer requested more changes**: Wait for next review round, then `/address-feedback` again
+- **All resolved, PR approved**: Merge the PR
 ```
 
 ## Non-Negotiable Gates

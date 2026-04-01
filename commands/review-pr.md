@@ -185,6 +185,15 @@ PR #[number]: [title] — [Approve / Request Changes / Comment]
 
 ### Posted
 [Yes — link to review / No — draft mode]
+
+### Suggested Next Steps
+[Pick based on current state:]
+- **Approved**: Done — PR is ready to merge
+- **Request Changes posted**: Wait for author to address, then `/review-pr` again to re-review
+- **Comment posted**: Author should review comments; re-run when updated
+- **Draft mode**: Post with `/review-pr <number>` (without `--draft`) when ready
+- **Security-sensitive areas detected**: Re-run with `--adversarial` for red-team review
+- **Author asked you to address feedback**: `/address-feedback <number>`
 ```
 
 ## Non-Negotiable Gates
