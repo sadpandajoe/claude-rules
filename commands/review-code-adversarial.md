@@ -32,9 +32,10 @@ Run both models in parallel:
 - Analyze through all lenses: security, edge cases, race conditions, error handling, data integrity, input validation
 - Produce findings with concrete failure scenarios
 
-**Codex adversarial** (background):
-- Launch `/codex:adversarial-review --background`
-- Different model (GPT-5.4), different blind spots
+**Codex adversarial** (background, if available):
+- Check if the Codex plugin is available (i.e., `/codex:setup` is a recognized command)
+- If available: launch `/codex:adversarial-review --background` — different model (GPT-5.4), different blind spots
+- If unavailable: skip Codex lane, proceed with Claude-only adversarial review
 
 ### 3. Merge Findings
 

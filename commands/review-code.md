@@ -69,16 +69,7 @@ Before declaring complete, run the repo's standard checks:
 - If checks fail, fix and return to step 3
 - If environment can't run checks: `Pre-flight: skipped` with reason
 
-### 5. Emit Review Gate
-
-```markdown
-## Review Gate
-Rounds: [N]
-Pre-flight: [pass/fail/skipped]
-Status: [clean/blocked/user decision/skipped/micro-fix]
-```
-
-### 6. Codex Second Opinion (Standard only, if available)
+### 5. Codex Second Opinion (Standard only, if available)
 
 Skip this step for Trivial complexity.
 
@@ -96,6 +87,17 @@ If available:
 5. Merge with existing findings, marking source as "Codex" for any new issues
 6. If Codex surfaces new `[major]` issues not caught by Claude, fix and re-run pre-flight (step 4)
 7. Include Codex scores in summary (Implementation Quality, Test Signal, Regression Protection)
+
+### 6. Emit Review Gate
+
+Emit the gate **after all review lanes have finished** (including Codex). Internal callers branch on this status.
+
+```markdown
+## Review Gate
+Rounds: [N]
+Pre-flight: [pass/fail/skipped]
+Status: [clean/blocked/user decision/skipped/micro-fix]
+```
 
 ### 7. Adversarial Suggestion
 

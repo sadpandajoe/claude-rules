@@ -86,7 +86,7 @@ Each reviewer gets the PR diff + full file context, applies its lens, returns se
 - Pattern analysis (step 6)
 
 **Lane 2 — Codex second opinion** (background, if available):
-Check if the Codex plugin is available. If yes, launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
+Check if the Codex plugin is available. If yes, fetch the PR head ref first (`gh pr checkout <number> --detach` or `git fetch origin pull/<number>/head`) so Codex reviews the actual PR diff, not the current local checkout. Then launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
 
 **Lane 3 — Adversarial** (background, only with `--adversarial` flag or auto-suggested):
 Launch Claude adversarial + `/codex:adversarial-review --background` (if Codex available). Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected. Falls back to Claude-only adversarial if Codex unavailable.
@@ -121,7 +121,7 @@ Tag issues by severity: `[major]`, `[minor]`, `[nitpick]`.
 
 This lets the user adjust severities, remove false positives, or escalate missed issues before anything is posted. Only after user confirmation does the review get posted to GitHub.
 
-**Clean reviews skip this step** — if overall 8/10+ with zero findings worth commenting on, auto-approve without pausing.
+**Clean reviews skip the reasoning review** — if overall 8/10+ with zero findings, proceed directly to step 9 (which handles the confirmation gate).
 
 Use `gh api repos/{owner}/{repo}/pulls/{number}/files --paginate` for accurate diff positions.
 

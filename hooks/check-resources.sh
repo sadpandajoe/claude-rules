@@ -32,11 +32,19 @@ fi
 # Check Docker container count (bounded probe — avoid hanging on wedged daemon)
 DOCKER_COUNT=0
 if command -v docker &>/dev/null; then
-    TIMEOUT_CMD=""
-    if command -v gtimeout &>/dev/null; then TIMEOUT_CMD="gtimeout 2"
-    elif command -v timeout &>/dev/null; then TIMEOUT_CMD="timeout 2"
+    if command -v gtimeout &>/dev/null; then
+        DOCKER_COUNT=$(gtimeout 2 docker ps -q 2>/dev/null | wc -l | tr -d ' ') || DOCKER_COUNT=0
+    elif command -v timeout &>/dev/null; then
+        DOCKER_COUNT=$(timeout 2 docker ps -q 2>/dev/null | wc -l | tr -d ' ') || DOCKER_COUNT=0
+    else
+        # No timeout utility — run in background with manual kill to avoid hanging
+        docker ps -q > /tmp/.cc_docker_count 2>/dev/null &
+        DOCKER_PID=$!
+        ( sleep 2 && kill $DOCKER_PID 2>/dev/null ) &
+        wait $DOCKER_PID 2>/dev/null
+        DOCKER_COUNT=$(wc -l < /tmp/.cc_docker_count 2>/dev/null | tr -d ' ') || DOCKER_COUNT=0
+        rm -f /tmp/.cc_docker_count
     fi
-    DOCKER_COUNT=$($TIMEOUT_CMD docker ps -q 2>/dev/null | wc -l | tr -d ' ') || DOCKER_COUNT=0
 fi
 
 # Warn if Docker is heavy
