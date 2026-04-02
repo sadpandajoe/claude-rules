@@ -57,7 +57,7 @@ Before reviewing code, validate the premise of the PR:
 3. **For bug fixes**: verify the bug logic — does the fix address the actual cause?
 4. **For features**: does the feature solve the stated need? Is it in the right place architecturally?
 
-If the premise doesn't hold up, flag it as the **primary finding** — no amount of clean code matters if the PR is solving the wrong problem. Post early with this finding rather than completing the full review.
+If the premise doesn't hold up, flag it as the **primary finding** — no amount of clean code matters if the PR is solving the wrong problem. Skip the remaining team review lanes (steps 4–6) but still route the finding through step 7's reasoning/confirmation flow before posting. The user must see and confirm this high-stakes finding like any other.
 
 If the premise is valid, proceed to team review with that understanding as context for all reviewers.
 
@@ -86,7 +86,7 @@ Each reviewer gets the PR diff + full file context, applies its lens, returns se
 - Pattern analysis (step 6)
 
 **Lane 2 — Codex second opinion** (background, if available):
-Check if the Codex plugin is available. If yes, check out the PR head so Codex reviews the actual PR diff: `gh pr checkout <number> --detach`. Then launch `/codex:review --background --base <base-branch>` automatically for Standard PRs. Async — doesn't slow down the regular team. Findings merged after both complete. Restore the original branch after Codex completes. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
+Check if the Codex plugin is available. If yes, launch the Codex review in an **isolated worktree** so it never mutates the current checkout while other reviewers are reading files. Use `isolation: "worktree"` on a **foreground** subagent that: (1) runs `gh pr checkout <number> --detach` inside the worktree, (2) launches `/codex:review --base <base-branch>` synchronously, and (3) returns the findings. The subagent must stay alive until Codex completes — if it exits early the worktree is auto-cleaned and the review loses its checkout. Run Lane 2 in parallel with Lane 1 (both foreground); the orchestrator waits for all lanes before merging. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
 
 **Lane 3 — Adversarial** (background, only with `--adversarial` flag or auto-suggested):
 Launch Claude adversarial + `/codex:adversarial-review --background` (if Codex available). Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected. Falls back to Claude-only adversarial if Codex unavailable.
@@ -233,6 +233,6 @@ If a PROJECT.md exists, update after posting with PR number, recommendation, and
 - Read full files for context, only comment on changed lines
 - Use diff positions (not file line numbers) when posting inline comments
 - Default is auto-post; use `--draft` for local-only review
-- Auto-approve on 8/10+ with zero `[major]` — no manual step needed
+- Standard + clean PRs pause for confirmation before approving (step 9); use `--auto` to skip all confirmations
 - Team selection is transparent in the summary so you can `/learn` to correct bad selections
 - For adversarial review, check out the PR locally and run `/review-code-adversarial`

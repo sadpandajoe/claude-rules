@@ -18,7 +18,7 @@
 ### 1. Discover Changed Files
 
 - Default: uncommitted changes via `git diff --name-only` + `git diff --cached --name-only` (deduplicated)
-- `--committed`: committed changes via `git diff base..HEAD --name-only`
+- `--committed`: committed changes via `git diff <base>..HEAD --name-only`, where `<base>` is resolved dynamically: use `git merge-base HEAD origin/<main-branch>` with the main branch detected from `git remote show origin | sed -n 's/.*HEAD branch: //p'` (fallback: `main`). Always use the `origin/` remote-tracking ref — bare branch names may not exist locally in fresh clones or CI worktrees.
 - Path argument: filter to matching files
 
 Read the full content of each changed file plus surrounding context.
@@ -46,8 +46,9 @@ When both complete:
 3. Unique findings from either model are included at normal confidence
 4. Sort by severity: `[vulnerability]` > `[race-condition]` > `[edge-case]` > `[missing-validation]`
 
-Present unified findings:
+Present unified findings. Adapt the template to reflect which models actually ran:
 
+**Dual-model** (both Claude and Codex available):
 ```markdown
 ### Adversarial Findings (Claude + Codex)
 
@@ -58,6 +59,13 @@ Present unified findings:
 - [finding]
 
 **Codex only**:
+- [finding]
+```
+
+**Claude-only fallback** (Codex unavailable):
+```markdown
+### Adversarial Findings (Claude only)
+
 - [finding]
 ```
 
@@ -79,15 +87,17 @@ Rounds: [N]
 Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked]
 Adversarial Rating: [Hardened/Adequate/Vulnerable/Critical]
-Reviewers: Claude (adversarial) + Codex (adversarial)
+Reviewers: [Claude (adversarial) + Codex (adversarial) | Claude (adversarial, solo)]
 ```
+
+Use `Claude (adversarial, solo)` when Codex was unavailable. Never claim dual-model coverage for a Claude-only run.
 
 ### 6. Summary
 
 ```markdown
 ## Review-Code-Adversarial Complete
 Rating: [Hardened/Adequate/Vulnerable/Critical] | Rounds: [N] | Status: [clean/blocked]
-Reviewers: Claude + Codex (dual-model)
+Reviewers: [Claude + Codex (dual-model) | Claude only (Codex unavailable)]
 
 ### Findings
 - [N] high confidence (both models), [N] Claude only, [N] Codex only
