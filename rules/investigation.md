@@ -4,7 +4,7 @@
 - [ ] **Document in PROJECT.md before proposing solutions** — include: problem statement, evidence gathered, root cause hypothesis, and how you confirmed it
 - [ ] **Use git history first** — blame, log, bisect
 - [ ] **Find root cause, not symptoms** — verify by writing a test that fails before the fix and passes after
-- [ ] **Prefer existing solutions** — check other branches first
+- [ ] **Scope git searches to master + current branch** — do not use `git log --all`. Unmerged branches may contain experimental or unvetted code that was never shipped. When restoring removed or commented-out code, trace the removal commit on master, then inspect its parent (`git show <removal-sha>^:<file>`)
 - [ ] **Parallelize when useful** — user-visible triage and code investigation can run together
 - [ ] **Gather evidence** — logs, stack traces, reproduction steps
 - [ ] **Verify assumptions** — dependencies, imports, file existence
@@ -20,3 +20,5 @@ When investigation is complete (root cause documented, evidence gathered, approa
 | Assume | Verify with commands |
 | Patch symptoms | Fix root cause |
 | Skip documentation | Document in PROJECT.md |
+| `git log --all` for code to restore | Trace the removal commit on master, inspect parent |
+| Pull code from unmerged branches | Use only master's history — unmerged code is unvetted |

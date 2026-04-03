@@ -25,8 +25,8 @@ This file is the reusable RCA phase for larger workflows. Use it when the public
 
 1. Define the problem precisely.
 2. Reproduce if possible.
-3. Inspect code, history, and recent changes.
-4. Identify the most likely introducing change.
+3. Inspect code, history, and recent changes. Scope git searches to master and the current branch — do not use `git log --all` (unmerged branches may contain experimental or unvetted code).
+4. Identify the most likely introducing change. When restoring removed or commented-out code, trace the removal commit on master and inspect its parent (`git show <sha>^:<file>`) rather than searching other branches.
 5. Check whether an equivalent fix already exists.
 6. Summarize root cause, evidence, and open uncertainty.
 

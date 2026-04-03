@@ -23,6 +23,10 @@ When skipping, emit the output block with `Status: SKIPPED` and a one-line reaso
 
 Run the relevant checks in parallel, merge the evidence, and return one normalized outcome that the calling workflow can act on.
 
+## Git Scope
+
+All checks below are scoped to master, the current branch, and merged PRs. Do not use `git log --all` — unmerged branches may contain experimental or unvetted implementations that were never shipped.
+
 ## Parallel Checks
 
 Run the relevant checks in parallel:
