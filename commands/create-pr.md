@@ -1,7 +1,3 @@
----
-model: haiku
----
-
 # /create-pr - Generate Pull Request
 
 > **When**: You have committed changes on a feature branch and want a well-written PR with a human-readable title and description.

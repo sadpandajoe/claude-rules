@@ -1,7 +1,3 @@
----
-model: haiku
----
-
 # /checkpoint - Save Workflow State
 
 > **When**: Context depth is at or above ~70%, or you want to save progress mid-workflow.

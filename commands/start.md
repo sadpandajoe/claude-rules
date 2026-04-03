@@ -1,7 +1,3 @@
----
-model: haiku
----
-
 # /start - Initialize Session
 
 @{{TOOLKIT_DIR}}/PROJECT_TEMPLATE.md
