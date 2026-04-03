@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Implement Change
 
 Use this phase when the workflow is ready to apply a code change after investigation and any needed planning are complete.

@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # Verify CI Fix
 
 Use this phase after a candidate CI fix has been applied.

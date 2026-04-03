@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Cherry-Pick Plan
 
 Use this phase when the user provides multiple commits or PRs, or requests a plan-only dry run.

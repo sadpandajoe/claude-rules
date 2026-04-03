@@ -39,6 +39,8 @@ Classify the change scope:
 | Logic changes | None / cosmetic | Functional |
 | Cross-cutting | No | Yes |
 
+Examples — TRIVIAL: renamed a variable in one file (10 lines, no logic). STANDARD: refactored error handling across 6 files (200+ lines, behavioral change).
+
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 - **Trivial**: Code quality reviewer only.

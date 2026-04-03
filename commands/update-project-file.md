@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # /update-project-file - Manual PROJECT.md Status Refresh
 
 @{{TOOLKIT_DIR}}/rules/planning.md

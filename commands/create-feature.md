@@ -52,6 +52,8 @@ Then assess complexity:
 | New APIs / migrations | No | Yes |
 | Behavioral risk | Mechanical / cosmetic | Functional change |
 
+Examples — TRIVIAL: add a tooltip to an existing button (1 component, no state change). STANDARD: add bulk edit for dashboard filters (new API endpoint, state management, UI components).
+
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 **Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
@@ -103,6 +105,8 @@ Add when the plan needs them:
 - `review-backend`
 
 Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input.
+
+**Convergence criteria**: Maximum 3 rounds per reviewer. If a reviewer has not reached 8/10 after 3 rounds, stop and surface the persistent issues to the user. If any reviewer is stuck below 6/10 after 2 rounds, stop immediately — further iteration is unlikely to help without user input on scope or approach.
 
 **c. Cold read**: Use `finalize-plan` as a fresh-eyes final check. If it finds a blocking issue, revise and re-run.
 

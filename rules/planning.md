@@ -7,16 +7,18 @@
 - **Define success** — clear completion criteria
 
 ## Stay in Planning When
-- Root cause unclear
-- Multiple approaches possible
-- Risk assessment incomplete
-- Dependencies unverified
+- Root cause unclear (multiple plausible causes, insufficient evidence)
+- Multiple approaches possible (design decision needed)
+- Risk assessment incomplete (cross-cutting changes, migration concerns)
+- Dependencies unverified (external APIs, library compatibility)
 
 ## Move to Implementation When
-- Problem understood
-- Approach validated
-- Risks assessed
-- Dependencies confirmed
+- Problem understood (can state root cause in one sentence)
+- Approach validated (reviewers at 8/10+ per `rules/scoring.md`)
+- Risks assessed (each identified with mitigation)
+- Dependencies confirmed (verified locally or documented)
+
+Note: trivial work (per `rules/complexity-gate.md`) skips planning entirely — go straight to implementation.
 
 ## PROJECT.md Update Defaults
 

@@ -27,42 +27,37 @@
 
 2. **Gather CI Logs**
 
-   Try `gh` first:
-   ```bash
-   # Get failed run
-   gh run list --branch <branch> --status failure --limit 1
-   gh run view <run-id> --log-failed
+   Follow this decision tree to obtain failure logs:
 
-   # Or from PR
-   gh pr checks <number>
-   gh run view <run-id> --log-failed
-   ```
+   1. **Local file provided?** (log or zip from step 1)
+      - YES → Use it. For zips, unzip and locate failing logs; split multi-job bundles into per-failure units.
+      - NO → Continue.
 
-   If `gh run list` returns no failures, check the check-runs endpoint — failures may be at the check-run level rather than the workflow-run level:
-   ```bash
-   gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
-     --jq '.check_runs[] | select(.conclusion == "failure")'
-   ```
+   2. **`gh run view <run-id> --log-failed` produces output?**
+      ```bash
+      gh run list --branch <branch> --status failure --limit 1
+      gh run view <run-id> --log-failed
+      # Or from PR: gh pr checks <number> → gh run view <run-id> --log-failed
+      ```
+      - YES → Use it.
+      - NO (empty output or no failures listed) → Continue.
 
-   If `gh run view --log-failed` returns empty output (exit 0 but no log lines), fall back to per-job logs:
-   ```bash
-   # List jobs for the run
-   gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
-     --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+   3. **Check-run or per-job logs available?**
+      ```bash
+      # Check-runs (failures may be at check-run level, not workflow-run level)
+      gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
+        --jq '.check_runs[] | select(.conclusion == "failure")'
 
-   # Fetch logs for each failed job
-   gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
-   ```
+      # Per-job logs
+      gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
+        --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+      gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
+      ```
+      - YES → Use them.
+      - NO → Continue.
 
-   If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
-   - Check whether a local log file or zip bundle was provided in step 1.
-   - If yes, use that file as the log source.
-   - If no, ask the user for a log file path or URL. Do not proceed to classification without actual log output.
-
-   If the input is a zip bundle:
-   - unzip it automatically
-   - locate the failing logs
-   - split multi-job bundles into per-failure units before classification
+   4. **All methods failed** (or CI is external — Jenkins, GitLab, etc.)
+      - Ask the user for a log file path or URL. Do not proceed to classification without actual log output.
 
 3. **Classify Failures** (`build-engineer`)
 
@@ -99,6 +94,8 @@
    | Files touched | 1-2 | 3+ or unclear |
    | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
    | Verification | STRONG or PARTIAL available | WEAK only |
+
+   Examples — TRIVIAL: lint failure from trailing whitespace (1 file, mechanical fix). STANDARD: test fails due to race condition in async setup (requires understanding test lifecycle, 3+ files).
 
    **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
    1. Apply the fix (step 8)

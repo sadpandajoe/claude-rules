@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # /archive-project-file - Archive Completed Work
 
 > **When**: A project/feature is done and needs to be preserved.

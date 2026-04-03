@@ -1,6 +1,7 @@
 ---
 name: review-rca
 description: Review root cause analysis and proposed fix before implementation.
+model: opus
 ---
 
 # Review RCA
@@ -8,7 +9,7 @@ description: Review root cause analysis and proposed fix before implementation.
 Review the root cause analysis and proposed solution before implementation.
 This is a shared validator, not a persona-owned workflow.
 
-If PROJECT.md exists, read it first.
+If PROJECT.md exists, read it first. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 Focus on these sections if present:
 - Issue
@@ -50,11 +51,15 @@ Identify possible failure scenarios such as:
 
 ## Output
 
-Provide:
-- Summary
-- Plan score (1-10)
-- Root Cause Validation
-- Plan Evaluation
-- Potential Risks
-- Suggested Improvements
-- Next Steps
+```markdown
+## RCA Review
+### Score: X/10
+### Strengths
+- [What the RCA does well — thorough evidence, clear causal chain, etc.]
+### Issues
+- [High/Medium/Low] [Issue — why it matters for the fix]
+### Suggestions
+- [Specific improvement to the analysis or proposed fix]
+### Missing
+- [What the RCA should address — alternative causes, untested assumptions, etc.]
+```

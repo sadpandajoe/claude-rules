@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Action Gate
 
 Use this helper after an investigation or classification phase has produced a root-cause hypothesis, a proposed fix, and a validation plan.
@@ -57,3 +61,21 @@ Treat confidence numerically:
 - `8-10` = high confidence
 - `5-7` = medium confidence
 - `1-4` = low confidence
+
+## Verification Strength Examples
+
+- **STRONG**: "Ran `pytest tests/unit/test_dashboard.py` — the same test that CI reported failing — and it passes after the fix."
+- **PARTIAL**: "Ran `mypy superset/models/dashboard.py` (type-check on the changed file), but the CI failure was in an integration test that requires Docker."
+- **WEAK**: "Reviewed the diff and confirmed the logic change matches the root cause, but no local execution was possible — the test requires a running app with seed data."
+
+## Decision Required: YES Example
+
+"The CI failure could be caused by either (a) a stale TypeScript declaration or (b) a genuine type incompatibility from the PR. Option (a) is a 1-line rebuild fix; option (b) requires changing the function signature. Set `Decision Required: YES` because the fix approach differs materially."
+
+## Confidence Calibration
+
+- **9-10**: Root cause confirmed by local reproduction. Fix is narrow and behavior-preserving.
+- **7-8**: Root cause strongly supported by evidence but not directly reproduced. Fix is targeted.
+- **5-6**: Root cause plausible but alternative explanations exist. Fix scope may need adjustment.
+- **3-4**: Multiple plausible root causes. Investigation incomplete.
+- **1-2**: Root cause unknown. Evidence is indirect or contradictory.

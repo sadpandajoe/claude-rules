@@ -13,7 +13,9 @@ Claude Code is the primary orchestrator: planning, investigation, complex reason
 
 ## Model Selection
 
-Always use **opus** for subagents and parallel agents. When invoking the Agent tool, pass `model: "opus"`.
+Each skill specifies its recommended model in its frontmatter (`model: opus`, `model: sonnet`, or `model: haiku`). When dispatching a subagent for a skill, pass the skill's model to the Agent tool.
+
+The default is **opus** — quality matters most. Only skills doing mechanical work (pattern matching, environment checks, API wrappers) use sonnet or haiku. When unsure, use opus.
 
 ## Subagent Context Loading
 

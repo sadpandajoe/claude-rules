@@ -1,13 +1,16 @@
 ---
 name: finalize-plan
 description: Fresh-eyes final review of a plan for coherence, contradictions, and implementability.
+model: opus
 ---
 
 # Plan Finalization Review
 
 You are a principal engineer doing a **cold read** of this plan. You have NOT seen any prior reviews or iteration history. Evaluate the plan purely on its own merits.
 
-If PROJECT.md exists, read it first.
+Read before scoring: `rules/scoring.md`, `rules/severity.md`
+
+If PROJECT.md exists, read it first. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 ## Focus Areas
 

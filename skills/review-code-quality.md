@@ -1,9 +1,14 @@
+---
+model: opus
+---
+
 # Review Code Quality
 
 Use this phase when repo-tracked files have changed and need a code quality review/fix loop. Works for both local changes (`/review-code`) and PR reviews (`/review-pr`).
 
 ## Required Context
 Read before starting: `rules/code-review.md`, `rules/review-gate.md`, `rules/stop-rules.md`
+Findings use severity tags from `rules/severity.md` and scoring from `rules/code-review.md`.
 
 ## Goal
 

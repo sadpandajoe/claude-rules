@@ -1,13 +1,14 @@
 ---
 name: review-tests
 description: Evaluate test quality, regression signal, production failure scenarios, and recommended safeguards before merge.
+model: opus
 ---
 
 # Review Tests
 
 Evaluate the tests related to the current change.
 
-If PROJECT.md exists, read it first to understand the issue, root cause, and expected behavior.
+If PROJECT.md exists, read it first to understand the issue, root cause, and expected behavior. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 Focus on whether the test suite provides meaningful regression protection and whether the change could fail in production even if tests pass.
 
@@ -67,12 +68,15 @@ Identify tests that should be:
 
 ## Output
 
-Provide:
-- Behavioral Coverage Summary
-- Weak or Low-Signal Tests
-- Missing Behavioral Coverage
-- Production Failure Scenarios and Test Blind Spots
-- Suite Simplification Opportunities
-- Recommended Safeguards (tests to add, defensive checks, monitoring)
-- Test score (1-10)
-- Next Steps
+```markdown
+## Test Review
+### Score: X/10
+### Strengths
+- [Behavioral coverage, high-signal tests, suite efficiency]
+### Issues
+- [High/Medium/Low] [Weak tests, missing coverage, production blind spots — why each matters]
+### Suggestions
+- [Tests to add, simplification opportunities, defensive checks, monitoring]
+### Missing
+- [Untested behaviors, production failure scenarios not covered, safeguards needed]
+```

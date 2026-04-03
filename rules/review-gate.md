@@ -45,3 +45,7 @@ Then:
 ## Mandatory Emission
 
 The Review Gate block must appear even when the review loop is skipped. Callers branch on this block — completing a review phase without emitting it is not sufficient.
+
+## Continuation Rule
+
+The Review Gate marks the completion of the review phase, not the end of the workflow. After a gate passes (Status: `clean` or `micro-fix`), the calling command must continue to its remaining steps — QA validation, commit, summary, etc. Do not treat a passing review gate as a signal to stop or ask the user whether to continue.

@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # /toolkit-doctor - Structural Health Check
 
 > **When**: After install, after editing source files, or as a regression gate at the end of each wave.

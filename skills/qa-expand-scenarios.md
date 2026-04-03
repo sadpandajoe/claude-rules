@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Expand Scenarios
 
 Use this phase after the likely fix is known to identify the smallest set of extra behavioral checks that would catch meaningful regressions without widening scope.

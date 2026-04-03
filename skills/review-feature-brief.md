@@ -1,13 +1,16 @@
 ---
 name: review-feature-brief
 description: Review a feature brief for scope clarity, acceptance quality, milestone framing, and product-level risks.
+model: opus
 ---
 
 # Feature Brief Review
 
 Review the product-facing feature brief before technical planning begins.
 
-If PROJECT.md exists, read it first.
+Read before scoring: `rules/scoring.md`, `rules/severity.md`
+
+If PROJECT.md exists, read it first. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 ## Focus Areas
 

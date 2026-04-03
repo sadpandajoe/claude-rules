@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Execute Use Cases
 
 Use this phase when a workflow already has a use-case matrix or confirmed repro steps and needs a generic QA execution pass.
@@ -17,6 +21,18 @@ Run the relevant scenarios against a real environment, record the outcomes clear
 4. Record PASS, FAIL, BLOCKED, or SKIP for each scenario.
 5. Hand the results back to the calling workflow with enough evidence for summary, reporting, or bug filing when needed.
 
+## Evidence Capture
+
+After execution, capture only the evidence that materially improves confidence:
+
+1. Capture the smallest useful artifact set for each scenario:
+   - screenshot for visual failures
+   - Playwright video for repro-heavy UI paths
+   - console, network, or API output when it explains the failure
+2. Keep naming descriptive and tied to the scenario or issue.
+3. Save artifacts under a stable local structure such as `qa-evidence/<scenario>/`.
+4. Record which artifact actually proves the behavior instead of dumping everything.
+
 ## Output
 
 ```markdown
@@ -26,5 +42,6 @@ Run the relevant scenarios against a real environment, record the outcomes clear
   - Result: <pass / fail / blocked / skip>
   - Validation path: <playwright / api / manual>
   - Evidence: <screenshots, logs, video, or none>
+  - Best proof: <single artifact or log line to reference first>
   - Follow-up: <summarize / rerun later / file bug / no action>
 ```

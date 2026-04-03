@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Cherry-Pick Validate
 
 Use this phase after a cherry-pick applies cleanly or after conflict resolution completes.
@@ -83,6 +87,16 @@ Use these labels in the execution table. Do not overstate what was actually veri
 | **Not run** | No validation performed |
 
 Never use "Clean" or "Validated" as a status — they are ambiguous about what was actually run.
+
+## What To Do When Validation Fails
+
+| Current Label | Failure | Action |
+|---------------|---------|--------|
+| Tested | Test failure | Re-run failed tests, fix the issue, re-validate |
+| Checked | Lint or type error | Fix errors, re-run checks |
+| Build-only | Build failure | Fix build, re-run |
+| Structural | Parse error or conflict markers found | Fix by hand, re-validate |
+| Not run | No validation performed | Run at least structural validation before merging |
 
 ## Output
 

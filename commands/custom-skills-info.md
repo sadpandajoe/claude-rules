@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # /custom-skills-info - Toolkit Reference Card
 
 > **When**: You want to see what commands are available, what they do, and what gates they enforce.

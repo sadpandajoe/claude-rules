@@ -44,6 +44,8 @@ Classify the PR scope:
 | Behavioral change | None / cosmetic | Functional |
 | Cross-cutting | No | Yes |
 
+Examples — TRIVIAL: docs-only PR (3 files, 30 lines, no behavior change). STANDARD: new API endpoint with migration, tests, and frontend integration.
+
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 **Trivial + confidence 8/10+**: Code quality review only. Skip team.
@@ -85,8 +87,15 @@ Each reviewer gets the PR diff + full file context, applies its lens, returns se
 - Tests (`review-tests.md`) or Test Plan (`review-testplan.md`) — like an SDET reviewing whether the test suite provides real regression protection
 - Pattern analysis (step 6)
 
-**Lane 2 — Codex second opinion** (background, if available):
-Check if the Codex plugin is available. If yes, launch the Codex review in an **isolated worktree** so it never mutates the current checkout while other reviewers are reading files. Use `isolation: "worktree"` on a **foreground** subagent that: (1) runs `gh pr checkout <number> --detach` inside the worktree, (2) launches `/codex:review --base <base-branch>` synchronously, and (3) returns the findings. The subagent must stay alive until Codex completes — if it exits early the worktree is auto-cleaned and the review loses its checkout. Run Lane 2 in parallel with Lane 1 (both foreground); the orchestrator waits for all lanes before merging. If Codex is unavailable, skip this lane silently and note "Codex: skipped (plugin not available)" in the summary.
+**Lane 2 — Codex second opinion** (if available):
+Check if the Codex plugin is available. If unavailable, skip silently and note "Codex: skipped (plugin not available)" in the summary.
+
+If available, launch as a **foreground** subagent with `isolation: "worktree"` (prevents mutating the current checkout while other reviewers read files):
+1. Inside the worktree: `gh pr checkout <number> --detach`
+2. Run `/codex:review --base <base-branch>` synchronously
+3. Return findings to orchestrator
+
+The subagent must stay alive until Codex completes — early exit auto-cleans the worktree and loses the checkout. Run Lane 2 in parallel with Lane 1; the orchestrator waits for all lanes before merging.
 
 **Lane 3 — Adversarial** (background, only with `--adversarial` flag or auto-suggested):
 Launch Claude adversarial + `/codex:adversarial-review --background` (if Codex available). Dual-model red-team. Only runs when explicitly requested or when security-sensitive code is detected. Falls back to Claude-only adversarial if Codex unavailable.

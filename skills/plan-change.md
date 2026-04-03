@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Plan Change
 
 Use this phase when the RCA is plausible but the fix is broad enough, risky enough, or uncertain enough that the workflow should pause to define a tighter implementation approach before coding.
@@ -10,7 +14,7 @@ Create a compact implementation plan that is specific enough for the current bug
 
 1. State the validated root cause and the narrow success condition.
 2. Break the fix into the smallest implementation slices that preserve behavior.
-3. Define the RED test first, then the GREEN implementation path.
+3. Define the RED test first, then the GREEN implementation path. (The failing test proves you are verifying the actual bug, not just running the suite. If the test passes before the fix, it does not capture the bug.)
 4. Call out edge cases, risk points, and the validation plan.
 5. Note anything that still requires approval before coding.
 

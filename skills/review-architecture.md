@@ -1,13 +1,16 @@
 ---
 name: review-architecture
 description: Review plan from a system design and architecture perspective.
+model: opus
 ---
 
 # Architecture Review
 
 Evaluate the plan's architectural decisions, component boundaries, and system design.
 
-If PROJECT.md exists, read it first.
+Read before scoring: `rules/scoring.md`, `rules/severity.md`
+
+If PROJECT.md exists, read it first. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 ## Focus Areas
 

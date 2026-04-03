@@ -1,6 +1,7 @@
 ---
 name: review-adversarial
 description: Red-team code review focused on security, edge cases, race conditions, and failure modes.
+model: opus
 ---
 
 # Adversarial Code Review
@@ -68,6 +69,8 @@ Rate the overall adversarial assessment:
 | **Adequate** (6-8) | Minor gaps but no critical vulnerabilities. Some edge cases unhandled. |
 | **Vulnerable** (3-5) | One or more exploitable issues. Missing validation at boundaries. |
 | **Critical** (1-2) | Security vulnerabilities or data integrity risks that must be fixed before merge. |
+
+When consumed by commands that aggregate numeric scores, use the numeric equivalent (1-10) alongside the tier name. See `rules/scoring.md` for the universal scale.
 
 ## Rules
 

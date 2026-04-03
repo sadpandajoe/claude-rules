@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Check Existing Fix
 
 Use this helper when a workflow needs to know whether a reported bug is already fixed in `master`, pending in an open PR, or still unfixed.

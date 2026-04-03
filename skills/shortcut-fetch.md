@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # Shortcut API Fetch
 
 Use this helper whenever a workflow needs to make Shortcut REST API calls. It wraps the known operational gotchas so callers don't rediscover them each session.

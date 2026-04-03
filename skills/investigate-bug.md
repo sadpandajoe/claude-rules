@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Investigate Bug
 
 Use this phase when a workflow needs code-level RCA for a reported bug as an internal step rather than a standalone user-facing investigation command.
@@ -11,14 +15,15 @@ Trace the likely failing path, identify the most plausible root cause with evide
 
 ## Core Steps
 
-1. Restate the bug in code-level terms.
-2. Identify the likely files, state transitions, or services involved.
-3. Reproduce locally if practical, or explain why reproduction is still indirect.
-4. Inspect recent code, git history, and introducing changes.
-5. Look for partial fixes, guards, or adjacent regressions in the current codebase.
-6. Return the most plausible RCA with the strongest available evidence.
+Follow the investigation process in `investigate-change.md` with these bug-specific additions:
+
+1. **Restate the reported problem in code-level terms** — trace from the user-visible symptom to the code path responsible.
+2. **Attempt local reproduction when practical** — if reproduction is not possible, explain why and what indirect evidence substitutes.
+3. **Frame findings in terms of user impact** — connect the root cause back to the observable failure the user reported.
 
 ## Output
+
+Use the base output from `investigate-change.md` and include the bug-specific additions (Affected area, Introducing change, Existing local safeguards) documented there.
 
 ```markdown
 ## Bug Investigation

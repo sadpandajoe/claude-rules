@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Validate Fix
 
 Use this phase after a bug fix has been implemented and code-level verification has already run.

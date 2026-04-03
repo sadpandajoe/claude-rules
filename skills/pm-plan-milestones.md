@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # Plan Milestones
 
 Use this phase when the feature needs milestone framing beyond a single small implementation slice.

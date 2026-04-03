@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Investigate Change
 
 Use this phase when a workflow needs investigation or root-cause analysis as an internal step rather than as a standalone user-facing command.
@@ -39,3 +43,11 @@ Return a compact handoff:
 - Existing fix: <yes/no and where>
 - Open questions: <remaining uncertainty>
 ```
+
+### Bug-Specific Additions (Optional)
+
+When investigating a bug, also include these fields in the summary:
+
+- **Affected area**: files, services, or flows involved
+- **Introducing change**: commit or PR that introduced the regression, or "unknown"
+- **Existing local safeguards**: tests, guards, or defensive checks that should have caught this (present / absent / partial)

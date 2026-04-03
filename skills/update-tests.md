@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Update Tests
 
 Use this phase when the workflow needs to improve an existing test suite without running a larger end-to-end feature or bug workflow.

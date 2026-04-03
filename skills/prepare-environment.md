@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # Prepare Environment
 
 Use this phase when implementation or QA validation may require a runnable local environment, rebuilt artifacts, or other setup beyond reading code.

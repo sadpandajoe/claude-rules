@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Create Tests
 
 Use this phase when the workflow needs to create the first meaningful automated tests for an area that does not already have a real suite.

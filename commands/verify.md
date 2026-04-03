@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # /verify - Run Tests on Changed Files
 
 > **When**: After implementation, before review, or standalone to check the current state.

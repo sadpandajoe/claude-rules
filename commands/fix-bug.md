@@ -58,6 +58,8 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    | Fix type | Typo, config, off-by-one | Logic, architecture |
    | Regression risk | Isolated, testable | Cross-cutting |
 
+   Examples — TRIVIAL: error message has a typo (`settngs` → `settings`), one file, no logic change. STANDARD: dashboard filter applies to wrong panel — requires tracing filter propagation across 4+ files.
+
    Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
@@ -73,7 +75,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    6. Update PROJECT.md (single update)
    7. Emit summary (step 17)
 
-   The review gate at step 4 is mid-workflow — steps 5–7 must still execute. Do not stop after the review gate passes.
+   The review gate is mid-workflow — see Continuation Rule in `rules/review-gate.md`.
 
    **Micro-fix** (subset of trivial): per the micro-fix rule in `rules/review-gate.md`, emit `Status: micro-fix` with the diff inlined — no iterative loop needed.
    - PROJECT.md update is optional if no PROJECT.md exists and the workflow completes in a single pass
@@ -188,7 +190,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap — writing the test is separate from running it. The test must exist in the commit; CI or a future local run validates it.
 
-14. **Review Changed Files** (gate — not the finish line)
+14. **Review Changed Files** (gate)
 
    Switch mental mode: review the changes as if someone else wrote them.
 
@@ -203,7 +205,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Do not skip this step when resuming from a pre-built plan.
 
-   **After the review gate passes, continue to steps 15–17.** The review gate is mid-workflow, not the end.
+   After the review gate passes, continue to steps 15–17 — see Continuation Rule in `rules/review-gate.md`.
 
 15. **Validate the Fix With QA When Needed**
 

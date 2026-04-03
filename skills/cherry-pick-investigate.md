@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Cherry-Pick Investigation
 
 Use this phase before applying a cherry-pick.

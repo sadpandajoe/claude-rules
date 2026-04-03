@@ -42,7 +42,7 @@ State which reviewers are selected and why before launching.
 
 ### 3. Review Iterations
 
-Launch all selected reviewer subagents in parallel (use `model: "opus"` per orchestration rules). Each reviewer:
+Launch all selected reviewer subagents in parallel (`model: "opus"`). Each reviewer:
 - Reads PROJECT.md for the plan content
 - Loads its own skill file (subagents load their own domain rules)
 - Produces a scored review block (X/10 with strengths, issues, suggestions)

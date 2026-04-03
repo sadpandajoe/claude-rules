@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Triage Bug
 
 Use this phase at the start of a bug workflow to determine whether the report is reproducible, what evidence exists, and what setup is required.

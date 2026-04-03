@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Analyze Use Cases
 
 Use this phase when a workflow needs exploratory QA discovery rather than immediate implementation.

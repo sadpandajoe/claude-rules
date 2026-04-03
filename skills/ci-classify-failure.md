@@ -1,3 +1,7 @@
+---
+model: haiku
+---
+
 # Classify CI Failure
 
 Use this phase after CI logs or artifacts have been gathered.

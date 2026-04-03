@@ -23,6 +23,20 @@ When classification is `TRIVIAL` and confidence is `8/10` or higher:
 
 Always emit the gate block above. Do not silently choose a path — the block must be visible in conversation so the user and any continuation checkpoint can see the classification.
 
+## Worked Examples
+
+### TRIVIAL
+
+- **Typo in error message**: 1 file, no logic change, no regression risk. Confidence 10/10.
+- **Config value change**: 1-2 files, mechanical substitution, testable in isolation. Confidence 9/10.
+- **Missing import after rename**: 1 file, fix is deterministic from the error, no design decision. Confidence 9/10.
+
+### STANDARD
+
+- **API endpoint returns wrong status code for edge case**: 3+ files (handler, test, maybe middleware), requires understanding request flow, behavioral change with regression potential. Confidence 6/10 until investigated.
+- **Feature flag logic inverted**: Cross-cutting impact across multiple components, needs investigation to confirm scope. Confidence 5/10.
+- **New validation rule on existing form**: Multiple files (frontend component, backend validator, test suite), design decision about error UX, potential for regression in adjacent flows. Confidence 7/10.
+
 ## Scope
 
 This rule defines an output contract. It does not define the signal tables (those are command-specific) or the trivial-path steps (those are command-owned).

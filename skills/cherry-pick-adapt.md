@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Cherry-Pick Adapt
 
 Use this phase when a cherry-pick cannot be applied mechanically.

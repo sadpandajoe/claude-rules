@@ -1,3 +1,7 @@
+---
+model: opus
+---
+
 # Plan Feature
 
 Use this phase when the feature brief is ready and the workflow needs a technical plan that a developer could implement without guessing.
@@ -9,7 +13,7 @@ Translate the approved brief into a concrete implementation plan with PR slices,
 ## Core Steps
 
 1. Identify the key code paths, interfaces, and data boundaries affected.
-2. Choose the narrowest workable technical approach.
+2. Choose the narrowest workable technical approach. (Narrower approaches have smaller review surfaces, lower regression risk, and faster iteration cycles. A broader approach can always follow in a later slice.)
 3. Break the work into reviewable PR slices.
 4. Call out migrations, API changes, and compatibility concerns when they exist.
 5. Define the test strategy and verification path.

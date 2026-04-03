@@ -1,13 +1,16 @@
 ---
 name: review-implementation
 description: Review plan from an implementation feasibility and sequencing perspective.
+model: opus
 ---
 
 # Implementation Review
 
 Evaluate whether the plan is practically implementable with realistic effort and sequencing.
 
-If PROJECT.md exists, read it first.
+Read before scoring: `rules/scoring.md`, `rules/severity.md`
+
+If PROJECT.md exists, read it first. If it does not exist, use the in-conversation context, plan, or diff as primary source.
 
 ## Focus Areas
 
@@ -16,10 +19,9 @@ Analyze:
 - Effort realism — are estimates reasonable for each step?
 - Dependency availability — do required libraries/APIs exist?
 - Consistency with existing codebase patterns and conventions
-- Incremental delivery — can the plan be implemented in shippable increments?
-- Phase decomposition — is each phase a small, independently deployable PR?
-- Standalone migration PRs — migrations must be bundled with the code that uses them
-- Vertical slices — prefer end-to-end feature slices over horizontal layers (all models → all APIs → all UI)
+- Incremental delivery — is each phase a small, independently deployable PR that can be shipped without leaving the system in a broken state?
+- Standalone migration PRs — migrations must be bundled with the code that uses them (if the migration ships alone and needs revert, dependent code may already be deployed in another PR)
+- Vertical slices — prefer end-to-end feature slices over horizontal layers (all models → all APIs → all UI) (each slice is deployable and testable independently; horizontal layers leave the system partially functional between PRs)
 - Migration concerns — backward compatibility, data migration, rollback
 - Risk of each step — what could go wrong?
 
