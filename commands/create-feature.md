@@ -64,21 +64,23 @@ Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 Enter plan mode. Inside plan mode, do all of the following:
 
-**a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
+**a. PM brief** (product criteria): Use `pm-create-feature-brief.md` to investigate the request and produce a brief with verifiable acceptance criteria. Use `pm-plan-milestones.md` for milestone framing when the work spans multiple deliverables. Skip only when the work is already tightly scoped with clear acceptance criteria — state the decision explicitly.
 
-**b. Create the feature brief**: If PM planning is needed, use `pm-create-feature-brief.md` with milestones via `pm-plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
+**b. Architect + QA in parallel** (technical + test criteria): These are peers that both consume the PM brief — launch them together:
+- **Architect**: Use `plan-feature.md` to define the technical approach, structured slices with scope/entrance/exit criteria, and implementation sequencing.
+- **QA**: Use `qa-analyze-use-cases.md` to derive test scenarios from the PM brief's acceptance criteria, then `qa-expand-scenarios.md` to identify edge cases and adjacent flows. Produce a test plan that maps scenarios to slices.
 
-**c. Create the technical plan**: Use `plan-feature.md` to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
+The Architect defines *how to build it*. QA defines *how to prove it works*. Neither needs the other's output — both need the PM brief. Running them in parallel means the test plan is ready before implementation starts, strengthening TDD: devs know what tests to write as part of their slice, not as an afterthought.
 
-Exit plan mode when you have a draft feature brief and technical plan. These do not need to be polished — review iterations in step 4 will refine them.
+Exit plan mode when you have: feature brief, technical plan with structured slices, and QA test plan. These do not need to be polished — review iterations in step 4 will refine them.
 
 ### 3. Write PROJECT.md (hard gate)
 
 After exiting plan mode, read the plan file. Write its content into PROJECT.md sections:
-- `Feature Brief`
+- `Feature Brief` (PM brief with acceptance criteria)
 - `Milestones` (if PM planning was used)
-- `Implementation Plan`
-- `Test Strategy`
+- `Implementation Plan` (Architect's structured slices)
+- `Test Plan` (QA's test scenarios mapped to slices)
 
 **Do not proceed to step 4 until this confirmation block is emitted:**
 
@@ -95,10 +97,10 @@ Now in normal mode, iterate the plan using reviewer agents. This is the main qua
 
 **a. PM brief review** (if PM planning was used): Run `review-feature-brief` and revise until 8/10.
 
-**b. Technical plan review**: Always run these reviewers:
-- `review-architecture`
-- `review-implementation`
-- `review-testplan`
+**b. Technical plan + test plan review**: Always run these reviewers:
+- `review-architecture` — validates the Architect's slice decomposition and technical approach
+- `review-implementation` — validates feasibility, sequencing, and slice boundaries
+- `review-testplan` — validates the QA test plan covers the architecture and acceptance criteria. This reviewer now has both the technical plan and test plan, so it can verify alignment: does every slice have test coverage? Does the test plan catch cross-slice integration risks?
 
 Add when the plan needs them:
 - `review-frontend`
@@ -120,34 +122,23 @@ Update PROJECT.md with final review scores after this step.
 
 Read the plan's structured slices from PROJECT.md. For each slice, the plan defines scope, entrance/exit criteria, and acceptance — use these to drive implementation.
 
-**5a. Launch implementation + QA in parallel:**
+**5a. Dispatch implementation subagents:**
 
-The orchestrator dispatches two workstreams simultaneously:
-
-**Workstream 1 — Implementation subagents:**
+The QA test plan already exists from step 2b — devs use it to know what tests to write for their slice. Each subagent gets its slice context (scope, entrance/exit criteria, acceptance) AND the relevant test scenarios from the QA test plan.
 
 Check the plan's Parallelism section and dispatch:
-- **Independent slices**: launch as parallel subagents, each with `isolation: "worktree"` and `model: "opus"`. Each subagent gets its slice context (scope, entrance/exit criteria, acceptance) and runs `implement-change.md`. The worktree isolation ensures parallel subagents don't conflict on files.
+- **Independent slices**: launch as parallel subagents, each with `isolation: "worktree"` and `model: "opus"`, running `implement-change.md`. The worktree isolation ensures parallel subagents don't conflict on files.
 - **Sequential slices** (depends-on chain): implement in dependency order. After each slice completes and its exit criteria are met, start the next.
 - **Single slice or no structured slices**: implement as one unit through `implement-change.md` (no worktree needed).
 
 Each subagent:
 - Verifies **entrance criteria** before starting — stops if unmet
 - Installs dependencies in the worktree if needed (`node_modules/`, build outputs)
-- Writes the failing test before the code change when feasible
+- Writes the failing test from the QA test plan before the code change (TDD — the test plan tells them exactly what to test)
 - Stays within the slice's **scope** boundary
 - Stops when **exit criteria** are met and **acceptance** passes
 - Commits changes on the worktree's temp branch with a message referencing the slice name
 - Returns the Implementation Handoff block
-
-**Workstream 2 — QA test planning** (parallel with implementation):
-
-Launch a QA subagent (`model: "opus"`) that runs while devs are coding:
-- Use `qa-analyze-use-cases.md` to derive test scenarios from the feature brief's acceptance criteria
-- Use `qa-expand-scenarios.md` to identify edge cases and adjacent flows
-- Produce a test plan ready for execution after implementation merges
-
-The QA agent doesn't need the code — it works from the feature brief and plan.
 
 **5b. Merge worktrees back:**
 
@@ -158,11 +149,13 @@ After all implementation subagents complete:
 4. If a merge conflict occurs, stop and surface it — the plan's scope boundaries were wrong, don't auto-resolve
 5. Run a quick build/type-check after all merges to verify integration
 
-**5c. Execute QA test plan:**
+**5c. QA validates the integrated result:**
 
-After merge, use the QA agent's test plan to validate the integrated result:
-- Run `qa-execute-use-cases.md` against the merged code
-- Use `qa-validate-fix.md` for any scenarios that need live environment validation
+After merge, execute the test plan from step 2b against the integrated code:
+- Run `qa-execute-use-cases.md` for the test scenarios
+- Use `qa-validate-fix.md` for scenarios that need live environment validation
+- Dev subagents already wrote unit/integration/API tests per-slice — QA execution focuses on cross-slice integration and user-facing behavior
+- In the future, QA can also own E2E test slices (Playwright tests in their own worktree) since unit/integration coverage is handled by dev subagents
 
 **Trivial path** (from step 1):
 1. Implement the change
