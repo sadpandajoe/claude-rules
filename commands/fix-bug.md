@@ -179,8 +179,11 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - use `implement-change.md`
 
    For non-trivial fixes:
-   - use `plan-change.md`
-   - then continue with `implement-change.md`
+   - use `plan-change.md` to produce structured slices with scope, entrance/exit criteria, and acceptance
+   - then dispatch slices through `implement-change.md`:
+     - **Independent slices**: launch as parallel subagents, each verifying its own exit criteria
+     - **Sequential slices**: implement in dependency order
+     - **Single slice**: implement as one unit
 
 13. **Expand Regression Coverage** (gate)
 

@@ -117,12 +117,22 @@ Update PROJECT.md with final review scores after this step.
 ### 5. Implementation
 
 **Standard path** (from step 4):
-- For each implementation slice, define the acceptance or regression test first
-- Write the failing test before the code change when feasible
-- If test-first is blocked by env, repro, or harness constraints, write the test anyway and record the verification gap — writing is separate from running
-- For mechanical changes (renames, config swaps, endpoint changes with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
-- Implement the feature through `developer`
-- Run QA validation when the work is user-visible
+
+Read the plan's structured slices from PROJECT.md. For each slice, the plan defines scope, entrance/exit criteria, and acceptance — use these to drive implementation.
+
+**Dispatch strategy** — check the plan's Parallelism section:
+- **Independent slices** (no dependencies on each other): launch as parallel subagents, each running `implement-change.md` with its slice context. Each subagent verifies its own exit criteria and acceptance before returning.
+- **Sequential slices** (depends-on chain): implement in dependency order. After each slice completes and its exit criteria are met, start the next.
+- **Single slice or no structured slices**: implement as one unit through `implement-change.md`.
+
+For each slice:
+- Subagent verifies **entrance criteria** before starting — stops if unmet
+- Writes the failing test before the code change when feasible
+- Stays within the slice's **scope** boundary
+- Stops when **exit criteria** are met and **acceptance** passes
+- If test-first is blocked by env, repro, or harness constraints, writes the test anyway and records the gap
+
+After all slices complete, run QA validation when the work is user-visible.
 
 **Trivial path** (from step 1):
 1. Implement the change
