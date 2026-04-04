@@ -56,7 +56,7 @@
 
    Keep the current change focused on the smallest set of high-signal suite improvements.
 
-6. **Update the Tests Through `developer`**
+6. **Update the Tests**
 
    Use `update-tests.md`:
 

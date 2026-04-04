@@ -59,7 +59,7 @@
    4. **All methods failed** (or CI is external — Jenkins, GitLab, etc.)
       - Ask the user for a log file path or URL. Do not proceed to classification without actual log output.
 
-3. **Classify Failures** (`build-engineer`)
+3. **Classify Failures**
 
    For each failure:
    - identify the failing step
@@ -134,7 +134,7 @@
    If the gate allows automatic action (or the complexity gate routed here directly):
    - apply the narrow proposed fix
    - keep scope limited to the failing surface
-   - hand off to `developer` only when code adaptation becomes non-mechanical
+   - hand off to `implement-change.md` only when code adaptation becomes non-mechanical
 
    Otherwise:
    - stop
@@ -149,7 +149,7 @@
 
    Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
 
-9. **Verify Locally** (`build-engineer`)
+9. **Verify Locally**
 
 10. **Review Changed Files** (gate)
 

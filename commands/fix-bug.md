@@ -138,7 +138,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    If the helper returns `FIXED_UPSTREAM`:
    - route internally to `/cherry-pick`
-   - let `release-engineer` own the branch movement
+   - let the cherry-pick workflow own the branch movement
    - return to this workflow for validation, `/review-code`, and final summary
    - do not auto-commit after the cherry-pick path; let the user decide whether any follow-up should be amended or added separately
 
@@ -176,7 +176,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    This is the first PROJECT.md write for the standard path. All findings collected during plan mode are flushed here.
 
-13. **Implement Through `developer`**
+13. **Implement**
 
    Dev subagents get both the slice context AND the QA test scenarios — they know exactly what tests to write (TDD from the QA plan).
 
@@ -307,7 +307,7 @@ When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fi
 - If local tests in repo B can partially cover the fix (e.g., model introspection, type checks), still run them — partial coverage beats none
 
 ## Notes
-- `/fix-bug` is the public bug entrypoint; RCA-only work now stays inside the internal `developer` and `core` helpers
+- `/fix-bug` is the public bug entrypoint; RCA-only work stays inside the internal investigation skills
 - Keep `PROJECT.md` updates command-owned
 - Prefer the open-PR or cherry-pick path over inventing a new fix
 - Use test-first implementation by default; document why when the failing test cannot be written first

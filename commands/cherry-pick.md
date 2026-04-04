@@ -46,7 +46,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
 ## Steps
 
-1. **Plan Order if Needed** (`release-engineer`)
+1. **Plan Order if Needed**
 
    If multiple PRs or SHAs are provided, or if `--plan-only` is set:
 
@@ -54,7 +54,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    If `--plan-only` is set, stop after producing the plan report.
 
-2. **Investigate Each Change in Order** (`release-engineer`)
+2. **Investigate Each Change in Order**
 
    For a single input, investigate that change directly.
    For multiple inputs, process the planned sequence one change at a time.
@@ -69,7 +69,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    **Fast path for single LOW-risk changes**: When there is only one change and investigation rates it `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, combine investigate and apply into a single phase — emit the action gate block and proceed directly to apply without a separate presentation step.
 
-3. **Apply Each Auto-Approved Cherry-Pick Sequentially** (`release-engineer`)
+3. **Apply Each Auto-Approved Cherry-Pick Sequentially**
 
    ```bash
    git checkout <target-branch>
@@ -78,13 +78,13 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    Always apply on the target branch sequentially, never in parallel.
 
-4. **Adapt Conflicts if Needed** (`developer`)
+4. **Adapt Conflicts if Needed**
 
    This phase owns conflict classification and code-level adaptation.
    If the cherry-pick state is lost, do not continue blindly; return to the apply phase.
    If a prerequisite or behavior decision is required, stop and ask the user.
 
-5. **Validate Each Applied Change** (`developer`)
+5. **Validate Each Applied Change**
 
    This phase owns validation depth, including stronger checks for dependency-manifest changes.
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.

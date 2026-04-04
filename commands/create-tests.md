@@ -21,7 +21,7 @@
    - Specific file or function: as provided
    - Read the code thoroughly before writing any tests
 
-2. **Delegate Initial Test Creation to `developer`**
+2. **Create Initial Tests**
 
    Use `create-tests.md`. This helper owns:
    - running `review-tests` before writing tests
