@@ -154,18 +154,31 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - do internal planning first
    - stop for ambiguity or risk
 
-11. **Exit Plan Mode → PROJECT.md**
+11. **Plan Fix + QA in Parallel**
+
+   Once RCA is validated and the action gate says proceed, launch two workstreams together:
+
+   **Architect**: Use `plan-change.md` to produce structured slices with scope, entrance/exit criteria, and acceptance. The RCA tells the Architect *what* to fix; the slices define *how*.
+
+   **QA**: Use `qa-analyze-use-cases.md` to derive test scenarios from the validated RCA — what behaviors should the fix restore? What edge cases surround the root cause? Use `qa-expand-scenarios.md` to identify adjacent flows that might be affected. Produce a test plan that maps scenarios to the fix slices.
+
+   QA doesn't need the slices to plan — it needs the RCA. The Architect doesn't need the test plan to slice — it needs the RCA. Both consume the RCA, both produce criteria. Running them in parallel means devs get both the slice definitions AND the test plan before writing code.
+
+12. **Exit Plan Mode → PROJECT.md**
 
    Read the plan file produced by plan mode. Write its content into PROJECT.md:
    - bug summary, repro status, affected area
    - upstream-fix status
    - validated RCA
-   - fix approach and test strategy
+   - fix approach with structured slices (from Architect)
+   - QA test plan mapped to slices
    - action-gate outcome
 
    This is the first PROJECT.md write for the standard path. All findings collected during plan mode are flushed here.
 
-12. **Implement Through `developer`**
+13. **Implement Through `developer`**
+
+   Dev subagents get both the slice context AND the QA test scenarios — they know exactly what tests to write (TDD from the QA plan).
 
    Before changing the code:
    - define the regression this fix must catch
@@ -178,30 +191,31 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    For direct fixes:
    - use `implement-change.md`
 
-   For non-trivial fixes:
-   - use `plan-change.md` to produce structured slices with scope, entrance/exit criteria, and acceptance
-   - then dispatch slices through `implement-change.md`:
+   For non-trivial fixes (slices already produced in step 11):
+   - dispatch slices through `implement-change.md`:
      - **Independent slices**: launch as parallel subagents with `isolation: "worktree"`, each verifying its own exit criteria and committing on the worktree's temp branch
      - **Sequential slices**: implement in dependency order
      - **Single slice**: implement as one unit (no worktree needed)
    - after all slices complete, merge worktree branches back one at a time in dependency order. If a merge conflict occurs, stop and surface it.
 
-13. **Expand Regression Coverage** (gate)
+14. **QA Validates the Fix**
 
-   Keep this phase tightly scoped to the bug at hand:
-   - `developer` adds or updates only the automated tests needed to protect this fix
-   - `qa` identifies must-cover scenarios, suggested follow-up tests, and out-of-scope risks
+   Execute the QA test plan from step 11 against the implemented code:
+   - Dev subagents already wrote unit/integration tests per-slice (from the QA test scenarios) — verify they exist and pass
+   - Run `qa-execute-use-cases.md` for cross-slice integration scenarios
+   - Use `qa-validate-fix.md` for scenarios that need live environment validation
+   - If any test is missing, add it now — do not proceed to commit without regression coverage for the root cause
 
-   Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap — writing the test is separate from running it. The test must exist in the commit; CI or a future local run validates it.
+   Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap.
 
-14. **Review Changed Files** (gate)
+15. **Review Changed Files** (gate)
 
-   Switch mental mode: review the changes as if someone else wrote them.
+   For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result.
 
    Run `/review-code` on changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   If step 13 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
+   If step 14 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
 
    The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
 
@@ -209,15 +223,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Do not skip this step when resuming from a pre-built plan.
 
-   After the review gate passes, continue to steps 15–17 — see Continuation Rule in `rules/review-gate.md`.
-
-15. **Validate the Fix With QA When Needed**
-
-   For UI, workflow, or live-behavior bugs:
-   - run `qa-validate-fix.md` when the app is runnable locally or in a suitable environment
-   - use Playwright MCP as the default UI repro and validation path when available
-
-   If the app cannot be run locally (missing Docker, env dependencies, or data requirements), note the blocker in PROJECT.md and skip QA validation. Check prerequisites before attempting — don't discover the failure experimentally.
+   After the review gate passes, continue to steps 16–17 — see Continuation Rule in `rules/review-gate.md`.
 
 16. **Commit New Bug Fixes**
 
@@ -228,7 +234,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - do not auto-commit beyond the cherry-pick result
    - leave any follow-up amend or extra-commit decision to the user
 
-17. **Summary**
+17. **Summary** (PM wrap-up)
 
    Lead with the answer to the user's original question — not the implementation details. If the user asked "did X break things?", answer that first. Technical details go in a collapsible section or are omitted unless the user asked for them.
 
