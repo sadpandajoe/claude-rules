@@ -181,9 +181,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    For non-trivial fixes:
    - use `plan-change.md` to produce structured slices with scope, entrance/exit criteria, and acceptance
    - then dispatch slices through `implement-change.md`:
-     - **Independent slices**: launch as parallel subagents, each verifying its own exit criteria
+     - **Independent slices**: launch as parallel subagents with `isolation: "worktree"`, each verifying its own exit criteria and committing on the worktree's temp branch
      - **Sequential slices**: implement in dependency order
-     - **Single slice**: implement as one unit
+     - **Single slice**: implement as one unit (no worktree needed)
+   - after all slices complete, merge worktree branches back one at a time in dependency order. If a merge conflict occurs, stop and surface it.
 
 13. **Expand Regression Coverage** (gate)
 

@@ -120,19 +120,49 @@ Update PROJECT.md with final review scores after this step.
 
 Read the plan's structured slices from PROJECT.md. For each slice, the plan defines scope, entrance/exit criteria, and acceptance — use these to drive implementation.
 
-**Dispatch strategy** — check the plan's Parallelism section:
-- **Independent slices** (no dependencies on each other): launch as parallel subagents, each running `implement-change.md` with its slice context. Each subagent verifies its own exit criteria and acceptance before returning.
-- **Sequential slices** (depends-on chain): implement in dependency order. After each slice completes and its exit criteria are met, start the next.
-- **Single slice or no structured slices**: implement as one unit through `implement-change.md`.
+**5a. Launch implementation + QA in parallel:**
 
-For each slice:
-- Subagent verifies **entrance criteria** before starting — stops if unmet
+The orchestrator dispatches two workstreams simultaneously:
+
+**Workstream 1 — Implementation subagents:**
+
+Check the plan's Parallelism section and dispatch:
+- **Independent slices**: launch as parallel subagents, each with `isolation: "worktree"` and `model: "opus"`. Each subagent gets its slice context (scope, entrance/exit criteria, acceptance) and runs `implement-change.md`. The worktree isolation ensures parallel subagents don't conflict on files.
+- **Sequential slices** (depends-on chain): implement in dependency order. After each slice completes and its exit criteria are met, start the next.
+- **Single slice or no structured slices**: implement as one unit through `implement-change.md` (no worktree needed).
+
+Each subagent:
+- Verifies **entrance criteria** before starting — stops if unmet
+- Installs dependencies in the worktree if needed (`node_modules/`, build outputs)
 - Writes the failing test before the code change when feasible
 - Stays within the slice's **scope** boundary
 - Stops when **exit criteria** are met and **acceptance** passes
-- If test-first is blocked by env, repro, or harness constraints, writes the test anyway and records the gap
+- Commits changes on the worktree's temp branch with a message referencing the slice name
+- Returns the Implementation Handoff block
 
-After all slices complete, run QA validation when the work is user-visible.
+**Workstream 2 — QA test planning** (parallel with implementation):
+
+Launch a QA subagent (`model: "opus"`) that runs while devs are coding:
+- Use `qa-analyze-use-cases.md` to derive test scenarios from the feature brief's acceptance criteria
+- Use `qa-expand-scenarios.md` to identify edge cases and adjacent flows
+- Produce a test plan ready for execution after implementation merges
+
+The QA agent doesn't need the code — it works from the feature brief and plan.
+
+**5b. Merge worktrees back:**
+
+After all implementation subagents complete:
+1. Collect results — check each subagent's Implementation Handoff for exit criteria status
+2. If any slice failed its exit criteria, stop and surface the failure before merging
+3. Merge each worktree's temp branch into the current branch, one at a time, in dependency order
+4. If a merge conflict occurs, stop and surface it — the plan's scope boundaries were wrong, don't auto-resolve
+5. Run a quick build/type-check after all merges to verify integration
+
+**5c. Execute QA test plan:**
+
+After merge, use the QA agent's test plan to validate the integrated result:
+- Run `qa-execute-use-cases.md` against the merged code
+- Use `qa-validate-fix.md` for any scenarios that need live environment validation
 
 **Trivial path** (from step 1):
 1. Implement the change
@@ -143,7 +173,9 @@ If a meaningful decision surfaces during implementation, stop and present it cle
 
 ### 6. Review Changed Files (gate)
 
-Run `/review-code` on changed repo-tracked files as an internal loop. Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+For multi-slice implementations: run `/review-code` on the full merged diff. The per-slice exit criteria already verified each slice individually — this review checks the integrated result and cross-slice interactions.
+
+Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
 

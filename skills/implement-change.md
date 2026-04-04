@@ -23,6 +23,15 @@ When the plan defines structured slices (with scope, entrance/exit criteria, acc
 
 When no structured slices exist (simple fix, trivial path), implement the full change as a single unit.
 
+## Worktree Mode
+
+When launched with `isolation: "worktree"`, this skill runs in a temporary git worktree — an isolated copy of the repository. Key differences:
+
+- **Dependencies may be missing**: check for `node_modules/` or equivalent before running tests. Install if needed.
+- **Build outputs may be absent**: rebuild if the slice's acceptance check requires it.
+- **Commit your changes**: worktree changes must be committed to be preserved. Create a commit with a clear message referencing the slice name.
+- **The orchestrator handles the merge**: do not merge back yourself. Commit on the worktree's temp branch and return the implementation handoff.
+
 ## Core Steps
 
 1. Check entrance criteria (if slice is defined). Stop if unmet.
