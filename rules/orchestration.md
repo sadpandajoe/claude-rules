@@ -28,6 +28,17 @@ Subagents load their own domain rules — commands should not `@import` rules th
 
 Never load the same rule in both contexts.
 
+## Skill Execution: In-Thread vs Subagent
+
+When a command says "use `skill-name.md`", it means the main thread reads the skill file and follows its instructions — same agent, same context. This is the default for sequential, single-track work.
+
+When a command says "launch as subagent" or "dispatch as parallel subagents", it means creating isolated agents via the Agent tool. Each subagent gets fresh context with only what it needs — the skill file, the relevant slice/diff, and any criteria. Subagents are used for:
+- **Parallel work**: independent slices in worktrees
+- **Isolation**: reviewers that should not see planning context (prevents confirmation bias)
+- **Domain focus**: each reviewer applies its own lens independently
+
+Pass the skill's `model` frontmatter value to the Agent tool. If the skill has no model field, default to opus.
+
 ## Command Composition
 
 Commands orchestrate skills as their primary workers. A small set of utility commands (`/review-code`, `/checkpoint`, `/verify`) may be invoked as internal phases by end-to-end commands. This is intentional — these commands contain adaptive logic (team selection, flag handling) that would be duplicated if extracted into skills.

@@ -140,6 +140,19 @@ Each subagent:
 - Commits changes on the worktree's temp branch with a message referencing the slice name
 - Returns the Implementation Handoff block
 
+**Slice status tracking**: As subagents complete, update a status table in PROJECT.md so progress is visible and re-planning decisions can be made if a slice fails:
+
+```markdown
+## Slice Status
+| Slice | Status | Exit Criteria | Notes |
+|-------|--------|---------------|-------|
+| Slice 1: [name] | complete | met | |
+| Slice 2: [name] | in-flight | — | |
+| Slice 3: [name] | blocked | unmet — depends on Slice 2 | |
+```
+
+Statuses: `queued` → `in-flight` → `complete` / `failed` / `blocked`. If a slice fails, assess whether other in-flight slices should continue or be aborted.
+
 **5b. Merge worktrees back:**
 
 After all implementation subagents complete:
@@ -166,7 +179,18 @@ If a meaningful decision surfaces during implementation, stop and present it cle
 
 ### 6. Review Changed Files (gate)
 
-For multi-slice implementations: run `/review-code` on the full merged diff. The per-slice exit criteria already verified each slice individually — this review checks the integrated result and cross-slice interactions.
+Launch `/review-code` as a **subagent** (`model: "opus"`) that receives only:
+- The merged diff (not the full conversation history)
+- The acceptance criteria from the PM brief
+- The QA test results from step 5c
+
+This isolation matters — a reviewer who watched the planning and implementation has confirmation bias. A fresh subagent that only sees the diff and criteria reviews like a real PR reviewer.
+
+For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result and cross-slice interactions.
+
+**Classify review findings before looping:**
+- **Code-level** (naming, logic, edge case, test gap): fix in the review loop as normal
+- **Plan-level** (slice boundary is wrong, acceptance criterion is ambiguous, architecture issue): route back to step 4 for re-planning rather than trying to fix it in the review loop. Re-planning may invalidate implementation work, but it's cheaper than shipping a flawed design.
 
 Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 

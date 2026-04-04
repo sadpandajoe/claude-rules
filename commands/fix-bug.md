@@ -210,18 +210,22 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
 15. **Review Changed Files** (gate)
 
+   Launch `/review-code` as a **subagent** (`model: "opus"`) that receives only:
+   - The merged diff (not the full conversation history)
+   - The validated RCA and acceptance criteria
+   - The QA test results from step 14
+
+   This isolation prevents confirmation bias — a reviewer who watched the investigation and planning will rationalize issues away. A fresh subagent reviews like a real PR reviewer.
+
    For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result.
 
-   Run `/review-code` on changed repo-tracked files as an internal loop.
-   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+   **Classify review findings before looping:**
+   - **Code-level** (logic, edge case, test gap): fix in the review loop as normal
+   - **Plan-level** (RCA was incomplete, slice boundary wrong, fix scope too narrow/wide): route back to step 11 for re-planning rather than looping review
 
    If step 14 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
 
-   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
-
-   For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
-
-   Do not skip this step when resuming from a pre-built plan.
+   Emit a Review Gate block per `rules/review-gate.md`. For truly minimal mechanical fixes, apply the skip rule.
 
    After the review gate passes, continue to steps 16–17 — see Continuation Rule in `rules/review-gate.md`.
 
