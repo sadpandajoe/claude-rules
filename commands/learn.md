@@ -2,8 +2,8 @@
 
 @{{TOOLKIT_DIR}}/rules/rule-maintenance.md
 
-> **When**: Capturing workflow patterns, reviewing accumulated memories, pruning stale entries, or extracting rules from experience.
-> **Produces**: Updated memory files, pruned index, or draft rules proposed for user confirmation.
+> **When**: Capturing workflow patterns, reviewing accumulated memories, pruning stale entries, extracting rules from experience, recording failures, or promoting learnings to global rules.
+> **Produces**: Updated memory files, pruned index, draft rules, structured postmortems, or promoted rules.
 
 ## Usage
 
@@ -14,6 +14,8 @@
 /learn review                   # Assess memories for accuracy and relevance
 /learn prune                    # Remove outdated or redundant memories
 /learn propose-rule             # Extract a recurring pattern into a draft rule
+/learn failure                  # Record a structured postmortem
+/learn promote <filename>       # Move a project memory to a global rule
 ```
 
 ## Steps
@@ -26,6 +28,8 @@ Route based on the first argument:
 - `review` → Review flow (step 4)
 - `prune` → Prune flow (step 5)
 - `propose-rule` → Rule proposal flow (step 6)
+- `failure` → Failure postmortem flow (step 7)
+- `promote` → Memory promotion flow (step 8)
 
 ### 2. Add Flow (`/learn` or `/learn add`)
 
@@ -157,6 +161,97 @@ Write this rule?
 2. Remind user to run `./install.sh` to rebuild path-resolved copies
 3. Suggest which commands might benefit from importing the new rule
 
+### 7. Failure Postmortem Flow (`/learn failure`)
+
+Record a structured postmortem after a workflow fails or produces a bad outcome. This creates a feedback memory with enough context to prevent recurrence.
+
+**a.** Ask the user (or accept inline) what happened. Gather:
+- Which command or workflow failed
+- What the expected outcome was
+- What actually happened
+- Whether it was a tooling issue, a process gap, or a knowledge gap
+
+**b.** Investigate the current state for evidence:
+- Check recent git log for what was committed or reverted
+- Check PROJECT.md for the last recorded status
+- Check conversation for gate decisions, review scores, or error messages
+
+**c.** Write the postmortem memory file:
+
+```markdown
+---
+name: {descriptive name}
+description: {one-line summary of what went wrong}
+type: feedback
+---
+
+## What happened
+{Factual description: command, inputs, expected vs actual outcome}
+
+## What the system decided
+{Which gate, skill, or step made the wrong call — with evidence}
+
+## What it should have decided
+{The correct action and why}
+
+## Prevention
+**Why:** {Root cause — process gap, missing signal, wrong threshold, etc.}
+**How to apply:** {Specific rule, gate, or skill to adjust — reference by file path}
+```
+
+Filename: `feedback_failure_{snake_case_topic}.md`
+
+**d.** Update `MEMORY.md` index.
+
+**e.** If the postmortem points to a clear rule or skill fix, suggest the specific change. Do not auto-apply — present it for user confirmation.
+
+### 8. Memory Promotion Flow (`/learn promote`)
+
+Move a project-level memory to a global rule when the same pattern has proven universal.
+
+**a.** Accept a memory filename argument (e.g., `feedback_no_cherry_pick_no_commit.md`). If no argument, display `/learn list` output and ask the user to select.
+
+**b.** Read the memory file. Assess universality:
+- Does this pattern apply across projects, or only to this one?
+- Is it structural (constrains behavior) or contextual (describes a situation)?
+- Has a similar pattern appeared in other projects or conversations?
+
+If the pattern is project-specific, explain why and suggest keeping it as a memory. Stop.
+
+**c.** Check `rules/` for existing coverage:
+- Does an existing rule already cover this? → suggest updating that rule instead
+- Is there partial coverage? → suggest extending the existing rule
+
+**d.** Draft the rule file following conventions from `rules/rule-maintenance.md`:
+- 20–40 lines, one concern per file
+- Kebab-case filename (e.g., `rules/no-commit-flag-safety.md`)
+- Same heading style as other rules
+
+**e.** Present the draft:
+
+```markdown
+## Proposed Rule Promotion
+
+**Source memory:** `{memory-filename}`
+**Target rule:** `rules/{proposed-name}.md`
+
+\```markdown
+{draft rule content}
+\```
+
+Promote this memory to a rule? This will:
+1. Write the rule file
+2. Delete the source memory file
+3. Update MEMORY.md index
+```
+
+**f.** On user confirmation:
+1. Write the rule file
+2. Delete the source memory file
+3. Remove the entry from `MEMORY.md`
+4. Remind user to run `./install.sh` to rebuild path-resolved copies
+5. Suggest which commands might benefit from importing the new rule
+
 ## Notes
 
 - `/learn` works with the existing auto-memory system at `~/.claude/projects/<path>/memory/`. It does not create a parallel storage mechanism.
@@ -164,3 +259,5 @@ Write this rule?
 - The `MEMORY.md` index file is always kept in sync with the actual memory files.
 - `/learn` is read-only for the codebase — it only writes to the memory directory and optionally to `rules/` (with confirmation).
 - When called from `/start`, suggest `/learn review` if memories haven't been reviewed in > 30 days.
+- `/learn failure` is best used immediately after a failure while context is fresh.
+- `/learn promote` requires cross-project evidence — a pattern seen once is a memory, a pattern seen across projects is a rule candidate.

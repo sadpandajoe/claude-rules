@@ -62,6 +62,8 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
+   Record lifecycle: `gate` { command: "fix-bug", complexity: `<tier>`, confidence: `<N>` }
+
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
    2. Implement the fix — do not enter plan mode for trivial fixes; go straight to the edit
@@ -164,6 +166,8 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    QA doesn't need the slices to plan — it needs the RCA. The Architect doesn't need the test plan to slice — it needs the RCA. Both consume the RCA, both produce criteria. Running them in parallel means devs get both the slice definitions AND the test plan before writing code.
 
+   Record lifecycle: `plan-complete` { command: "fix-bug", reviewer_scores: `{<reviewer: score>}`, round_count: `<N>` }
+
 12. **Exit Plan Mode → PROJECT.md**
 
    Read the plan file produced by plan mode. Write its content into PROJECT.md:
@@ -200,7 +204,9 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
      - **Independent slices**: launch as parallel subagents with `isolation: "worktree"`, each verifying its own exit criteria and committing on the worktree's temp branch
      - **Sequential slices**: implement in dependency order
      - **Single slice**: implement as one unit (no worktree needed)
-   - after all slices complete, merge worktree branches back one at a time in dependency order. If a merge conflict occurs, stop and surface it.
+   - after all subagents complete, use `sync-workstreams.md` to collect results, update the slice status table in PROJECT.md, and merge worktree branches. Branch on its recommendation (`proceed-to-review` / `stop-for-failure` / `stop-for-conflict`).
+
+   Record lifecycle: `impl-complete` { command: "fix-bug", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
 
 14. **QA Validates the Fix**
 
@@ -223,13 +229,15 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result.
 
-   **Classify review findings before looping:**
+   **Classify review findings before looping:** Use `feedback-classify.md` to classify each finding as code-level or plan-level.
    - **Code-level** (logic, edge case, test gap): fix in the review loop as normal
    - **Plan-level** (RCA was incomplete, slice boundary wrong, fix scope too narrow/wide): route back to step 11 for re-planning rather than looping review
 
    If step 14 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
 
    Emit a Review Gate block per `rules/review-gate.md`. For truly minimal mechanical fixes, apply the skip rule.
+
+   Record lifecycle: `review-gate` { command: "fix-bug", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
 
    After the review gate passes, continue to steps 16–17 — see Continuation Rule in `rules/review-gate.md`.
 
@@ -276,6 +284,8 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    </details>
    ```
+
+   Record lifecycle: `command-complete` { command: "fix-bug", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
 
 ## PROJECT.md Update Discipline
 

@@ -43,35 +43,40 @@ Examples — TRIVIAL: renamed a variable in one file (10 lines, no logic). STAND
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
+Record lifecycle: `gate` { command: "review-code", complexity: `<tier>`, confidence: `<N>` } — skip when invoked as an internal phase.
+
 - **Trivial**: Code quality reviewer only.
 - **Standard**: Full review team.
 
 Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the review loop entirely.
 
-### 3. Launch Review Team
+### 3. Classify and Assess Impact
 
-Dispatch all reviewers as **parallel subagents** (`model: "opus"`). Each reviewer subagent receives **only**: (1) the diff, (2) full content of changed files, (3) acceptance criteria from PROJECT.md if available, (4) its skill file. Do **not** pass conversation history, planning rationale, or investigation context — reviewers who know *why* a change was made rationalize problems away instead of catching them. Each applies its lens independently and returns severity-tagged findings.
+Run these two skills in parallel on the changeset:
+- **`classify-diff.md`** — determines which review domains apply (structure: which reviewers)
+- **`qa-assess-impact.md`** — determines functional impact: CORE, STANDARD, or PERIPHERAL (function: how critical)
 
-| Reviewer | Trigger | Focus |
-|----------|---------|-------|
-| Code quality (`review-code-quality.md`) | Always | Code review against `rules/code-review.md`, finding normalization, fix suggestions |
-| Architecture (`review-architecture.md`) | Standard + logic changes | Right file? Right layer? Duplicate function? |
-| Tests (`review-tests.md`) | Standard + tests exist | Behavioral coverage, weak tests, production failure scenarios, blind spots |
-| Test Plan (`review-testplan.md`) | Standard + no tests exist | Coverage approach, test layers, edge cases, what tests to write |
+**Impact escalation**: If the impact is CORE, escalate regardless of complexity tier:
+- TRIVIAL + CORE → run full review team (not just code quality)
+- STANDARD + CORE → full team + suggest `--adversarial` for security-sensitive areas
+- Test coverage findings for CORE workflows use stricter severity per `rules/code-review.md` calibration
 
-**Trivial**: Code quality subagent only.
-**Standard**: Code quality + all triggered reviewers in parallel.
+Pass the impact assessment to all reviewer subagents so they can calibrate severity accordingly.
+
+### 4. Launch Review Team
+
+Dispatch all triggered reviewers as **parallel subagents** (`model: "opus"`). Each reviewer subagent receives **only**: (1) the diff, (2) full content of changed files, (3) acceptance criteria from PROJECT.md if available, (4) the impact assessment from step 3, (5) its skill file. Do **not** pass conversation history, planning rationale, or investigation context — reviewers who know *why* a change was made rationalize problems away instead of catching them. Each applies its lens independently and returns severity-tagged findings.
 
 Collect all findings. Deduplicate. Apply fix + verify loop for any `[major]` or `[minor]` issues.
 
-### 4. Run Pre-flight Checks
+### 5. Run Pre-flight Checks
 
 Before declaring complete, run the repo's standard checks:
 - Build, type check, lint, tests covering changed files
 - If checks fail, fix and return to step 3
 - If environment can't run checks: `Pre-flight: skipped` with reason
 
-### 5. Codex Second Opinion (Standard only, if available)
+### 6. Codex Second Opinion (Standard only, if available)
 
 Skip this step for Trivial complexity.
 
@@ -90,7 +95,7 @@ If available:
 6. If Codex surfaces new `[major]` issues not caught by Claude, fix and re-run pre-flight (step 4)
 7. Include Codex scores in summary (Implementation Quality, Test Signal, Regression Protection)
 
-### 6. Emit Review Gate
+### 7. Emit Review Gate
 
 Emit the gate **after all review lanes have finished** (including Codex). Internal callers branch on this status.
 
@@ -101,12 +106,14 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-### 7. Adversarial Suggestion
+Record lifecycle: `review-gate` { command: "review-code", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` } — skip when invoked as an internal phase.
+
+### 8. Adversarial Suggestion
 
 If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
 > Consider running `/review-code-adversarial` for security-focused review.
 
-### 8. Summary
+### 9. Summary
 
 ```markdown
 ## Review-Code Complete
@@ -155,6 +162,8 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 - **Security-sensitive areas detected**: `/review-code-adversarial` for red-team review
 - **Test gaps identified**: `/create-tests` or `/update-tests` to fill coverage
 ```
+
+Record lifecycle: `command-complete` { command: "review-code", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` } — skip when invoked as an internal phase (the calling command records its own lifecycle events).
 
 ## Notes
 - This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`

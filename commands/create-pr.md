@@ -90,6 +90,8 @@ Base: [base branch] ← [head branch]
 Commits: [N]
 ```
 
+Record lifecycle: `command-complete` { command: "create-pr", status: "clean", complexity: "trivial", rounds: 0 }
+
 ## Notes
 - This command generates and creates the PR — it does not review the code
 - For code review before PR, use `/review-code` first

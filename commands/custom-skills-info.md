@@ -42,11 +42,13 @@ Print the reference card below and stop. No investigation, no file reading — j
 | `/checkpoint` | Save state to PROJECT.md (add `--commit --clear` for full protocol) | Context getting deep | — |
 | `/update-project-file` | Manual PROJECT.md refresh | Need to update status | — |
 | `/archive-project-file` | Move completed work to archive | PROJECT.md is cluttered | — |
+| `/complete-project` | Capstone: summarize, promote learnings, archive, hand off | Project or major work is done | — |
 
 ### Learning & Memory
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/learn` | Add/list/review/prune memories, propose rules | Capture patterns, review knowledge | — |
+| `/learn` | Add/list/review/prune/failure/promote memories and rules | Capture patterns, postmortems, promote to rules | — |
+| `/metrics` | Summarize workflow pass rates, rounds, model usage | Understand workflow performance | — |
 
 ### Maintenance
 | Command | What it does | When to call | Gates |

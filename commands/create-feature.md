@@ -56,6 +56,8 @@ Examples — TRIVIAL: add a tooltip to an existing button (1 component, no state
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
+Record lifecycle: `gate` { command: "create-feature", complexity: `<tier>`, confidence: `<N>` }
+
 **Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
 
 **Standard**: Continue to step 2. Make this decision yourself and continue automatically — do not ask the user whether to run review iterations, which reviewers to use, or whether the plan is "good enough." End-to-end commands own their internal loops.
@@ -106,7 +108,7 @@ Add when the plan needs them:
 - `review-frontend`
 - `review-backend`
 
-Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input.
+Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input. After each round, record lifecycle: `review-round` { command: "create-feature", round: `<N>`, status: `<iterating/converged>`, finding_counts: `{major: N, minor: N}` }
 
 **Convergence criteria**: Maximum 3 rounds per reviewer. If a reviewer has not reached 8/10 after 3 rounds, stop and surface the persistent issues to the user. If any reviewer is stuck below 6/10 after 2 rounds, stop immediately — further iteration is unlikely to help without user input on scope or approach.
 
@@ -115,6 +117,8 @@ Revise the plan until all applicable reviewers are at 8/10 or better. Run iterat
 **d. Action gate**: Run `action-gate.md`. Auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
 
 Update PROJECT.md with final review scores after this step.
+
+Record lifecycle: `plan-complete` { command: "create-feature", reviewer_scores: `{<reviewer: score>}`, round_count: `<N>` }
 
 ### 4½. Checkpoint Before Implementation
 
@@ -144,27 +148,19 @@ Each subagent:
 - Commits changes on the worktree's temp branch with a message referencing the slice name
 - Returns the Implementation Handoff block
 
-**Slice status tracking**: As subagents complete, update a status table in PROJECT.md so progress is visible and re-planning decisions can be made if a slice fails:
+**5b. Sync and merge worktrees:**
 
-```markdown
-## Slice Status
-| Slice | Status | Exit Criteria | Notes |
-|-------|--------|---------------|-------|
-| Slice 1: [name] | complete | met | |
-| Slice 2: [name] | in-flight | — | |
-| Slice 3: [name] | blocked | unmet — depends on Slice 2 | |
-```
+Use `sync-workstreams.md` to collect subagent results, update the slice status table in PROJECT.md, and merge worktree branches. Pass the list of subagent results (Implementation Handoff blocks) and the dependency graph from the plan.
 
-Statuses: `queued` → `in-flight` → `complete` / `failed` / `blocked`. If a slice fails, assess whether other in-flight slices should continue or be aborted.
+The skill handles: result collection, status table updates (`queued` → `in-flight` → `complete` / `failed` / `blocked`), failure gating, dependency-ordered merges, conflict detection, and integration checks.
 
-**5b. Merge worktrees back:**
+Branch on the skill's recommendation:
+- `proceed-to-review` → continue to step 5c
+- `stop-for-failure` → surface the failure to the user before proceeding
+- `stop-for-conflict` → the plan's scope boundaries were wrong; surface for user decision
+- `stop-for-integration-failure` → merged code doesn't build; investigate before continuing
 
-After all implementation subagents complete:
-1. Collect results — check each subagent's Implementation Handoff for exit criteria status
-2. If any slice failed its exit criteria, stop and surface the failure before merging
-3. Merge each worktree's temp branch into the current branch, one at a time, in dependency order
-4. If a merge conflict occurs, stop and surface it — the plan's scope boundaries were wrong, don't auto-resolve
-5. Run a quick build/type-check after all merges to verify integration
+Record lifecycle: `impl-complete` { command: "create-feature", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
 
 **5c. QA validates the integrated result:**
 
@@ -192,13 +188,15 @@ This isolation matters — a reviewer who watched the planning and implementatio
 
 For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result and cross-slice interactions.
 
-**Classify review findings before looping:**
-- **Code-level** (naming, logic, edge case, test gap): fix in the review loop as normal
-- **Plan-level** (slice boundary is wrong, acceptance criterion is ambiguous, architecture issue): route back to step 4 for re-planning rather than trying to fix it in the review loop. Re-planning may invalidate implementation work, but it's cheaper than shipping a flawed design.
+**Classify review findings before looping:** Use `feedback-classify.md` to classify each finding as code-level or plan-level.
+- **Code-level**: fix in the review loop as normal
+- **Plan-level**: route back to step 4 for re-planning rather than trying to fix it in the review loop. Re-planning may invalidate implementation work, but it's cheaper than shipping a flawed design.
 
 Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
+
+Record lifecycle: `review-gate` { command: "create-feature", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
 
 For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
@@ -236,6 +234,8 @@ Lead with the outcome, not the process. If the user gave you a ticket, answer wh
 </details>
 ```
 
+Record lifecycle: `command-complete` { command: "create-feature", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+
 ## Non-Negotiable Gates
 
 Use this checklist to verify you haven't skipped a gate:
@@ -247,6 +247,7 @@ Use this checklist to verify you haven't skipped a gate:
 - [ ] `/review-code` Review Gate block emitted (step 6)
 - [ ] PROJECT.md updated with final status
 - [ ] Summary emitted (step 7)
+- [ ] Lifecycle events recorded at phase boundaries
 
 ## PROJECT.md Update Discipline
 

@@ -86,6 +86,10 @@
    ```
    If SOME failures are ours and some are pre-existing, note the pre-existing ones and continue the workflow for the remaining failures.
 
+   Evaluate each classified failure against the complexity signals, then emit the Complexity Gate block per `rules/complexity-gate.md`.
+
+   Record lifecycle: `gate` { command: "fix-ci", complexity: `<tier>`, confidence: `<N>` }
+
    Evaluate each classified failure against:
 
    | Signal | Trivial | Standard |
@@ -140,14 +144,9 @@
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
-   ```bash
-   git commit --fixup=<originating-sha>
-   # repeat for each originating commit
-   git rebase --autosquash <base>
-   ```
+   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, follow the fixup+autosquash pattern in `rules/implementation.md` (Commit Strategy section).
 
-   Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
+   Record lifecycle: `impl-complete` { command: "fix-ci", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
 
 9. **Verify Locally**
 
@@ -160,6 +159,8 @@
 
    For zero-logic diffs (formatting-only, lint-disable, import reorder), apply the skip rule from `rules/review-gate.md`.
    If the diff touches any logic, invoke `/review-code` — do not skip.
+
+   Record lifecycle: `review-gate` { command: "fix-ci", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
 
 11. **Summary**
    **Full template** (standard path or trivial path with PARTIAL verification):
@@ -183,6 +184,8 @@
    [1 line: what failed → what was fixed] | Verification: STRONG | Review: skipped — [reason]
    Next: [specific next action]
    ```
+
+   Record lifecycle: `command-complete` { command: "fix-ci", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
 
 ## PROJECT.md Update Discipline
 

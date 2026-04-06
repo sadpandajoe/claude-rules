@@ -31,6 +31,20 @@
 | `fixup` + `rebase` for old commits | Amend non-HEAD commits |
 | Factual PR descriptions | Hyperbolic language |
 
+## Commit Strategy: Fixup + Autosquash
+
+When fixes need to be folded back into their originating commits (e.g., CI fix belongs in the commit that introduced the issue), use the fixup+autosquash pattern:
+
+```bash
+git commit --fixup=<originating-sha>
+# repeat for each originating commit
+git rebase --autosquash <base>
+```
+
+**Dependency ordering**: When staging files for commit A's fixup, pre-commit hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
+
+**Default behavior**: Stop before commit and let the user decide the commit strategy. Only use fixup+autosquash when the user explicitly requests fixes folded into originating commits.
+
 ## Pre-Flight Checks
 
 **Before every commit**, verify:

@@ -89,6 +89,8 @@
    - [Manual next steps only]
    ```
 
+   Record lifecycle: `command-complete` { command: "run-test-plan", status: `<outcome>`, complexity: "standard", rounds: 0, models_used: `{opus: N, sonnet: N, haiku: N}` }
+
 ## PROJECT.md Update Discipline
 
 Update `PROJECT.md` at these points:

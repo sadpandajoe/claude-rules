@@ -154,6 +154,8 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - **All resolved, PR approved**: Merge the PR
 ```
 
+Record lifecycle: `command-complete` { command: "address-feedback", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+
 ## Non-Negotiable Gates
 
 - [ ] Complexity Gate block emitted

@@ -64,10 +64,29 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target). **Exception**: skip the check for dependency upgrades, version bumps, or mixed PRs where the primary change is not an isolated defect — see `check-existing-fix.md` skip rules. When skipping, still emit the output block with `Status: SKIPPED`.
 
    This phase produces the risk assessment for each change.
+
+   **Per-change complexity classification**: After investigation, classify each change:
+
+   | Signal | Mechanical | Non-Mechanical |
+   |--------|-----------|----------------|
+   | Files touched | 1–2 | 3+ |
+   | Change type | Version bump, config, import fix, one-liner | Logic change, behavioral, multi-component |
+   | Conflicts | Clean apply (no conflicts) | Conflicts expected or detected |
+   | Dependency | No new dependencies | Adds/changes dependencies |
+
+   Emit a classification block per change:
+   ```markdown
+   ### Change Classification: <sha>
+   Classification: MECHANICAL / NON-MECHANICAL
+   Confidence: X/10
+   Reason: [one line]
+   ```
+
+   - **Mechanical + confidence 8/10+**: fast path — apply directly, validate with targeted checks, skip full adapt cycle. If a single change and `Risk: LOW`, combine investigate and apply into one phase.
+   - **Non-mechanical**: full path — investigate, adapt if needed, validate, and stop for user decisions when required.
+
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
    Otherwise record the status in the execution table and stop for user input only where required.
-
-   **Fast path for single LOW-risk changes**: When there is only one change and investigation rates it `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, combine investigate and apply into a single phase — emit the action gate block and proceed directly to apply without a separate presentation step.
 
 3. **Apply Each Auto-Approved Cherry-Pick Sequentially**
 
@@ -130,6 +149,8 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    Keep the dependency graph from the planning phase if inter-change dependencies were detected.
    The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
    Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
+
+   Record lifecycle: `command-complete` { command: "cherry-pick", status: `<applied/partial/blocked/rejected>`, complexity: "standard", rounds: 0, models_used: `{}` }
 
    ```markdown
    ## Continuation Checkpoint — [timestamp]

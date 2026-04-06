@@ -63,6 +63,8 @@
    - [Ready for manual commit / needs more work]
    ```
 
+   Record lifecycle: `command-complete` { command: "create-tests", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+
 ## PROJECT.md Update Discipline
 
 Update `PROJECT.md` at these points:
