@@ -116,6 +116,10 @@ Revise the plan until all applicable reviewers are at 8/10 or better. Run iterat
 
 Update PROJECT.md with final review scores after this step.
 
+### 4½. Checkpoint Before Implementation
+
+The plan→implement transition is the deepest context point in this workflow — planning rationale, review scores, and QA test plans are all in memory. Check context depth per `rules/context-management.md`. If at or above ~70%, run `/checkpoint --commit --clear` before proceeding. After `/clear`, `/start` reloads PROJECT.md (which has the full plan from step 3) and resumes at step 5.
+
 ### 5. Implementation
 
 **Standard path** (from step 4):
@@ -257,7 +261,7 @@ Use this checklist to verify you haven't skipped a gate:
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /create-feature <arguments>
-- Phase: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / implement / review-code / summarize
+- Phase: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / checkpoint / implement / review-code / summarize
 - Resume target: <story, issue, milestone, PR slice, file set, or current blocker>
 - Completed items: <finished phases or accepted decisions>
 ### State

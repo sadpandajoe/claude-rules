@@ -176,6 +176,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    This is the first PROJECT.md write for the standard path. All findings collected during plan mode are flushed here.
 
+12½. **Checkpoint Before Implementation**
+
+   The plan→implement transition is the deepest context point — investigation findings, RCA, QA plans, and structured slices are all in memory. Check context depth per `rules/context-management.md`. If at or above ~70%, run `/checkpoint --commit --clear` before proceeding. After `/clear`, `/start` reloads PROJECT.md (which has the full plan from step 12) and resumes at step 13.
+
 13. **Implement**
 
    Dev subagents get both the slice context AND the QA test scenarios — they know exactly what tests to write (TDD from the QA plan).
@@ -290,7 +294,7 @@ Record the smallest useful status refresh each time. Do not wait until the end i
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /fix-bug <arguments>
-- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / implement / review / qa-validate / commit / summarize
+- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / checkpoint / implement / review / qa-validate / commit / summarize
 - Resume target: <issue, PR, repro path, file set, or current validation target>
 - Completed items: <finished phases or decisions already locked in>
 ### State

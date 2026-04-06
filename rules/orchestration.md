@@ -17,6 +17,8 @@ Each skill specifies its recommended model in its frontmatter (`model: opus`, `m
 
 The default is **opus** — quality matters most. Only skills doing mechanical work (pattern matching, environment checks, API wrappers) use sonnet or haiku. When unsure, use opus.
 
+**Dynamic override for trivial work**: When the Complexity Gate classifies work as TRIVIAL, pass `model: "sonnet"` to subagents regardless of the skill's frontmatter. Trivial changes (cosmetic fixes, renames, config swaps) don't need opus-level reasoning — sonnet handles them well at lower cost and latency. This override does not apply to the `/review-code` subagent itself (review quality should stay high even for trivial changes), only to implementation and investigation subagents.
+
 ## Subagent Context Loading
 
 Subagents load their own domain rules — commands should not `@import` rules that only subagents use.

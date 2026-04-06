@@ -50,7 +50,7 @@ Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the
 
 ### 3. Launch Review Team
 
-Dispatch all reviewers as **parallel subagents** (`model: "opus"`). Each gets the diff + full file context, applies its lens independently, and returns severity-tagged findings.
+Dispatch all reviewers as **parallel subagents** (`model: "opus"`). Each reviewer subagent receives **only**: (1) the diff, (2) full content of changed files, (3) acceptance criteria from PROJECT.md if available, (4) its skill file. Do **not** pass conversation history, planning rationale, or investigation context — reviewers who know *why* a change was made rationalize problems away instead of catching them. Each applies its lens independently and returns severity-tagged findings.
 
 | Reviewer | Trigger | Focus |
 |----------|---------|-------|
