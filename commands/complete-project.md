@@ -84,7 +84,33 @@ Run `/archive-project-file` as an internal phase. This moves completed developme
 
 Pass the hint that this is a full-project archive: all completed phases should be archived, not just the most recent one.
 
-### 5. Write Final PROJECT.md Status
+### 5. Tear Down Branch-Local Services
+
+Identify and stop any local services that were started for this branch:
+
+1. **Docker containers** — run `docker ps --format '{{.Names}}\t{{.Status}}\t{{.Image}}'`. Stop containers whose names or labels match the current branch, project name, or working directory. Common patterns:
+   - Containers named with the branch slug (e.g., `feat-auth-db-1`)
+   - Containers started by docker-compose files in this project directory
+   - Dev databases, Redis instances, or app servers tied to this work
+
+2. **Docker Compose stacks** — if a `docker-compose.yml` (or `compose.yml`) exists in the project root, run `docker compose ps` to check for running services. If any are up, run `docker compose down` to tear them down.
+
+3. **Dev servers / background processes** — check for processes started from this working directory:
+   - `lsof -ti :<common-ports>` (3000, 3001, 5173, 8080, 8088, etc.)
+   - If any match processes rooted in this project directory, report them and ask before killing
+
+4. **Worktrees** — check `git worktree list`. If any worktrees were created for this branch/project and have no uncommitted changes, offer to remove them.
+
+Report what was found and stopped:
+```markdown
+### Services Torn Down
+- [service]: [action taken]
+- {Or "No branch-local services found"}
+```
+
+If nothing is running, skip silently — no output needed.
+
+### 6. Write Final PROJECT.md Status
 
 After archiving, write the final project state:
 
@@ -105,7 +131,7 @@ After archiving, write the final project state:
 See PROJECT_ARCHIVE.md for full history.
 ```
 
-### 6. Suggest Final Action
+### 7. Suggest Final Action
 
 Based on the current project and branch state, recommend the concrete next step:
 
@@ -120,7 +146,7 @@ Pick one:
 - **Everything merged**: Deploy to staging/production
 - **No code changes (process/learning project)**: Archive complete. No further action needed.
 
-### 7. Summary
+### 8. Summary
 
 ```markdown
 ## Complete-Project Done
@@ -150,7 +176,7 @@ Record lifecycle: `command-complete` { command: "complete-project", status: "cle
 ## Continuation Checkpoint — [timestamp]
 ### Workflow
 - Top-level command: /complete-project
-- Phase: read-project / metrics-summary / promote-memories / archive / write-final / suggest-action / summarize
+- Phase: read-project / metrics-summary / promote-memories / archive / teardown-services / write-final / suggest-action / summarize
 - Resume target: [current phase]
 - Completed items: [finished phases]
 ### State
@@ -158,6 +184,7 @@ Record lifecycle: `command-complete` { command: "complete-project", status: "cle
 - Memories reviewed: [N of N]
 - Promoted: [N] | Pruned: [N] | Kept: [N]
 - Archived: yes/no
+- Services torn down: yes/no/skipped
 - Final status written: yes/no
 ```
 
@@ -166,4 +193,5 @@ Record lifecycle: `command-complete` { command: "complete-project", status: "cle
 - `/archive-project-file` is called as an internal phase, following the composition pattern from `rules/orchestration.md`
 - Memory promotion uses the same flow as `/learn promote` — draft rule, confirm, write, delete source
 - Auto-postmortems created by `workflow-lifecycle.md` during the project appear as promotion candidates here
+- Service teardown follows `rules/resource-management.md` — prevents abandoned containers and dev servers from accumulating across branches
 - The final PROJECT.md status is intentionally brief — full history lives in PROJECT_ARCHIVE.md
