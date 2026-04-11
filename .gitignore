@@ -1,2 +1,5 @@
 .claude/
 PROJECT.md
+build/
+config/CLAUDE.md
+.DS_Store

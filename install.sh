@@ -100,38 +100,38 @@ echo "  Claude Code Configuration Installer"
 echo "========================================"
 echo ""
 
-# Step 1: Generate CLAUDE.md with correct paths
-step "Generating CLAUDE.md with correct paths..."
+# Step 1: Build resolved files from templates
+# Source files use {{TOOLKIT_DIR}} as a portable placeholder.
+# This step replaces it with the actual repo path for the local install.
+step "Building resolved config and commands..."
 
-# Keep CLAUDE.md intentionally thin. Workflow-specific rules load on demand
-# from commands and skills.
-{
-    if [[ -f "$REPO_DIR/rules/universal.md" ]]; then
-        echo "@$REPO_DIR/rules/universal.md"
-    fi
-    if [[ -f "$REPO_DIR/rules/resource-management.md" ]]; then
-        echo "@$REPO_DIR/rules/resource-management.md"
-    fi
-} > "$REPO_DIR/config/CLAUDE.md"
+BUILD_DIR="$REPO_DIR/build"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR/config" "$BUILD_DIR/commands"
 
-info "Generated lightweight CLAUDE.md from:"
-for rule in "$REPO_DIR/rules/universal.md" "$REPO_DIR/rules/resource-management.md"; do
-    if [[ -f "$rule" ]]; then
-        echo "  $rule"
+# Resolve config/CLAUDE.md
+sed "s|{{TOOLKIT_DIR}}|$REPO_DIR|g" "$REPO_DIR/config/CLAUDE.md" > "$BUILD_DIR/config/CLAUDE.md"
+info "Resolved config/CLAUDE.md"
+
+# Resolve all command files
+for cmd in "$REPO_DIR/commands"/*.md; do
+    if [[ -f "$cmd" ]]; then
+        sed "s|{{TOOLKIT_DIR}}|$REPO_DIR|g" "$cmd" > "$BUILD_DIR/commands/$(basename "$cmd")"
     fi
 done
+info "Resolved $(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ') command files"
 
 # Step 2: Symlink universal configuration files
 step "Symlinking configuration files..."
 
 # Only symlink universal configs (CLAUDE.md)
 # settings.json and mcp-global.json are personal - users manage their own
-create_symlink "$REPO_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+create_symlink "$BUILD_DIR/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 
-# Step 3: Symlink commands directory
+# Step 3: Symlink commands directory (from build output)
 step "Symlinking commands directory..."
 
-create_symlink "$REPO_DIR/commands" "$CLAUDE_DIR/commands"
+create_symlink "$BUILD_DIR/commands" "$CLAUDE_DIR/commands"
 
 # Step 3b: Symlink skills directory
 step "Symlinking skills directory..."
@@ -166,16 +166,32 @@ verify_link() {
 verify_link "$CLAUDE_DIR/CLAUDE.md"
 verify_link "$CLAUDE_DIR/commands"
 verify_link "$CLAUDE_DIR/skills"
-verify_link "$CODEX_DIR/skills/build-engineer"
-verify_link "$CODEX_DIR/skills/core"
-verify_link "$CODEX_DIR/skills/developer"
-verify_link "$CODEX_DIR/skills/pm"
-verify_link "$CODEX_DIR/skills/pgm"
-verify_link "$CODEX_DIR/skills/qa"
-verify_link "$CODEX_DIR/skills/release-engineer"
-verify_link "$CODEX_DIR/skills/shared"
+# Verify a sample of Codex skill links (flat .md files)
+CODEX_LINK_COUNT=0
+for link in "$CODEX_DIR/skills"/*.md; do
+    if [[ -L "$link" ]]; then
+        CODEX_LINK_COUNT=$((CODEX_LINK_COUNT + 1))
+    fi
+done
+echo -e "  ${GREEN}✓${NC} Codex skills: $CODEX_LINK_COUNT linked"
 
 echo ""
+
+# Step 5: Install PGM extension (optional)
+if [[ -d "$REPO_DIR/extensions/pgm" ]]; then
+    if [[ "${1:-}" == "--with-pgm" ]]; then
+        step "Installing PGM extension..."
+        "$REPO_DIR/extensions/pgm/install.sh" "$REPO_DIR"
+    else
+        info "PGM extension available. Run with --with-pgm to install."
+    fi
+fi
+
+# Step 6: Hooks advisory
+if [[ -d "$REPO_DIR/hooks" ]]; then
+    info "Hooks available (PROJECT.md protection, resource checks)."
+    info "Install with: ./install-hooks.sh"
+fi
 
 # Show backup info if backups were created
 if [[ -d "$BACKUP_DIR" ]]; then
@@ -191,17 +207,17 @@ echo "========================================"
 echo "  Installation Complete!"
 echo "========================================"
 echo ""
-COMMAND_COUNT=$(ls "$REPO_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
-SKILL_COUNT=$(find "$REPO_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+COMMAND_COUNT=$(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
-ls "$REPO_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
+ls "$BUILD_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
     echo "  /$cmd"
 done
 echo ""
 info "Available skills ($SKILL_COUNT):"
-find "$REPO_DIR/skills" -name "SKILL.md" -exec dirname {} \; 2>/dev/null | while read dir; do
-    echo "  ${dir#$REPO_DIR/skills/}"
-done | sort
+find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" -exec basename {} .md \; 2>/dev/null | sort | while read skill; do
+    echo "  $skill"
+done
 echo ""
 info "Codex skill links:"
 find "$CODEX_DIR/skills" -maxdepth 1 -mindepth 1 -type l 2>/dev/null | xargs -I {} basename {} | sort | while read skill; do

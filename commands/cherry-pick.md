@@ -46,7 +46,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
 ## Steps
 
-1. **Plan Order if Needed** (`release-engineer`)
+1. **Plan Order if Needed**
 
    If multiple PRs or SHAs are provided, or if `--plan-only` is set:
 
@@ -54,7 +54,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    If `--plan-only` is set, stop after producing the plan report.
 
-2. **Investigate Each Change in Order** (`release-engineer`)
+2. **Investigate Each Change in Order**
 
    For a single input, investigate that change directly.
    For multiple inputs, process the planned sequence one change at a time.
@@ -64,12 +64,31 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target). **Exception**: skip the check for dependency upgrades, version bumps, or mixed PRs where the primary change is not an isolated defect — see `check-existing-fix.md` skip rules. When skipping, still emit the output block with `Status: SKIPPED`.
 
    This phase produces the risk assessment for each change.
+
+   **Per-change complexity classification**: After investigation, classify each change:
+
+   | Signal | Mechanical | Non-Mechanical |
+   |--------|-----------|----------------|
+   | Files touched | 1–2 | 3+ |
+   | Change type | Version bump, config, import fix, one-liner | Logic change, behavioral, multi-component |
+   | Conflicts | Clean apply (no conflicts) | Conflicts expected or detected |
+   | Dependency | No new dependencies | Adds/changes dependencies |
+
+   Emit a classification block per change:
+   ```markdown
+   ### Change Classification: <sha>
+   Classification: MECHANICAL / NON-MECHANICAL
+   Confidence: X/10
+   Reason: [one line]
+   ```
+
+   - **Mechanical + confidence 8/10+**: fast path — apply directly, validate with targeted checks, skip full adapt cycle. If a single change and `Risk: LOW`, combine investigate and apply into one phase.
+   - **Non-mechanical**: full path — investigate, adapt if needed, validate, and stop for user decisions when required.
+
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
    Otherwise record the status in the execution table and stop for user input only where required.
 
-   **Fast path for single LOW-risk changes**: When there is only one change and investigation rates it `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, combine investigate and apply into a single phase — emit the action gate block and proceed directly to apply without a separate presentation step.
-
-3. **Apply Each Auto-Approved Cherry-Pick Sequentially** (`release-engineer`)
+3. **Apply Each Auto-Approved Cherry-Pick Sequentially**
 
    ```bash
    git checkout <target-branch>
@@ -78,13 +97,13 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
    Always apply on the target branch sequentially, never in parallel.
 
-4. **Adapt Conflicts if Needed** (`developer`)
+4. **Adapt Conflicts if Needed**
 
    This phase owns conflict classification and code-level adaptation.
    If the cherry-pick state is lost, do not continue blindly; return to the apply phase.
    If a prerequisite or behavior decision is required, stop and ask the user.
 
-5. **Validate Each Applied Change** (`developer`)
+5. **Validate Each Applied Change**
 
    This phase owns validation depth, including stronger checks for dependency-manifest changes.
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
@@ -131,18 +150,16 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
    Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
 
-   ```markdown
-   ## Continuation Checkpoint — [timestamp]
-   ### Workflow
-   - Top-level command: /cherry-pick <arguments>
-   - Phase: plan / investigate / apply / adapt / validate / document
-   - Resume target: PR #123 / `<sha>` / current conflict file
-   - Completed items: [already applied, skipped, blocked, or rejected changes]
-   ### State
+   Record lifecycle: `command-complete`
+
+   ## Continuation Checkpoint
+
+   Phases: plan / investigate / apply / adapt / validate / document
+
+   State:
    - Target branch: <branch>
    - Current execution table snapshot: [latest status summary]
    - Pending intervention points: [any user decisions still needed]
-   ```
 
 ## Sequential Cherry-Pick Safety
 
@@ -152,13 +169,10 @@ When cherry-picking multiple commits in sequence:
 - Clean up the failed state (`git cherry-pick --abort`) before deciding next steps
 - Document which picks succeeded and which didn't
 
-## PROJECT.md Update Discipline
-
-Cherry-picks are branch-movement operations, not project-state changes. PROJECT.md updates are **not required** for cherry-pick workflows. The execution table and final report in the conversation are sufficient documentation.
-
-Exception: if the cherry-pick is part of a larger workflow (e.g., `/fix-bug` routing to `/cherry-pick`), the parent workflow owns the PROJECT.md update.
-
 ## Notes
+
+- **PROJECT.md**: Cherry-picks are branch-movement operations — the parent workflow owns any PROJECT.md update, not this command.
+
 - Always use `cherry-pick -x` to preserve source reference
 - Default to low-intervention flow when the investigation rates the move low-risk and no decision is required
 - Prefer functional over structural changes

@@ -1,6 +1,6 @@
 # /update-tests - Improve an Existing Test Suite
 
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
+@{{TOOLKIT_DIR}}/skills/review-tests.md
 
 > **When**: You want to improve an existing test suite in a specific area, path, or function and have the workflow analyze gaps, update tests, verify, review, and auto-commit when confidence is strong.
 > **Produces**: Scoped test updates, verification results, remaining follow-up gaps, and either an automatic `test:` commit or a clear handoff.
@@ -56,9 +56,9 @@
 
    Keep the current change focused on the smallest set of high-signal suite improvements.
 
-6. **Update the Tests Through `developer`**
+6. **Update the Tests**
 
-   Use `developer/update-tests.md`:
+   Use `update-tests.md`:
 
    This helper owns:
    - updating existing tests first
@@ -118,30 +118,18 @@
    - [Created `test:` commit / no commit and why]
    ```
 
-## PROJECT.md Update Discipline
-
-Update `PROJECT.md` at these points:
-- after the target scope is locked
-- after gap analysis is synthesized
-- after the main test-update pass
-- at final completion with verification, remaining gaps, and commit result
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /update-tests <arguments>
-- Phase: scope / gap-analysis / update-tests / verify / review / commit / summarize
-- Resume target: <area, path, function, or current failing test>
-- Completed items: <finished phases or accepted decisions>
-### State
+Phases: scope / gap-analysis / update-tests / verify / review / commit / summarize
+
+State:
 - Existing suite status: <found / insufficient / none>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Verification status: <passed / partial / blocked>
 - Pending blockers or follow-up gaps: <if any>
-```
 
 ## Notes
 - `/update-tests` is the public workflow for existing-suite maintenance

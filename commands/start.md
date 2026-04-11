@@ -1,6 +1,6 @@
 # /start - Initialize Session
 
-@/Users/joeli/opt/code/ai-toolkit/PROJECT_TEMPLATE.md
+@{{TOOLKIT_DIR}}/PROJECT_TEMPLATE.md
 
 > **When**: Beginning any work session.
 > **Produces**: Loaded PROJECT.md context and session entry.
@@ -65,7 +65,10 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
    - Creating the first meaningful tests → `/create-tests`
    - Validating a story, PR, or environment without fixing it → `/run-test-plan`
    - Cherry-picking → `/cherry-pick`
+   - Ready to open a PR → `/create-pr`
+   - Capturing a pattern or reviewing memories → `/learn`
    - Completed phases cluttering PROJECT.md → `/archive-project-file`
+   - Want to see all available commands → `/custom-skills-info`
 
 4. **Recommend Archiving When Useful**
 

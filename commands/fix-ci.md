@@ -1,6 +1,6 @@
 # /fix-ci - Fix CI Failures
 
-@/Users/joeli/opt/code/ai-toolkit/rules/complexity-gate.md
+@{{TOOLKIT_DIR}}/rules/complexity-gate.md
 
 > **When**: A CI build has failed and you want the repo-standard workflow to diagnose it, apply safe fixes, verify locally, and stop before commit.
 > **Produces**: Failure classification, PROJECT.md update, safe fixes where appropriate, validation results, and a recommended commit action.
@@ -27,44 +27,39 @@
 
 2. **Gather CI Logs**
 
-   Try `gh` first:
-   ```bash
-   # Get failed run
-   gh run list --branch <branch> --status failure --limit 1
-   gh run view <run-id> --log-failed
+   Follow this decision tree to obtain failure logs:
 
-   # Or from PR
-   gh pr checks <number>
-   gh run view <run-id> --log-failed
-   ```
+   1. **Local file provided?** (log or zip from step 1)
+      - YES → Use it. For zips, unzip and locate failing logs; split multi-job bundles into per-failure units.
+      - NO → Continue.
 
-   If `gh run list` returns no failures, check the check-runs endpoint — failures may be at the check-run level rather than the workflow-run level:
-   ```bash
-   gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
-     --jq '.check_runs[] | select(.conclusion == "failure")'
-   ```
+   2. **`gh run view <run-id> --log-failed` produces output?**
+      ```bash
+      gh run list --branch <branch> --status failure --limit 1
+      gh run view <run-id> --log-failed
+      # Or from PR: gh pr checks <number> → gh run view <run-id> --log-failed
+      ```
+      - YES → Use it.
+      - NO (empty output or no failures listed) → Continue.
 
-   If `gh run view --log-failed` returns empty output (exit 0 but no log lines), fall back to per-job logs:
-   ```bash
-   # List jobs for the run
-   gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
-     --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+   3. **Check-run or per-job logs available?**
+      ```bash
+      # Check-runs (failures may be at check-run level, not workflow-run level)
+      gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
+        --jq '.check_runs[] | select(.conclusion == "failure")'
 
-   # Fetch logs for each failed job
-   gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
-   ```
+      # Per-job logs
+      gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
+        --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
+      gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
+      ```
+      - YES → Use them.
+      - NO → Continue.
 
-   If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
-   - Check whether a local log file or zip bundle was provided in step 1.
-   - If yes, use that file as the log source.
-   - If no, ask the user for a log file path or URL. Do not proceed to classification without actual log output.
+   4. **All methods failed** (or CI is external — Jenkins, GitLab, etc.)
+      - Ask the user for a log file path or URL. Do not proceed to classification without actual log output.
 
-   If the input is a zip bundle:
-   - unzip it automatically
-   - locate the failing logs
-   - split multi-job bundles into per-failure units before classification
-
-3. **Classify Failures** (`build-engineer`)
+3. **Classify Failures**
 
    For each failure:
    - identify the failing step
@@ -91,6 +86,10 @@
    ```
    If SOME failures are ours and some are pre-existing, note the pre-existing ones and continue the workflow for the remaining failures.
 
+   Evaluate each classified failure against the complexity signals, then emit the Complexity Gate block per `rules/complexity-gate.md`.
+
+   Record lifecycle: `gate`
+
    Evaluate each classified failure against:
 
    | Signal | Trivial | Standard |
@@ -99,6 +98,8 @@
    | Files touched | 1-2 | 3+ or unclear |
    | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
    | Verification | STRONG or PARTIAL available | WEAK only |
+
+   Examples — TRIVIAL: lint failure from trailing whitespace (1 file, mechanical fix). STANDARD: test fails due to race condition in async setup (requires understanding test lifecycle, 3+ files).
 
    **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
    1. Apply the fix (step 8)
@@ -137,22 +138,17 @@
    If the gate allows automatic action (or the complexity gate routed here directly):
    - apply the narrow proposed fix
    - keep scope limited to the failing surface
-   - hand off to `developer` only when code adaptation becomes non-mechanical
+   - hand off to `implement-change.md` only when code adaptation becomes non-mechanical
 
    Otherwise:
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
-   ```bash
-   git commit --fixup=<originating-sha>
-   # repeat for each originating commit
-   git rebase --autosquash <base>
-   ```
+   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, follow the fixup+autosquash pattern in `rules/implementation.md` (Commit Strategy section).
 
-   Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
+   Record lifecycle: `impl-complete`
 
-9. **Verify Locally** (`build-engineer`)
+9. **Verify Locally**
 
 10. **Review Changed Files** (gate)
 
@@ -163,6 +159,8 @@
 
    For zero-logic diffs (formatting-only, lint-disable, import reorder), apply the skip rule from `rules/review-gate.md`.
    If the diff touches any logic, invoke `/review-code` — do not skip.
+
+   Record lifecycle: `review-gate`
 
 11. **Summary**
    **Full template** (standard path or trivial path with PARTIAL verification):
@@ -187,34 +185,19 @@
    Next: [specific next action]
    ```
 
-## PROJECT.md Update Discipline
-
-**Standard path** — update `PROJECT.md` at these points:
-- after log collection and initial failure classification
-- after RCA validation when that path runs
-- after the action gate determines whether the fix will proceed automatically
-- after local verification and `/review-code`
-- at final completion with verification strength and commit recommendation
-
-Keep the updates compact, but do not defer all state changes to the end of the workflow.
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
-- Resume target: <run id, artifact, failing job, or changed file set>
-- Completed items: <finished phases or already-fixed failures>
-### State
+Phases: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
+
+State:
 - Complexity: <trivial / standard>
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
-```
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone

@@ -1,6 +1,6 @@
 # /create-tests - Create the First Meaningful Tests
 
-@/Users/joeli/opt/code/ai-toolkit/skills/core/review-tests/SKILL.md
+@{{TOOLKIT_DIR}}/skills/review-tests.md
 
 > **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
 > **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.
@@ -21,9 +21,9 @@
    - Specific file or function: as provided
    - Read the code thoroughly before writing any tests
 
-2. **Delegate Initial Test Creation to `developer`**
+2. **Create Initial Tests**
 
-   Use `developer/create-tests.md`. This helper owns:
+   Use `create-tests.md`. This helper owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
    - creating the first meaningful tests for the target area
@@ -63,28 +63,17 @@
    - [Ready for manual commit / needs more work]
    ```
 
-## PROJECT.md Update Discipline
-
-Update `PROJECT.md` at these points:
-- after the target scope is locked
-- after the main test-writing pass
-- at final completion with the validation result and remaining gaps
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /create-tests <arguments>
-- Phase: scope / review-tests / write-tests / verify / review / summarize
-- Resume target: <files, function, or behavior under test>
-- Completed items: <finished steps>
-### State
+Phases: scope / review-tests / write-tests / verify / review / summarize
+
+State:
 - Current scope: <what is being tested>
 - Review status: <clean / blocked / pending>
 - Tests added so far: <files or none>
 - Verification status: <passed / partial / blocked>
-```
 
 ## Notes
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows

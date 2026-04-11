@@ -151,6 +151,16 @@ main() {
     install_claude_code
     install_codex
 
+    # Optional dependencies
+    echo ""
+    info "Checking optional dependencies..."
+    if command -v jq &>/dev/null; then
+        info "jq already installed: $(jq --version)"
+    else
+        warn "jq not found. Needed for hook installation (install-hooks.sh)."
+        echo "  Install with: brew install jq (macOS) or apt-get install jq (Linux)"
+    fi
+
     echo ""
     echo "========================================"
     echo "  Installation Complete!"
@@ -163,6 +173,7 @@ main() {
     echo "  - tmux:   $(tmux -V 2>/dev/null || echo 'not found')"
     echo "  - claude: $(command -v claude &>/dev/null && echo 'installed' || echo 'not found')"
     echo "  - codex:  $(command -v codex &>/dev/null && echo 'installed' || echo 'not found')"
+    echo "  - jq:     $(jq --version 2>/dev/null || echo 'not found (optional, needed for hooks)')"
     echo ""
     info "API Key Setup:"
     echo "  - Claude: Run 'claude' and follow authentication prompts"
