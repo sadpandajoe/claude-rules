@@ -88,7 +88,7 @@
 
    Evaluate each classified failure against the complexity signals, then emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-   Record lifecycle: `gate` { command: "fix-ci", complexity: `<tier>`, confidence: `<N>` }
+   Record lifecycle: `gate`
 
    Evaluate each classified failure against:
 
@@ -146,7 +146,7 @@
 
    **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, follow the fixup+autosquash pattern in `rules/implementation.md` (Commit Strategy section).
 
-   Record lifecycle: `impl-complete` { command: "fix-ci", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
+   Record lifecycle: `impl-complete`
 
 9. **Verify Locally**
 
@@ -160,7 +160,7 @@
    For zero-logic diffs (formatting-only, lint-disable, import reorder), apply the skip rule from `rules/review-gate.md`.
    If the diff touches any logic, invoke `/review-code` — do not skip.
 
-   Record lifecycle: `review-gate` { command: "fix-ci", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
+   Record lifecycle: `review-gate`
 
 11. **Summary**
    **Full template** (standard path or trivial path with PARTIAL verification):
@@ -185,36 +185,19 @@
    Next: [specific next action]
    ```
 
-   Record lifecycle: `command-complete` { command: "fix-ci", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
-
-## PROJECT.md Update Discipline
-
-**Standard path** — update `PROJECT.md` at these points:
-- after log collection and initial failure classification
-- after RCA validation when that path runs
-- after the action gate determines whether the fix will proceed automatically
-- after local verification and `/review-code`
-- at final completion with verification strength and commit recommendation
-
-Keep the updates compact, but do not defer all state changes to the end of the workflow.
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
-- Resume target: <run id, artifact, failing job, or changed file set>
-- Completed items: <finished phases or already-fixed failures>
-### State
+Phases: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
+
+State:
 - Complexity: <trivial / standard>
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
-```
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone

@@ -30,6 +30,8 @@ Plan mode is for **exploration and design only** — step 2 below. Review iterat
 /create-feature apache/superset#28456
 /create-feature https://github.com/owner/repo/issues/123
 /create-feature https://app.shortcut.com/.../story/123
+/create-feature sc-epic-456                              # epic — decomposes into waves
+/create-feature https://github.com/owner/repo/milestone/5 # milestone — treated as epic
 ```
 
 ## Steps
@@ -42,6 +44,18 @@ Accept:
 - GitHub issue or PR reference / URL
 
 When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any planning or code investigation. Extract scope, acceptance criteria, and constraints from the source. These are authoritative — don't re-derive scope from scratch.
+
+**Detect scope** — after fetching, determine if this is a single story or an epic:
+
+| Signal | Single story | Epic |
+|--------|-------------|------|
+| Input type | One ticket, one issue, one feature description | Shortcut epic, GitHub milestone, multiple linked stories |
+| Sub-tasks | None or implementation sub-tasks of one feature | Multiple independent features/stories |
+| Scope | One PR worth of work | Multiple PRs across different areas |
+
+**If epic → use the Epic Path section below.** Each story within the epic runs the single-story flow independently.
+
+**If single story** → continue with the complexity gate below.
 
 Then assess complexity:
 
@@ -56,7 +70,7 @@ Examples — TRIVIAL: add a tooltip to an existing button (1 component, no state
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate` { command: "create-feature", complexity: `<tier>`, confidence: `<N>` }
+Record lifecycle: `gate`
 
 **Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
 
@@ -118,7 +132,7 @@ Revise the plan until all applicable reviewers are at 8/10 or better. Run iterat
 
 Update PROJECT.md with final review scores after this step.
 
-Record lifecycle: `plan-complete` { command: "create-feature", reviewer_scores: `{<reviewer: score>}`, round_count: `<N>` }
+Record lifecycle: `plan-complete`
 
 ### 4½. Checkpoint Before Implementation
 
@@ -160,7 +174,7 @@ Branch on the skill's recommendation:
 - `stop-for-conflict` → the plan's scope boundaries were wrong; surface for user decision
 - `stop-for-integration-failure` → merged code doesn't build; investigate before continuing
 
-Record lifecycle: `impl-complete` { command: "create-feature", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
+Record lifecycle: `impl-complete`
 
 **5c. QA validates the integrated result:**
 
@@ -179,12 +193,7 @@ If a meaningful decision surfaces during implementation, stop and present it cle
 
 ### 6. Review Changed Files (gate)
 
-Launch `/review-code` as a **subagent** (`model: "opus"`) that receives only:
-- The merged diff (not the full conversation history)
-- The acceptance criteria from the PM brief
-- The QA test results from step 5c
-
-This isolation matters — a reviewer who watched the planning and implementation has confirmation bias. A fresh subagent that only sees the diff and criteria reviews like a real PR reviewer.
+Launch `/review-code` as a **subagent** (`model: "opus"`) with context isolation per `rules/orchestration.md`. Pass the merged diff, acceptance criteria from the PM brief, and QA test results from step 5c.
 
 For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result and cross-slice interactions.
 
@@ -196,7 +205,7 @@ Keep iterating until only nitpicks remain or a real blocker/user decision appear
 
 The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
 
-Record lifecycle: `review-gate` { command: "create-feature", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
+Record lifecycle: `review-gate`
 
 For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
@@ -234,7 +243,102 @@ Lead with the outcome, not the process. If the user gave you a ticket, answer wh
 </details>
 ```
 
-Record lifecycle: `command-complete` { command: "create-feature", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+Record lifecycle: `command-complete`
+
+## Epic Path
+
+When step 1 detects an epic, use this path instead of steps 2–7. Each story runs the single-story flow independently in its own worktree.
+
+### E1. Decompose Epic
+
+Use `decompose-epic.md` to produce a wave plan — stories grouped into dependency-ordered waves. The skill analyzes what each story produces/consumes and sorts them topologically.
+
+If resuming an epic (wave plan already in PROJECT.md), skip to E3.
+
+### E2. Write Wave Plan to PROJECT.md
+
+```markdown
+## Epic: [title]
+**Reference**: [epic URL/ID]
+
+[Wave plan table from decompose-epic.md]
+
+### Wave Status
+| Wave | Stories | Status |
+|------|---------|--------|
+| 1 | [N] | pending |
+| 2 | [N] | blocked — waiting on Wave 1 |
+```
+
+### E3. Execute Current Wave
+
+Find the next wave with status `pending`. For each story in that wave, dispatch a subagent:
+
+```
+Agent(
+  isolation: "worktree",
+  model: "opus",
+  prompt: "Read and follow {{TOOLKIT_DIR}}/commands/create-feature.md for story [ref].
+    This is a single story — use the single-story path (steps 1–7).
+    You are the orchestrator for this story: create your own PROJECT.md, plan, implement, review, and commit.
+    Create branch: [branch from wave plan].
+    Return: branch name, commit SHAs, summary of what was built, and any blockers."
+)
+```
+
+Each subagent:
+- Is a **full orchestrator** for its story (nested orchestration per `rules/orchestration.md`)
+- Gets its own worktree → its own PROJECT.md, branch, and full planning/review cycle
+- Installs dependencies in the worktree per `rules/resource-management.md` (Worktree Management)
+- Runs the complete single-story flow autonomously — planning, implementation, review, commit
+- Returns results to the epic orchestrator
+
+**Concurrency**: Check resources per `rules/resource-management.md`. Typical limits: 2–3 parallel stories with Docker running, 3–4 without.
+
+After all stories in the wave complete:
+- Collect results (success/failure per story)
+- For each successful story, run `/create-pr` against the worktree branch
+- Update wave status in PROJECT.md: `pending` → `complete` or `partial (N of M)`
+- If any story failed, note it but continue with successful ones
+
+### E4. Wave Transition
+
+After creating PRs for the current wave, check if more waves remain.
+
+**If more waves AND user said "auto" or PRs are already approved**: Merge PRs via `gh pr merge --squash`, pull updated base branch, and continue to the next wave automatically. Only auto-merge if CI passes and the PR is approved — never force-merge.
+
+**Otherwise**: Report and pause for the user to merge:
+
+```markdown
+## Wave [N] Complete
+
+### PRs Created
+| Story | PR | Status |
+|-------|-----|--------|
+| [ref] | #[N] | ready for review |
+
+### Next
+Wave [N+1] has [N] stories. Merge the Wave [N] PRs, then run:
+`/create-feature [epic-ref]`
+```
+
+Update PROJECT.md wave status. The next invocation detects the wave plan, finds the next pending wave, pulls the updated base branch, and resumes from E3.
+
+If all waves are complete → emit epic summary:
+
+```markdown
+## Epic Complete — [title]
+
+### All PRs
+| Wave | Story | PR |
+|------|-------|----|
+| [N] | [ref] | #[N] |
+
+### Remaining
+- [Failed/blocked stories, or "None"]
+```
+
+Record lifecycle: `command-complete`
 
 ## Non-Negotiable Gates
 
@@ -249,23 +353,13 @@ Use this checklist to verify you haven't skipped a gate:
 - [ ] Summary emitted (step 7)
 - [ ] Lifecycle events recorded at phase boundaries
 
-## PROJECT.md Update Discipline
-
-**Standard path:**
-- **step 3** — after exiting plan mode, flush the draft plan into PROJECT.md. This is the first write and a hard gate.
-- **step 4** — after review iterations complete, update with final review scores.
-- after implementation and validation complete.
-
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /create-feature <arguments>
-- Phase: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / checkpoint / implement / review-code / summarize
-- Resume target: <story, issue, milestone, PR slice, file set, or current blocker>
-- Completed items: <finished phases or accepted decisions>
-### State
+**Single-story phases**: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / checkpoint / implement / review-code / summarize
+
+**Epic phases**: input / decompose / write-wave-plan / execute-wave / wave-transition / epic-summary
+
+State (single story):
 - Complexity: <trivial / standard>
 - PM required: <yes / no / skipped — trivial>
 - PM brief score: <score or skipped>
@@ -274,10 +368,20 @@ Use this checklist to verify you haven't skipped a gate:
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
-```
+
+State (epic):
+- Epic: <reference>
+- Mode: epic
+- Current wave: <N of N>
+- Wave status: <wave: status, ...>
+- Stories in current wave: <N total, N complete, N failed>
+- PRs created: <list or none>
 
 ## Notes
 - `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped
+- Accepts both single stories and epics — epic detection is automatic based on input type
+- Epic path: each story runs the full single-story flow in its own worktree. The orchestrator manages wave ordering and PR creation.
+- Epic re-invocation is stateful — the wave plan in PROJECT.md persists across conversations. Run the same command after merging a wave's PRs to continue.
 - Only pause when a real decision matters
 - Use test-first implementation by default for each slice; document why when it is blocked
 - `/review-code` is an internal phase here, not the expected next top-level user step

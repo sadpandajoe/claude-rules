@@ -32,6 +32,8 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 /fix-bug apache/superset#28456
 /fix-bug https://github.com/owner/repo/issues/123
 /fix-bug https://app.shortcut.com/.../story/123
+/fix-bug sc-123 sc-456 sc-789                           # batch — parallel worktrees
+/fix-bug "list: sc-123, apache/superset#28456, sc-789"  # batch — mixed refs
 ```
 
 ## Steps
@@ -46,6 +48,10 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any code investigation. Extract the reproduction URL, affected page/area, and error description. These are authoritative — don't re-derive the affected area from scratch by scanning code.
 
    Pull in external context when references are provided.
+
+   **Detect batch** — if multiple bug references are provided (multiple arguments, comma-separated list, or a ticket that links to several bugs):
+   - **Single bug** → continue to step 2 (existing flow)
+   - **Multiple bugs** → use the **Batch Path** section below
 
 2. **Complexity Gate**
 
@@ -62,7 +68,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-   Record lifecycle: `gate` { command: "fix-bug", complexity: `<tier>`, confidence: `<N>` }
+   Record lifecycle: `gate`
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
@@ -166,7 +172,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    QA doesn't need the slices to plan — it needs the RCA. The Architect doesn't need the test plan to slice — it needs the RCA. Both consume the RCA, both produce criteria. Running them in parallel means devs get both the slice definitions AND the test plan before writing code.
 
-   Record lifecycle: `plan-complete` { command: "fix-bug", reviewer_scores: `{<reviewer: score>}`, round_count: `<N>` }
+   Record lifecycle: `plan-complete`
 
 12. **Exit Plan Mode → PROJECT.md**
 
@@ -206,7 +212,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
      - **Single slice**: implement as one unit (no worktree needed)
    - after all subagents complete, use `sync-workstreams.md` to collect results, update the slice status table in PROJECT.md, and merge worktree branches. Branch on its recommendation (`proceed-to-review` / `stop-for-failure` / `stop-for-conflict`).
 
-   Record lifecycle: `impl-complete` { command: "fix-bug", slices_complete: `<N>`, slices_failed: `<N>`, slices_blocked: `<N>` }
+   Record lifecycle: `impl-complete`
 
 14. **QA Validates the Fix**
 
@@ -220,12 +226,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
 15. **Review Changed Files** (gate)
 
-   Launch `/review-code` as a **subagent** (`model: "opus"`) that receives only:
-   - The merged diff (not the full conversation history)
-   - The validated RCA and acceptance criteria
-   - The QA test results from step 14
-
-   This isolation prevents confirmation bias — a reviewer who watched the investigation and planning will rationalize issues away. A fresh subagent reviews like a real PR reviewer.
+   Launch `/review-code` as a **subagent** (`model: "opus"`) with context isolation per `rules/orchestration.md`. Pass the merged diff, validated RCA, acceptance criteria, and QA test results from step 14.
 
    For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result.
 
@@ -237,7 +238,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Emit a Review Gate block per `rules/review-gate.md`. For truly minimal mechanical fixes, apply the skip rule.
 
-   Record lifecycle: `review-gate` { command: "fix-bug", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` }
+   Record lifecycle: `review-gate`
 
    After the review gate passes, continue to steps 16–17 — see Continuation Rule in `rules/review-gate.md`.
 
@@ -285,36 +286,110 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    </details>
    ```
 
-   Record lifecycle: `command-complete` { command: "fix-bug", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+   Record lifecycle: `command-complete`
 
-## PROJECT.md Update Discipline
+## Batch Path
 
-Update `PROJECT.md` at these points:
+When step 1 detects multiple bugs, use this path instead of steps 2–17.
 
-**Standard path:**
-- **step 11** — after exiting plan mode, flush all investigation findings (triage, RCA, upstream status, action-gate outcome) into PROJECT.md. This is the first write.
-- after implementation, review, and QA validation
-- at final completion with the branch outcome and commit result
+### B1. Triage for Shared Root Causes
 
-Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
+Before dispatching, do a lightweight investigation of all bugs together:
+- Fetch each bug's description, affected area, and error details
+- Look for overlap: do multiple bugs reference the same file, component, or behavior?
+- **Shared root cause** → group them into one fix (single `/fix-bug` run, not parallel)
+- **Independent bugs** → dispatch in parallel
+
+Output:
+
+```markdown
+## Bug Batch — [N] bugs
+
+### Groups
+| Group | Bugs | Reason | Strategy |
+|-------|------|--------|----------|
+| 1 | [refs] | Shared root cause: [description] | Single fix |
+| 2 | [ref] | Independent | Parallel worktree |
+| 3 | [ref] | Independent | Parallel worktree |
+```
+
+### B2. Write Batch Plan to PROJECT.md
+
+Write the group table and tracking status:
+
+```markdown
+### Batch Status
+| # | Bug | Group | Branch | Status |
+|---|-----|-------|--------|--------|
+| 1 | [ref] | 1 | `fix/[slug]` | pending |
+| 2 | [ref] | 2 | `fix/[slug]` | pending |
+```
+
+### B3. Execute in Parallel
+
+For each independent group, dispatch a subagent:
+
+```
+Agent(
+  isolation: "worktree",
+  model: "opus",
+  prompt: "Read and follow {{TOOLKIT_DIR}}/commands/fix-bug.md for bug [ref].
+    This is a single bug — use the standard flow (steps 1–17).
+    You are the orchestrator for this bug: create your own PROJECT.md, investigate, fix, review, and commit.
+    Create branch: fix/[slug].
+    Return: branch name, commit SHAs, root cause summary, and any blockers."
+)
+```
+
+Each subagent is a **full orchestrator** for its bug (nested orchestration per `rules/orchestration.md`).
+
+For shared-root-cause groups: run as a single `/fix-bug` in one worktree with all grouped bugs as context.
+
+**Concurrency**: Check resources per `rules/resource-management.md`. Typical limits: 2–3 parallel bugs with Docker running, 3–4 without.
+
+### B4. Collect Results and Create PRs
+
+After all subagents complete:
+- Collect results (success/failure/blocked per bug)
+- Run `/create-pr` for each successful fix branch
+- Update batch status in PROJECT.md
+
+### B5. Batch Summary
+
+```markdown
+## Fix-Bug Batch Complete
+
+### Results
+| Bug | PR | Root Cause | Status |
+|-----|----|-----------|--------|
+| [ref] | #[N] | [one-line RCA] | fixed |
+| [ref] | — | [reason] | blocked |
+
+### Remaining
+- [Blocked bugs and what's needed to unblock them, or "None"]
+```
+
+Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /fix-bug <arguments>
-- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / checkpoint / implement / review / qa-validate / commit / summarize
-- Resume target: <issue, PR, repro path, file set, or current validation target>
-- Completed items: <finished phases or decisions already locked in>
-### State
+**Single-bug phases**: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / checkpoint / implement / review / qa-validate / commit / summarize
+
+**Batch phases**: normalize / triage-shared-causes / write-batch-plan / execute-parallel / collect-results / batch-summary
+
+State (single bug):
 - Complexity: <trivial / standard>
 - Existing-fix status: <FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED>
 - RCA status: <validated / pending / not needed>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
-```
+
+State (batch):
+- Mode: batch
+- Bugs: <N total, N complete, N failed, N blocked>
+- Groups: <N independent, N shared-root-cause>
+- PRs created: <list or none>
 
 ## Cross-Repo Bugs
 
@@ -325,6 +400,8 @@ When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fi
 - If local tests in repo B can partially cover the fix (e.g., model introspection, type checks), still run them — partial coverage beats none
 
 ## Notes
+- `/fix-bug` accepts single bugs or batches — batch detection is automatic based on input count
+- Batch path: independent bugs run in parallel worktrees, shared-root-cause bugs are grouped into one fix
 - `/fix-bug` is the public bug entrypoint; RCA-only work stays inside the internal investigation skills
 - Keep `PROJECT.md` updates command-owned
 - Prefer the open-PR or cherry-pick path over inventing a new fix

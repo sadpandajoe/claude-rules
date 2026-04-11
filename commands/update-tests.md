@@ -118,32 +118,18 @@
    - [Created `test:` commit / no commit and why]
    ```
 
-   Record lifecycle: `command-complete` { command: "update-tests", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
-
-## PROJECT.md Update Discipline
-
-Update `PROJECT.md` at these points:
-- after the target scope is locked
-- after gap analysis is synthesized
-- after the main test-update pass
-- at final completion with verification, remaining gaps, and commit result
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /update-tests <arguments>
-- Phase: scope / gap-analysis / update-tests / verify / review / commit / summarize
-- Resume target: <area, path, function, or current failing test>
-- Completed items: <finished phases or accepted decisions>
-### State
+Phases: scope / gap-analysis / update-tests / verify / review / commit / summarize
+
+State:
 - Existing suite status: <found / insufficient / none>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Verification status: <passed / partial / blocked>
 - Pending blockers or follow-up gaps: <if any>
-```
 
 ## Notes
 - `/update-tests` is the public workflow for existing-suite maintenance

@@ -168,25 +168,19 @@ Pick one:
 - [The specific recommended next step]
 ```
 
-Record lifecycle: `command-complete` { command: "complete-project", status: "clean", complexity: "standard", rounds: 0 }
+Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /complete-project
-- Phase: read-project / metrics-summary / promote-memories / archive / teardown-services / write-final / suggest-action / summarize
-- Resume target: [current phase]
-- Completed items: [finished phases]
-### State
+Phases: read-project / metrics-summary / promote-memories / archive / teardown-services / write-final / suggest-action / summarize
+
+State:
 - Metrics computed: yes/no
 - Memories reviewed: [N of N]
 - Promoted: [N] | Pruned: [N] | Kept: [N]
 - Archived: yes/no
 - Services torn down: yes/no/skipped
 - Final status written: yes/no
-```
 
 ## Notes
 - This is the bookend to `/start` — it closes what `/start` opens

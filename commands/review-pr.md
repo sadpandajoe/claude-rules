@@ -15,6 +15,8 @@ Use `--draft` to show the review locally without posting.
 /review-pr <pr-number-or-url> --draft
 /review-pr <pr-number-or-url> --adversarial
 /review-pr <pr-number-or-url> --auto
+/review-pr 101 102 103                                   # batch — review multiple PRs
+/review-pr --all-open                                    # batch — review all open PRs in repo
 ```
 
 ## Orchestration Model
@@ -24,6 +26,12 @@ The main thread is the **orchestrator** — it gathers PR context, dispatches re
 ## Steps
 
 ### 1. Gather PR Context
+
+**Detect batch** — if multiple PR numbers are provided or `--all-open` is used:
+- `--all-open`: run `gh pr list --json number,title --state open` to get all open PRs
+- Multiple numbers: parse all provided refs
+- **Single PR** → continue to step 2 (existing flow)
+- **Multiple PRs** → use the **Batch Path** section below
 
 ```bash
 gh pr view $ARGUMENTS --json title,body,author,baseRefName,headRefName,files,additions,deletions
@@ -48,7 +56,7 @@ Examples — TRIVIAL: docs-only PR (3 files, 30 lines, no behavior change). STAN
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate` { command: "review-pr", complexity: `<tier>`, confidence: `<N>` }
+Record lifecycle: `gate`
 
 **Trivial + confidence 8/10+**: Code quality review only — unless impact assessment (step 3) escalates.
 
@@ -89,7 +97,7 @@ Additionally, for Standard PRs (or CORE-escalated), always include:
 **Standard**: Launch all review lanes in parallel:
 
 **Lane 1 — Regular team** (foreground subagents, `model: "opus"`):
-Each reviewer subagent receives **only**: (1) the PR diff, (2) full content of changed files, (3) PR description and linked issue context, (4) its skill file. Do **not** pass conversation history or planning rationale. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `classify-diff.md` plus pattern analysis (step 6).
+Each reviewer subagent runs with context isolation per `rules/orchestration.md`. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `classify-diff.md` plus pattern analysis (step 6).
 
 **Lane 2 — Codex second opinion** (if available):
 Check if the Codex plugin is available. If unavailable, skip silently and note "Codex: skipped (plugin not available)" in the summary.
@@ -209,7 +217,49 @@ PR #[number]: [title] — [Approve / Request Changes / Comment]
 - **Author asked you to address feedback**: `/address-feedback <number>`
 ```
 
-Record lifecycle: `command-complete` { command: "review-pr", status: `<approve/request-changes/comment>`, complexity: `<tier>`, rounds: 0, models_used: `{opus: N, sonnet: N, haiku: N}` }
+Record lifecycle: `command-complete`
+
+## Batch Path
+
+When step 1 detects multiple PRs, use this path instead of steps 2–11. Reviews are read-only — no worktrees needed, just parallel subagents.
+
+### B1. Dispatch Parallel Reviews
+
+For each PR, dispatch a subagent:
+
+```
+Agent(
+  model: "opus",
+  prompt: "Read and follow {{TOOLKIT_DIR}}/commands/review-pr.md for PR #[number].
+    This is a single PR — use the standard flow (steps 1–11).
+    Flags: --auto (skip confirmations, post directly).
+    Return: PR number, recommendation (approve/request-changes/comment), key findings, and whether it was posted."
+)
+```
+
+Each subagent runs the full single-PR review flow independently. Use `--auto` by default in batch mode to avoid N confirmation prompts.
+
+**Concurrency**: Reviews are CPU-light. Run up to 4–5 in parallel.
+
+### B2. Collect Results
+
+After all subagents complete, aggregate:
+
+```markdown
+## Review Batch Complete — [N] PRs
+
+| PR | Title | Recommendation | Key Finding | Posted |
+|----|-------|---------------|-------------|--------|
+| #[N] | [title] | approve | Clean — no issues | yes |
+| #[N] | [title] | request-changes | [top issue] | yes |
+| #[N] | [title] | comment | [observation] | yes |
+
+### Needs Attention
+- PR #[N]: [why it needs manual follow-up]
+- {Or "All PRs reviewed cleanly"}
+```
+
+Record lifecycle: `command-complete`
 
 ## Non-Negotiable Gates
 
@@ -222,29 +272,28 @@ Record lifecycle: `command-complete` { command: "review-pr", status: `<approve/r
 - [ ] Team selection shown in summary
 - [ ] Summary emitted
 
-## PROJECT.md Update Discipline
-
-If a PROJECT.md exists, update after posting with PR number, recommendation, and key findings. Skip if no PROJECT.md exists and review completes without issues.
-
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /review-pr <pr-reference>
-- Phase: gather / complexity-gate / understand-problem / detect-team / launch-review / pattern-analysis / scoring / gate / post / summarize
-- Resume target: PR #[number]
-- Completed items: [phases finished]
-### State
+**Single-PR phases**: gather / complexity-gate / understand-problem / detect-team / launch-review / pattern-analysis / scoring / gate / post / summarize
+
+**Batch phases**: gather-list / dispatch-reviews / collect-results / batch-summary
+
+State (single PR):
 - PR: [number] — [title]
 - Complexity: [trivial / standard]
 - Team: [list of selected reviewers]
 - Scores: [component: score, ...]
 - Recommendation: [approve / request-changes / comment / pending]
 - Posted: [yes / no / pending]
-```
+
+State (batch):
+- Mode: batch
+- PRs: [N total, N complete, N failed]
+- Recommendations: [N approve, N request-changes, N comment]
 
 ## Notes
+- Accepts single PRs or batches — batch detection is automatic. Use `--all-open` to review every open PR in the repo.
+- Batch mode defaults to `--auto` (posts reviews without confirmation). No worktrees needed — reviews are read-only.
 - Read full files for context, only comment on changed lines
 - Use diff positions (not file line numbers) when posting inline comments
 - Default is auto-post; use `--draft` for local-only review

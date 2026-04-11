@@ -89,31 +89,17 @@
    - [Manual next steps only]
    ```
 
-   Record lifecycle: `command-complete` { command: "run-test-plan", status: `<outcome>`, complexity: "standard", rounds: 0, models_used: `{opus: N, sonnet: N, haiku: N}` }
-
-## PROJECT.md Update Discipline
-
-Update `PROJECT.md` at these points:
-- after the starting point and target environment are resolved
-- after the test plan reaches `8/10` or stops on blockers
-- after execution and evidence capture complete
-- at final completion with the findings summary
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /run-test-plan <arguments>
-- Phase: resolve-plan / review-plan / execute / capture-evidence / summarize
-- Resume target: <plan doc, area, story, PR, or current scenario>
-- Completed items: <finished phases or scenarios already run>
-### State
+Phases: resolve-plan / review-plan / execute / capture-evidence / summarize
+
+State:
 - Plan score: <score or blocked>
 - Execution status: <not started / partial / complete>
 - Evidence status: <captured / none / pending>
 - Blockers or unclear items: <if any>
-```
 
 ## Notes
 - `/run-test-plan` is validation-only in v1

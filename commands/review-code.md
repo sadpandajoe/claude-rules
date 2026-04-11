@@ -43,7 +43,7 @@ Examples — TRIVIAL: renamed a variable in one file (10 lines, no logic). STAND
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate` { command: "review-code", complexity: `<tier>`, confidence: `<N>` } — skip when invoked as an internal phase.
+Record lifecycle: `gate`
 
 - **Trivial**: Code quality reviewer only.
 - **Standard**: Full review team.
@@ -65,7 +65,7 @@ Pass the impact assessment to all reviewer subagents so they can calibrate sever
 
 ### 4. Launch Review Team
 
-Dispatch all triggered reviewers as **parallel subagents** (`model: "opus"`). Each reviewer subagent receives **only**: (1) the diff, (2) full content of changed files, (3) acceptance criteria from PROJECT.md if available, (4) the impact assessment from step 3, (5) its skill file. Do **not** pass conversation history, planning rationale, or investigation context — reviewers who know *why* a change was made rationalize problems away instead of catching them. Each applies its lens independently and returns severity-tagged findings.
+Dispatch all triggered reviewers as **parallel subagents** (`model: "opus"`) with context isolation per `rules/orchestration.md`. Each receives: the diff, full content of changed files, acceptance criteria from PROJECT.md if available, the impact assessment from step 3, and its skill file. Each applies its lens independently and returns severity-tagged findings.
 
 Collect all findings. Deduplicate. Apply fix + verify loop for any `[major]` or `[minor]` issues.
 
@@ -106,7 +106,7 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-Record lifecycle: `review-gate` { command: "review-code", status: `<review-status>`, total_rounds: `<N>`, preflight: `<pass/fail/skipped>` } — skip when invoked as an internal phase.
+Record lifecycle: `review-gate`
 
 ### 8. Adversarial Suggestion
 
@@ -163,7 +163,7 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 - **Test gaps identified**: `/create-tests` or `/update-tests` to fill coverage
 ```
 
-Record lifecycle: `command-complete` { command: "review-code", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` } — skip when invoked as an internal phase (the calling command records its own lifecycle events).
+Record lifecycle: `command-complete`
 
 ## Notes
 - This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`

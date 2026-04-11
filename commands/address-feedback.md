@@ -154,7 +154,7 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - **All resolved, PR approved**: Merge the PR
 ```
 
-Record lifecycle: `command-complete` { command: "address-feedback", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
+Record lifecycle: `command-complete`
 
 ## Non-Negotiable Gates
 
@@ -163,27 +163,17 @@ Record lifecycle: `command-complete` { command: "address-feedback", status: `<ou
 - [ ] Review Gate block emitted (after fixes, unless skipped per skip rule)
 - [ ] Summary emitted
 
-## PROJECT.md Update Discipline
-
-If a PROJECT.md exists, update after fixes are committed with feedback resolution counts. Skip if no PROJECT.md exists and work completes without issues.
-
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /address-feedback <pr-reference>
-- Phase: gather / complexity-gate / investigate / triage / fix / review / draft / post / summarize
-- Resume target: PR #[number]
-- Completed items: [phases finished]
-### State
+Phases: gather / complexity-gate / investigate / triage / fix / review / draft / post / summarize
+
+State:
 - PR: [number] — [title]
 - Complexity: [trivial / standard]
 - Triage: [N] fix, [N] skip, [N] discuss
 - Fixes committed: [yes / no / partial]
 - Review: [clean / blocked / pending]
 - Posted: [yes / no / pending]
-```
 
 ## Notes
 - Always investigate before triaging — read the actual code

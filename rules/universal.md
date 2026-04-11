@@ -1,7 +1,7 @@
 # Universal Principles
 
 ## Golden Rules
-- **PROJECT.md is the single source of truth** — all documentation goes there
+- **PROJECT.md is the single source of truth** — all documentation goes there; PROJECT.md is local-only and must never be committed to git
 - **Evidence over assumptions** — use version control history, test results, existing solutions
 - **Working solution before optimization** — get it working, commit, then improve
 - **Incremental progress** — small, verified changes over big risky ones

@@ -41,6 +41,69 @@ When a command says "launch as subagent" or "dispatch as parallel subagents", it
 
 Pass the skill's `model` frontmatter value to the Agent tool. If the skill has no model field, default to opus.
 
+## Orchestrator Owns PROJECT.md
+
+The orchestrating agent (PM/EM role) owns all PROJECT.md writes. Subagents report results back to the orchestrator — they never write to PROJECT.md directly.
+
+**Default behavior** — update PROJECT.md at phase boundaries when the workflow has materially advanced. Don't defer everything to the end. Record the smallest useful status refresh each time: what phase completed, key findings, what's next.
+
+**Exceptions** (called out inline in the command that deviates):
+- Commands invoked as internal phases of a parent workflow (e.g., `/cherry-pick` called by `/fix-bug`) — the parent owns the update
+- Commands that may run without a PROJECT.md (e.g., `/review-pr`, `/address-feedback`) — skip if no PROJECT.md exists and the workflow completes cleanly
+- Hard gates — some commands require a PROJECT.md write before proceeding to the next phase (e.g., flushing a plan before implementation). These are marked explicitly in the command.
+
+## Continuation Checkpoints
+
+All commands use the same checkpoint structure. The canonical format is defined in `commands/checkpoint.md`:
+
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: [command with arguments]
+- Phase: [current phase from command's phase list]
+- Resume target: [current item, PR, SHA, file, or blocker]
+- Completed items: [items already finished]
+### State
+[command-specific fields]
+```
+
+The `### Workflow` section is standard — commands do not restate it. Each command defines only its **phase list** and **state fields**.
+
+## Subagent Isolation
+
+When dispatching review subagents, enforce context isolation to prevent confirmation bias:
+
+- Reviewers receive **only**: the diff, changed file contents, acceptance criteria, and their skill file
+- Reviewers do **not** receive: conversation history, planning rationale, investigation context, or implementation decisions
+- **Why**: A reviewer who watched planning and implementation will rationalize issues away. Fresh context produces honest review.
+
+This applies to all `/review-code` dispatches — standalone or as an internal phase of `/fix-bug`, `/create-feature`, `/fix-ci`, etc. The calling command specifies what criteria to pass (RCA, PM brief, QA results); the isolation principle is the same.
+
+For implementation subagents dispatched in parallel:
+- Use `isolation: "worktree"` for independent slices to avoid file conflicts
+- Each subagent gets its slice context, the skill file, and exit criteria
+- After all complete, use `sync-workstreams.md` to merge results
+
+## Lifecycle Recording
+
+Event schemas are defined in `skills/workflow-lifecycle.md`. Commands record lifecycle events at phase boundaries — just specify the event type (e.g., `Record lifecycle: 'gate'`). The skill provides the field schema; do not restate it inline.
+
+**Internal phase rule**: When a command is invoked as an internal phase of a parent workflow (e.g., `/review-code` called by `/fix-bug`), skip lifecycle recording — the parent command records its own events.
+
+## Nested Orchestration
+
+Some workflows spawn subagents that are themselves orchestrators — not just workers. This happens when:
+- An epic dispatches per-story subagents, each running the full `/create-feature` flow
+- A multi-repo workflow dispatches per-repo subagents, each running end-to-end
+
+In nested orchestration:
+- The **parent orchestrator** tracks high-level progress (waves, repos) in its own PROJECT.md
+- Each **child orchestrator** (subagent in a worktree) owns its own PROJECT.md, plans, reviews, and commits independently
+- Child orchestrators do not report to the parent's PROJECT.md — the parent collects results when the subagent returns
+- The parent dispatches children with a prompt that tells them to read and follow a specific command file, not just a skill
+
+This is distinct from flat orchestration (one orchestrator, many workers) where subagents run skills and report back without owning their own planning or review cycles.
+
 ## Command Composition
 
 Commands orchestrate skills as their primary workers. A small set of utility commands (`/review-code`, `/checkpoint`, `/verify`) may be invoked as internal phases by end-to-end commands. This is intentional — these commands contain adaptive logic (team selection, flag handling) that would be duplicated if extracted into skills.

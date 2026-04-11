@@ -150,20 +150,16 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
    Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
 
-   Record lifecycle: `command-complete` { command: "cherry-pick", status: `<applied/partial/blocked/rejected>`, complexity: "standard", rounds: 0, models_used: `{}` }
+   Record lifecycle: `command-complete`
 
-   ```markdown
-   ## Continuation Checkpoint — [timestamp]
-   ### Workflow
-   - Top-level command: /cherry-pick <arguments>
-   - Phase: plan / investigate / apply / adapt / validate / document
-   - Resume target: PR #123 / `<sha>` / current conflict file
-   - Completed items: [already applied, skipped, blocked, or rejected changes]
-   ### State
+   ## Continuation Checkpoint
+
+   Phases: plan / investigate / apply / adapt / validate / document
+
+   State:
    - Target branch: <branch>
    - Current execution table snapshot: [latest status summary]
    - Pending intervention points: [any user decisions still needed]
-   ```
 
 ## Sequential Cherry-Pick Safety
 
@@ -173,13 +169,10 @@ When cherry-picking multiple commits in sequence:
 - Clean up the failed state (`git cherry-pick --abort`) before deciding next steps
 - Document which picks succeeded and which didn't
 
-## PROJECT.md Update Discipline
-
-Cherry-picks are branch-movement operations, not project-state changes. PROJECT.md updates are **not required** for cherry-pick workflows. The execution table and final report in the conversation are sufficient documentation.
-
-Exception: if the cherry-pick is part of a larger workflow (e.g., `/fix-bug` routing to `/cherry-pick`), the parent workflow owns the PROJECT.md update.
-
 ## Notes
+
+- **PROJECT.md**: Cherry-picks are branch-movement operations — the parent workflow owns any PROJECT.md update, not this command.
+
 - Always use `cherry-pick -x` to preserve source reference
 - Default to low-intervention flow when the investigation rates the move low-risk and no decision is required
 - Prefer functional over structural changes

@@ -63,30 +63,17 @@
    - [Ready for manual commit / needs more work]
    ```
 
-   Record lifecycle: `command-complete` { command: "create-tests", status: `<outcome>`, complexity: `<tier>`, rounds: `<N>`, models_used: `{opus: N, sonnet: N, haiku: N}` }
-
-## PROJECT.md Update Discipline
-
-Update `PROJECT.md` at these points:
-- after the target scope is locked
-- after the main test-writing pass
-- at final completion with the validation result and remaining gaps
+   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /create-tests <arguments>
-- Phase: scope / review-tests / write-tests / verify / review / summarize
-- Resume target: <files, function, or behavior under test>
-- Completed items: <finished steps>
-### State
+Phases: scope / review-tests / write-tests / verify / review / summarize
+
+State:
 - Current scope: <what is being tested>
 - Review status: <clean / blocked / pending>
 - Tests added so far: <files or none>
 - Verification status: <passed / partial / blocked>
-```
 
 ## Notes
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
