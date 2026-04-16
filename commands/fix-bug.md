@@ -62,7 +62,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-   **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
+   **Trivial + confidence 8/10+**: Auto-proceed — do not ask the user for confirmation; execute the trivial path directly without entering standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
    2. Implement the fix — do not enter plan mode for trivial fixes; go straight to the edit
    3. Run the actual test suite covering the changed files (e.g., `pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient. Record the result:

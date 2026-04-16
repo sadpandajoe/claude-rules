@@ -16,6 +16,7 @@ Reason: [one line]
 ## Trivial Fast-Path
 
 When classification is `TRIVIAL` and confidence is `8/10` or higher:
+- **Auto-proceed** — do not ask the user for confirmation before implementing; the high-confidence classification is the approval
 - Skip plan mode, investigation lanes, RCA validation, and reviewer subagents
 - Go directly to implementation, verify, review, summary
 - Zero subagent spawns — orchestrator does all work inline
