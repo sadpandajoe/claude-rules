@@ -56,7 +56,7 @@ Then assess complexity:
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-**Trivial + confidence 8/10+**: Skip to the trivial path — step 5.
+**Trivial + confidence 8/10+**: Auto-proceed — do not ask the user for confirmation; skip to the trivial path — step 5.
 
 **Moderate + confidence 8/10+**: Skip plan mode and full reviewer army. Orchestrator designs inline:
 1. Explore and design in the main thread (no plan mode, no investigation subagents)

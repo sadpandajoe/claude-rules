@@ -121,7 +121,7 @@
    | Fix type | Mechanical (format, dep, config) | Logic change, known pattern | Behavioral, cross-cutting |
    | Verification | STRONG or PARTIAL available | STRONG or PARTIAL available | WEAK only |
 
-   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
+   **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Auto-proceed — do not ask the user for confirmation; execute the trivial path directly without entering standard-path steps 5–7:
    1. Apply the fix (step 8)
    2. Verify locally (step 9)
    3. Review gate — choose based on diff content:
