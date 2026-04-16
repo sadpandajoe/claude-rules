@@ -51,7 +51,7 @@ make_gradient_bar() {
             bar+=$(printf "%b%b%s%b" "$bg" "$WHITE" "$ch" "$RESET")
         else
             if [ "$ch" = " " ]; then
-                bar+=$(printf "%b%b▚%b" "$BG_CHECK" "\033[38;5;248m" "$RESET")
+                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "\033[38;5;248m" "$RESET")
             else
                 bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
             fi
