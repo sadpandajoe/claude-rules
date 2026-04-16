@@ -31,7 +31,6 @@ Run this **before** build/test validation. A clean build doesn't catch unrelated
 
 **This step is mandatory for every cherry-pick, including clean applies with zero conflicts.** Clean applies are the highest-risk vector for scope leak — git silently picks up the source branch's current state of conflicting regions, which may include changes from adjacent commits that happened to touch the same lines. No conflicts are raised, no scrutiny is triggered, and the leaked code ships.
 
-
 1. Get the source commit's diff: `git diff <source-commit>^..<source-commit>`
 2. Get the cherry-pick result diff: `git diff HEAD^..HEAD`
 3. Compare file-by-file:
