@@ -8,7 +8,7 @@
 
 ## Plan Mode Usage
 
-Steps 1–2 (normalize input, complexity gate) happen **before** plan mode in normal mode. The complexity gate must be visible in conversation, and a TRIVIAL result skips plan mode entirely.
+Steps 1–2 (normalize input, complexity gate) happen **before** plan mode in normal mode. The complexity gate must be visible in conversation, and a TRIVIAL or MODERATE result skips plan mode entirely.
 
 **Standard path**: After the complexity gate, enter plan mode for investigation and planning (steps 3–10). Let plan mode's natural phases drive the work, seeded with this command's requirements:
 
@@ -21,6 +21,8 @@ Steps 1–2 (normalize input, complexity gate) happen **before** plan mode in no
 
 On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PROJECT.md, then implement, review, QA, commit.
 
+**Moderate path**: Do not enter plan mode. Orchestrator investigates and plans inline (no investigation-lane subagents). Still spawn one reviewer subagent for `/review-code`. See step 2 for details.
+
 **Trivial path**: Do not enter plan mode. Go straight to implementation.
 
 **Exit trigger**: When the action gate (step 10) says "proceed" or "plan first," exit plan mode immediately — the next steps require file writes. If it says "stop and escalate," exit plan mode and surface the decision to the user.
@@ -32,8 +34,6 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 /fix-bug apache/superset#28456
 /fix-bug https://github.com/owner/repo/issues/123
 /fix-bug https://app.shortcut.com/.../story/123
-/fix-bug sc-123 sc-456 sc-789                           # batch — parallel worktrees
-/fix-bug "list: sc-123, apache/superset#28456, sc-789"  # batch — mixed refs
 ```
 
 ## Steps
@@ -49,26 +49,18 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Pull in external context when references are provided.
 
-   **Detect batch** — if multiple bug references are provided (multiple arguments, comma-separated list, or a ticket that links to several bugs):
-   - **Single bug** → continue to step 2 (existing flow)
-   - **Multiple bugs** → use the **Batch Path** section below
-
 2. **Complexity Gate**
 
    Assess the bug before launching investigation lanes:
 
-   | Signal | Trivial | Standard |
-   |--------|---------|----------|
-   | Root cause | Obvious from report | Needs investigation |
-   | Files touched | 1–2 | 3+ or unclear |
-   | Fix type | Typo, config, off-by-one | Logic, architecture |
-   | Regression risk | Isolated, testable | Cross-cutting |
-
-   Examples — TRIVIAL: error message has a typo (`settngs` → `settings`), one file, no logic change. STANDARD: dashboard filter applies to wrong panel — requires tracing filter propagation across 4+ files.
+   | Signal | Trivial | Moderate | Standard |
+   |--------|---------|----------|----------|
+   | Root cause | Obvious from report | Likely, needs confirmation | Needs investigation |
+   | Files touched | 1–2 | 2–4, single subsystem | 3+ or unclear scope |
+   | Fix type | Typo, config, off-by-one | Logic change, known pattern | Architecture, novel pattern |
+   | Regression risk | Isolated, testable | Contained, testable | Cross-cutting |
 
    Emit the Complexity Gate block per `rules/complexity-gate.md`.
-
-   Record lifecycle: `gate`
 
    **Trivial + confidence 8/10+**: Execute the trivial path directly — do not enter standard-path steps 3–10:
    1. Write the regression test (test-first when feasible) — even for 1-line fixes, a cheap assertion (model introspection, config check, type guard) is worth writing if it catches future drift
@@ -83,10 +75,22 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    6. Update PROJECT.md (single update)
    7. Emit summary (step 17)
 
-   The review gate is mid-workflow — see Continuation Rule in `rules/review-gate.md`.
+   The review gate at step 4 is mid-workflow — steps 5–7 must still execute. Do not stop after the review gate passes.
 
    **Micro-fix** (subset of trivial): per the micro-fix rule in `rules/review-gate.md`, emit `Status: micro-fix` with the diff inlined — no iterative loop needed.
    - PROJECT.md update is optional if no PROJECT.md exists and the workflow completes in a single pass
+
+   **Moderate + confidence 8/10+**: Skip plan mode and investigation-lane subagents. Orchestrator works inline:
+   1. Investigate inline — read code, check existing fixes, triage in the main thread (no subagent spawns)
+   2. Write the regression test (test-first when feasible)
+   3. Implement the fix inline
+   4. Run the actual test suite covering the changed files. Record STRONG/PARTIAL/WEAK.
+   5. `/review-code` — still spawns a reviewer subagent (never review your own work)
+   6. Commit the fix (step 16)
+   7. Update PROJECT.md (single update)
+   8. Emit summary (step 17)
+
+   If investigation reveals the bug is more complex than expected (cross-system, multiple root causes), escalate to STANDARD and enter plan mode.
 
    **Standard**: Continue to step 3.
 
@@ -100,7 +104,12 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    Determine whether to spin up subagents (via the Agent tool) for parallel investigation or run the lanes sequentially in the main thread. Subagents are worth it when multiple lanes involve non-trivial work (e.g., code investigation + upstream scan + environment prep). For simpler bugs, sequential in the main thread is fine.
 
-   When using subagents, pass each one the bug context (ticket summary, affected area, branch) and the relevant skill file. Collect the normalized output blocks before proceeding to step 4.
+   When using subagents, choose the model per `rules/orchestration.md`:
+   - `qa-triage-bug`, `investigate-bug`: `model: "sonnet"` — classification and bounded investigation
+   - `check-existing-fix`: `model: "sonnet"` (or `haiku` if it's pure issue-tracker search with no judgment required)
+   - `prepare-environment`: `model: "sonnet"` — mostly mechanical but may need light judgment
+
+   Pass each subagent the bug context (ticket summary, affected area, branch) and the relevant skill file. Brief them to commit to a finding rather than punt; if genuinely blocked, return `status: needs-input` with the specific question. The orchestrator surfaces blockers to the user; the subagent does not. Collect the normalized output blocks before proceeding to step 4.
 
 4. **Sync the Early Findings**
 
@@ -146,14 +155,17 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    If the helper returns `FIXED_UPSTREAM`:
    - route internally to `/cherry-pick`
-   - let the cherry-pick workflow own the branch movement
+   - let `release-engineer` own the branch movement
    - return to this workflow for validation, `/review-code`, and final summary
    - do not auto-commit after the cherry-pick path; let the user decide whether any follow-up should be amended or added separately
 
 9. **Validate the RCA for Unfixed Bugs**
 
    For `UNFIXED` issues:
-   - validate the diagnosis with the shared RCA reviewer
+   - validate the diagnosis with a shared RCA reviewer subagent
+   - Model per `rules/orchestration.md`:
+     - `model: "sonnet"` when the RCA is well-bounded (single failure mode, clear evidence chain)
+     - `model: "opus"` when multiple plausible root causes exist, the failure crosses systems, or the proposed fix changes behavior in ways needing broader trade-off analysis
 
 10. **Run the Action Gate**
 
@@ -162,37 +174,18 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - do internal planning first
    - stop for ambiguity or risk
 
-11. **Plan Fix + QA in Parallel**
-
-   Once RCA is validated and the action gate says proceed, launch two workstreams together:
-
-   **Architect**: Use `plan-change.md` to produce structured slices with scope, entrance/exit criteria, and acceptance. The RCA tells the Architect *what* to fix; the slices define *how*.
-
-   **QA**: Use `qa-analyze-use-cases.md` to derive test scenarios from the validated RCA — what behaviors should the fix restore? What edge cases surround the root cause? Use `qa-expand-scenarios.md` to identify adjacent flows that might be affected. Produce a test plan that maps scenarios to the fix slices.
-
-   QA doesn't need the slices to plan — it needs the RCA. The Architect doesn't need the test plan to slice — it needs the RCA. Both consume the RCA, both produce criteria. Running them in parallel means devs get both the slice definitions AND the test plan before writing code.
-
-   Record lifecycle: `plan-complete`
-
-12. **Exit Plan Mode → PROJECT.md**
+11. **Exit Plan Mode → PROJECT.md**
 
    Read the plan file produced by plan mode. Write its content into PROJECT.md:
    - bug summary, repro status, affected area
    - upstream-fix status
    - validated RCA
-   - fix approach with structured slices (from Architect)
-   - QA test plan mapped to slices
+   - fix approach and test strategy
    - action-gate outcome
 
    This is the first PROJECT.md write for the standard path. All findings collected during plan mode are flushed here.
 
-12½. **Checkpoint Before Implementation**
-
-   The plan→implement transition is the deepest context point — investigation findings, RCA, QA plans, and structured slices are all in memory. Check context depth per `rules/context-management.md`. If at or above ~70%, run `/checkpoint --commit --clear` before proceeding. After `/clear`, `/start` reloads PROJECT.md (which has the full plan from step 12) and resumes at step 13.
-
-13. **Implement**
-
-   Dev subagents get both the slice context AND the QA test scenarios — they know exactly what tests to write (TDD from the QA plan).
+12. **Implement Through `developer`**
 
    Before changing the code:
    - define the regression this fix must catch
@@ -205,42 +198,44 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    For direct fixes:
    - use `implement-change.md`
 
-   For non-trivial fixes (slices already produced in step 11):
-   - dispatch slices through `implement-change.md`:
-     - **Independent slices**: launch as parallel subagents with `isolation: "worktree"`, each verifying its own exit criteria and committing on the worktree's temp branch
-     - **Sequential slices**: implement in dependency order
-     - **Single slice**: implement as one unit (no worktree needed)
-   - after all subagents complete, use `sync-workstreams.md` to collect results, update the slice status table in PROJECT.md, and merge worktree branches. Branch on its recommendation (`proceed-to-review` / `stop-for-failure` / `stop-for-conflict`).
+   For non-trivial fixes:
+   - spawn a planning subagent (Agent tool, `subagent_type: "general-purpose"`) using `plan-change.md`. Choose the model per `rules/orchestration.md`:
+     - `model: "sonnet"` when the fix is non-mechanical but well-scoped (one module, clear constraints)
+     - `model: "opus"` when the fix spans systems, has architectural trade-offs, or the failure surface is still partially ambiguous
+   - the subagent returns the plan; the orchestrator applies it via `implement-change.md`
 
-   Record lifecycle: `impl-complete`
+13. **Expand Regression Coverage** (gate)
 
-14. **QA Validates the Fix**
+   Keep this phase tightly scoped to the bug at hand:
+   - `developer` adds or updates only the automated tests needed to protect this fix
+   - `qa` identifies must-cover scenarios, suggested follow-up tests, and out-of-scope risks
 
-   Execute the QA test plan from step 11 against the implemented code:
-   - Dev subagents already wrote unit/integration tests per-slice (from the QA test scenarios) — verify they exist and pass
-   - Run `qa-execute-use-cases.md` for cross-slice integration scenarios
-   - Use `qa-validate-fix.md` for scenarios that need live environment validation
-   - If any test is missing, add it now — do not proceed to commit without regression coverage for the root cause
+   Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap — writing the test is separate from running it. The test must exist in the commit; CI or a future local run validates it.
 
-   Do not proceed to commit if no test was added or updated. If tests cannot run locally (missing Docker, env, data), write the test anyway and note the verification gap.
+14. **Review Changed Files** (gate — not the finish line)
 
-15. **Review Changed Files** (gate)
+   Switch mental mode: review the changes as if someone else wrote them.
 
-   Launch `/review-code` as a **subagent** (`model: "opus"`) with context isolation per `rules/orchestration.md`. Pass the merged diff, validated RCA, acceptance criteria, and QA test results from step 14.
+   Run `/review-code` on changed repo-tracked files as an internal loop.
+   Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-   For multi-slice implementations: review the full merged diff. Per-slice exit criteria already verified each slice individually — this review checks the integrated result.
+   If step 13 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
 
-   **Classify review findings before looping:** Use `feedback-classify.md` to classify each finding as code-level or plan-level.
-   - **Code-level** (logic, edge case, test gap): fix in the review loop as normal
-   - **Plan-level** (RCA was incomplete, slice boundary wrong, fix scope too narrow/wide): route back to step 11 for re-planning rather than looping review
+   The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`, `micro-fix`.
 
-   If step 14 or the trivial path already assessed verification strength (STRONG/PARTIAL/WEAK), pass it to `/review-code` — do not re-run the same test discovery.
+   For truly minimal mechanical fixes (typo, config value, lint-disable), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
-   Emit a Review Gate block per `rules/review-gate.md`. For truly minimal mechanical fixes, apply the skip rule.
+   Do not skip this step when resuming from a pre-built plan.
 
-   Record lifecycle: `review-gate`
+   **After the review gate passes, continue to steps 15–17.** The review gate is mid-workflow, not the end.
 
-   After the review gate passes, continue to steps 16–17 — see Continuation Rule in `rules/review-gate.md`.
+15. **Validate the Fix With QA When Needed**
+
+   For UI, workflow, or live-behavior bugs:
+   - run `qa-validate-fix.md` when the app is runnable locally or in a suitable environment
+   - use Playwright MCP as the default UI repro and validation path when available
+
+   If the app cannot be run locally (missing Docker, env dependencies, or data requirements), note the blocker in PROJECT.md and skip QA validation. Check prerequisites before attempting — don't discover the failure experimentally.
 
 16. **Commit New Bug Fixes**
 
@@ -251,7 +246,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - do not auto-commit beyond the cherry-pick result
    - leave any follow-up amend or extra-commit decision to the user
 
-17. **Summary** (PM wrap-up)
+17. **Summary**
 
    Lead with the answer to the user's original question — not the implementation details. If the user asked "did X break things?", answer that first. Technical details go in a collapsible section or are omitted unless the user asked for them.
 
@@ -286,110 +281,34 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    </details>
    ```
 
-   Record lifecycle: `command-complete`
+## PROJECT.md Update Discipline
 
-## Batch Path
+Update `PROJECT.md` at these points:
 
-When step 1 detects multiple bugs, use this path instead of steps 2–17.
+**Standard path:**
+- **step 11** — after exiting plan mode, flush all investigation findings (triage, RCA, upstream status, action-gate outcome) into PROJECT.md. This is the first write.
+- after implementation, review, and QA validation
+- at final completion with the branch outcome and commit result
 
-### B1. Triage for Shared Root Causes
-
-Before dispatching, do a lightweight investigation of all bugs together:
-- Fetch each bug's description, affected area, and error details
-- Look for overlap: do multiple bugs reference the same file, component, or behavior?
-- **Shared root cause** → group them into one fix (single `/fix-bug` run, not parallel)
-- **Independent bugs** → dispatch in parallel
-
-Output:
-
-```markdown
-## Bug Batch — [N] bugs
-
-### Groups
-| Group | Bugs | Reason | Strategy |
-|-------|------|--------|----------|
-| 1 | [refs] | Shared root cause: [description] | Single fix |
-| 2 | [ref] | Independent | Parallel worktree |
-| 3 | [ref] | Independent | Parallel worktree |
-```
-
-### B2. Write Batch Plan to PROJECT.md
-
-Write the group table and tracking status:
-
-```markdown
-### Batch Status
-| # | Bug | Group | Branch | Status |
-|---|-----|-------|--------|--------|
-| 1 | [ref] | 1 | `fix/[slug]` | pending |
-| 2 | [ref] | 2 | `fix/[slug]` | pending |
-```
-
-### B3. Execute in Parallel
-
-For each independent group, dispatch a subagent:
-
-```
-Agent(
-  isolation: "worktree",
-  model: "opus",
-  prompt: "Read and follow {{TOOLKIT_DIR}}/commands/fix-bug.md for bug [ref].
-    This is a single bug — use the standard flow (steps 1–17).
-    You are the orchestrator for this bug: create your own PROJECT.md, investigate, fix, review, and commit.
-    Create branch: fix/[slug].
-    Return: branch name, commit SHAs, root cause summary, and any blockers."
-)
-```
-
-Each subagent is a **full orchestrator** for its bug (nested orchestration per `rules/orchestration.md`).
-
-For shared-root-cause groups: run as a single `/fix-bug` in one worktree with all grouped bugs as context.
-
-**Concurrency**: Check resources per `rules/resource-management.md`. Typical limits: 2–3 parallel bugs with Docker running, 3–4 without.
-
-### B4. Collect Results and Create PRs
-
-After all subagents complete:
-- Collect results (success/failure/blocked per bug)
-- Run `/create-pr` for each successful fix branch
-- Update batch status in PROJECT.md
-
-### B5. Batch Summary
-
-```markdown
-## Fix-Bug Batch Complete
-
-### Results
-| Bug | PR | Root Cause | Status |
-|-----|----|-----------|--------|
-| [ref] | #[N] | [one-line RCA] | fixed |
-| [ref] | — | [reason] | blocked |
-
-### Remaining
-- [Blocked bugs and what's needed to unblock them, or "None"]
-```
-
-Record lifecycle: `command-complete`
+Record the smallest useful status refresh each time. Do not wait until the end if the workflow has materially advanced.
 
 ## Continuation Checkpoint
 
-**Single-bug phases**: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / checkpoint / implement / review / qa-validate / commit / summarize
-
-**Batch phases**: normalize / triage-shared-causes / write-batch-plan / execute-parallel / collect-results / batch-summary
-
-State (single bug):
-- Complexity: <trivial / standard>
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /fix-bug <arguments>
+- Phase: triage / complexity-gate / existing-fix-check / ui-repro / rca / action-gate / exit-plan-mode / implement / review / qa-validate / commit / summarize
+- Resume target: <issue, PR, repro path, file set, or current validation target>
+- Completed items: <finished phases or decisions already locked in>
+### State
+- Complexity: <trivial / moderate / standard>
 - Existing-fix status: <FIXED_UPSTREAM / FIX_PENDING_PR / UNFIXED>
 - RCA status: <validated / pending / not needed>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
-
-State (batch):
-- Mode: batch
-- Bugs: <N total, N complete, N failed, N blocked>
-- Groups: <N independent, N shared-root-cause>
-- PRs created: <list or none>
+```
 
 ## Cross-Repo Bugs
 
@@ -400,9 +319,7 @@ When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fi
 - If local tests in repo B can partially cover the fix (e.g., model introspection, type checks), still run them — partial coverage beats none
 
 ## Notes
-- `/fix-bug` accepts single bugs or batches — batch detection is automatic based on input count
-- Batch path: independent bugs run in parallel worktrees, shared-root-cause bugs are grouped into one fix
-- `/fix-bug` is the public bug entrypoint; RCA-only work stays inside the internal investigation skills
+- `/fix-bug` is the public bug entrypoint; RCA-only work now stays inside the internal `developer` and `core` helpers
 - Keep `PROJECT.md` updates command-owned
 - Prefer the open-PR or cherry-pick path over inventing a new fix
 - Use test-first implementation by default; document why when the failing test cannot be written first

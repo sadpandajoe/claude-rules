@@ -1,6 +1,6 @@
 # Complexity Gate
 
-Classification protocol for commands that branch on trivial vs. standard paths. This defines the output block format and fast-path rule. Signal tables are command-specific and stay in commands.
+Classification protocol for commands that branch on trivial, moderate, or standard paths. This defines the output block format and path rules. Signal tables are command-specific and stay in commands.
 
 ## Block Format
 
@@ -8,7 +8,7 @@ Always emit this block in conversation before branching:
 
 ```markdown
 ## Complexity Gate
-Classification: TRIVIAL / STANDARD
+Classification: TRIVIAL / MODERATE / STANDARD
 Confidence: X/10
 Reason: [one line]
 ```
@@ -16,8 +16,32 @@ Reason: [one line]
 ## Trivial Fast-Path
 
 When classification is `TRIVIAL` and confidence is `8/10` or higher:
-- Skip the standard path (plan mode, investigation lanes, RCA validation)
+- Skip plan mode, investigation lanes, RCA validation, and reviewer subagents
 - Go directly to implementation, verify, review, summary
+- Zero subagent spawns — orchestrator does all work inline
+
+## Moderate Path
+
+When classification is `MODERATE` and confidence is `8/10` or higher:
+- Skip plan mode and parallel investigation-lane subagents
+- Orchestrator investigates and plans inline (no investigation subagent spawns)
+- Still spawn **one** reviewer subagent for code/plan review — never review your own work
+- Still run tests and emit a Review Gate block
+- Spawn additional subagents only when parallelism provides a clear wall-clock win
+
+**When to classify MODERATE** (any of these signals):
+- 2–4 files touched, but within a single subsystem
+- Non-mechanical change, but well-understood pattern (add endpoint, extend model, new test file)
+- No architectural decisions or cross-system trade-offs
+- Clear fix or implementation approach — investigation confirms rather than discovers
+
+MODERATE is the **default classification** — most real work lands here. Use TRIVIAL only for truly mechanical changes, STANDARD only when genuine multi-system complexity or ambiguity exists.
+
+## Standard Path
+
+When classification is `STANDARD` (or confidence is below `8/10` for any classification):
+- Full workflow: plan mode, investigation lanes, reviewer subagents, RCA validation
+- Spawn subagents per command-specific steps and `rules/orchestration.md` model tiers
 
 ## Never Silently Decide
 
@@ -39,4 +63,4 @@ Always emit the gate block above. Do not silently choose a path — the block mu
 
 ## Scope
 
-This rule defines an output contract. It does not define the signal tables (those are command-specific) or the trivial-path steps (those are command-owned).
+This rule defines an output contract. It does not define the signal tables (those are command-specific) or the path-specific steps (those are command-owned).
