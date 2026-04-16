@@ -31,27 +31,14 @@
 | `fixup` + `rebase` for old commits | Amend non-HEAD commits |
 | Factual PR descriptions | Hyperbolic language |
 
-## Commit Strategy: Fixup + Autosquash
-
-When fixes need to be folded back into their originating commits (e.g., CI fix belongs in the commit that introduced the issue), use the fixup+autosquash pattern:
-
-```bash
-git commit --fixup=<originating-sha>
-# repeat for each originating commit
-git rebase --autosquash <base>
-```
-
-**Dependency ordering**: When staging files for commit A's fixup, pre-commit hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
-
-**Default behavior**: Stop before commit and let the user decide the commit strategy. Only use fixup+autosquash when the user explicitly requests fixes folded into originating commits.
-
 ## Pre-Flight Checks
 
 **Before every commit**, verify:
 1. **Build passes**: `npm run build`, `tsc --noEmit`, or equivalent
 2. **Type-check passes**: if TypeScript/Flow/mypy is used
 3. **Linting passes**: `npm run lint`, `ruff check`, or equivalent
-4. **Tests pass**: run at minimum the tests related to changed files
-5. **Pre-commit hooks**: let them run — do NOT use `--no-verify`
+4. **Formatting passes**: run the formatter in check mode (`ruff format --check`, `prettier --check`, `gofmt -l`) in addition to the linter — lint and format are separate passes and CI runs both. If the check reports diffs, apply the formatter and re-stage before committing.
+5. **Tests pass**: run at minimum the tests related to changed files
+6. **Pre-commit hooks**: let them run — do NOT use `--no-verify`
 
 **In worktrees**: dependencies and build outputs may not exist. Run `npm install` / rebuild before pre-flight checks.
