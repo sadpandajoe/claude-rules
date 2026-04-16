@@ -23,6 +23,28 @@ When project tooling allows it safely, run these in parallel:
 
 Avoid parallel validation when the project's test/build tooling fights for the same generated outputs or shared local environment.
 
+## Diff Audit (Scope Leak Check)
+
+Run this **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
+
+1. Get the source commit's diff: `git diff <source-commit>^..<source-commit>`
+2. Get the cherry-pick result diff: `git diff HEAD^..HEAD`
+3. Compare file-by-file:
+   - **Extra files**: any file changed in the cherry-pick that wasn't in the source commit is a leak. Revert it with `git checkout HEAD^ -- <file>` and amend.
+   - **Extra hunks**: within a shared file, any hunk in the cherry-pick diff that has no corresponding change in the source diff is a leak candidate. It may be a legitimate adaptation (e.g., import path change for the target branch) or an accidental pickup from an adjacent commit.
+4. For each extra hunk, determine origin: `git log --oneline --all -S "<leaked line>" -- <file>` — if it belongs to a different commit than the one being cherry-picked, it's a leak.
+5. Report findings as a **Scope Audit** block:
+
+```markdown
+## Scope Audit
+Files in source: [N] | Files in cherry-pick: [M]
+Extra files: [list or "none"]
+Extra hunks: [list with origin commit or "none"]
+Verdict: [clean / leaked — reverted / leaked — kept with justification]
+```
+
+If the audit finds leaks, revert them before proceeding to build/test validation. If a leaked change appears to be a required prerequisite, escalate to the user rather than silently keeping it.
+
 ## Validation Order
 
 At minimum:

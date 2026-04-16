@@ -10,6 +10,7 @@
 - [ ] **Adapt rather than force** — work with target architecture
 - [ ] **Verify imports/modules exist** in target branch
 - [ ] **Prefer functional over structural** — extract value, not architecture
+- [ ] **Audit cherry-pick scope** — after resolution, diff-audit the result against the source commit to detect leaked changes from adjacent commits (see validate phase)
 - [ ] **Document decisions** — what accepted, rejected, why
 
 ## Accept vs Reject
