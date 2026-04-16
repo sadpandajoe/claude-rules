@@ -239,8 +239,13 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
 16. **Commit New Bug Fixes**
 
-   If this workflow implemented a new fix itself:
-   - create a normal `fix:` commit after review and validation pass
+   If this workflow implemented a new fix itself, branch on fix type and verification strength:
+
+   | Scenario | Action |
+   |----------|--------|
+   | Trivial fix + STRONG verification | Commit (`fix:`) + push automatically |
+   | Standard/moderate fix + STRONG verification | Commit (`fix:`) + push automatically |
+   | PARTIAL or WEAK verification | Commit (`fix:`) — stop before push, note verification gap |
 
    If this workflow routed through cherry-pick:
    - do not auto-commit beyond the cherry-pick result
@@ -324,5 +329,5 @@ When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fi
 - Prefer the open-PR or cherry-pick path over inventing a new fix
 - Use test-first implementation by default; document why when the failing test cannot be written first
 - `/review-code` is an internal phase here, not the expected next top-level user step
-- Auto-commit only when this workflow implemented a fresh bug fix itself
+- Auto-commit and push when this workflow implemented a fresh bug fix with STRONG verification; stop before push only when verification is PARTIAL or WEAK
 - When resuming from a pre-built plan, enter at the implementation phase but still run review, QA, and pre-flight checks before declaring done
