@@ -82,7 +82,7 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    Reason: [one line]
    ```
 
-   - **Mechanical + confidence 8/10+**: fast path — apply directly, validate with targeted checks, skip full adapt cycle. If a single change and `Risk: LOW`, combine investigate and apply into one phase.
+   - **Mechanical + confidence 8/10+**: fast path — apply directly, skip full adapt cycle. **Still runs diff audit via validate subagent** — clean applies are the primary scope leak vector. If a single change and `Risk: LOW`, combine investigate and apply into one phase.
    - **Non-mechanical**: full path — investigate, adapt if needed, validate, and stop for user decisions when required.
 
    Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
@@ -103,12 +103,23 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
    If the cherry-pick state is lost, do not continue blindly; return to the apply phase.
    If a prerequisite or behavior decision is required, stop and ask the user.
 
-5. **Validate Each Applied Change**
+5. **Validate Each Applied Change (subagent — mandatory)**
 
-   This phase owns validation depth, including stronger checks for dependency-manifest changes.
+   **Always run validation as a subagent**, never inline in the orchestrator thread. The thread that applied the cherry-pick must not validate its own work — the same separation principle as code review. Use `model: "sonnet"` per `rules/orchestration.md`.
+
+   **The diff audit is mandatory for every cherry-pick, including clean applies.** Clean applies are the highest-risk vector for scope leak — when git resolves without conflicts, nobody scrutinizes the result, and changes from adjacent commits on the source branch silently enter the target. The #38809 incident (SC-104110, P1) was a clean cherry-pick that leaked the `hideTab` guard from an adjacent commit.
+
+   The subagent runs `cherry-pick-validate.md` which includes:
+   1. **Diff audit** — compare source commit diff vs cherry-pick result diff, flag extra files/hunks
+   2. **Build/lint/type-check** — repo-standard checks
+   3. **Targeted tests** — covering the changed area
+
+   If the diff audit finds scope leak, the subagent reverts the leaked hunks and reports back. The orchestrator then amends the cherry-pick before pushing.
+
+   This phase also owns validation depth for dependency-manifest changes.
    If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
 
-   **Push after each successful cherry-pick**: After local validation passes, push immediately so CI runs against the change. CI matrices vary per repo (some include frontend, some don't) — early push gets that signal sooner rather than batching risk at the end.
+   **Push after each successful cherry-pick**: After local validation passes, push immediately so CI runs against the change.
    ```bash
    git push
    ```

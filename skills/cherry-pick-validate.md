@@ -6,9 +6,11 @@ model: sonnet
 
 Use this phase after a cherry-pick applies cleanly or after conflict resolution completes.
 
+**This phase must always run as a subagent**, never inline in the orchestrator thread. The thread that applied the cherry-pick must not validate its own work.
+
 ## Goal
 
-Prove that the moved change is integrated cleanly and did not leave the target branch in a broken state.
+Prove that the moved change is integrated cleanly, contains only the intended changes, and did not leave the target branch in a broken state.
 
 This phase owns post-apply verification only.
 It should consume risk signals from investigate and adaptation signals from adapt rather than re-litigating whether the cherry-pick should have happened.
@@ -23,9 +25,11 @@ When project tooling allows it safely, run these in parallel:
 
 Avoid parallel validation when the project's test/build tooling fights for the same generated outputs or shared local environment.
 
-## Diff Audit (Scope Leak Check)
+## Diff Audit (Scope Leak Check) — MANDATORY
 
 Run this **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
+
+**This step is mandatory for every cherry-pick, including clean applies with zero conflicts.** Clean applies are the highest-risk vector for scope leak — git silently picks up the source branch's current state of conflicting regions, which may include changes from adjacent commits that happened to touch the same lines. No conflicts are raised, no scrutiny is triggered, and the leaked code ships.
 
 1. Get the source commit's diff: `git diff <source-commit>^..<source-commit>`
 2. Get the cherry-pick result diff: `git diff HEAD^..HEAD`
