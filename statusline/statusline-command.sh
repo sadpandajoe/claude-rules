@@ -7,6 +7,7 @@ input=$(cat)
 RESET="\033[0m"
 WHITE="\033[97m"
 GRAY="\033[90m"
+BG_CHECK="\033[48;5;238m"
 BG_GREEN="\033[42m"
 BG_YELLOW="\033[43m"
 BG_RED="\033[41m"
@@ -16,27 +17,18 @@ FG_RED="\033[31m"
 
 # --- Helpers ---
 
-# bg_color_for_pct <percentage> <yellow_threshold> <red_threshold>
-bg_color_for_pct() {
-    local pct=$1 yellow=$2 red=$3
-    if [ "$pct" -ge "$red" ]; then
-        printf "%b" "$BG_RED"
-    elif [ "$pct" -ge "$yellow" ]; then
-        printf "%b" "$BG_YELLOW"
-    else
-        printf "%b" "$BG_GREEN"
-    fi
-}
-
-# make_centered_bar <percentage> <bg_color> [inner_width=10]
-# Renders: [  XX%  ] — bg fill from the left, percentage text centered
-make_centered_bar() {
+# make_gradient_bar <percentage> <yellow_threshold> <red_threshold> [inner_width=10]
+# Renders: [  XX%  ] — filled cells use green/yellow/red gradient based on position
+make_gradient_bar() {
     local pct=$1
-    local bg_color=$2
-    local width=${3:-10}
+    local yellow=$2
+    local red=$3
+    local width=${4:-10}
     (( pct < 0 )) && pct=0
     (( pct > 100 )) && pct=100
     local filled=$(( pct * width / 100 ))
+    local yellow_col=$(( yellow * width / 100 ))
+    local red_col=$(( red * width / 100 ))
     local text
     text=$(printf "%d%%" "$pct")
     local tlen=${#text}
@@ -48,9 +40,25 @@ make_centered_bar() {
     for ((i=0; i<width; i++)); do
         local ch="${full_inner:$i:1}"
         if [ "$i" -lt "$filled" ]; then
-            bar+=$(printf "%b%b%s%b" "$bg_color" "$WHITE" "$ch" "$RESET")
+            local fg
+            if [ "$i" -ge "$red_col" ]; then
+                fg="$FG_RED"
+            elif [ "$i" -ge "$yellow_col" ]; then
+                fg="$FG_YELLOW"
+            else
+                fg="$FG_GREEN"
+            fi
+            if [ "$ch" = " " ]; then
+                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "$fg" "$RESET")
+            else
+                bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
+            fi
         else
-            bar+=$(printf "%b%s%b" "$GRAY" "$ch" "$RESET")
+            if [ "$ch" = " " ]; then
+                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "\033[38;5;248m" "$RESET")
+            else
+                bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
+            fi
         fi
     done
     printf "[%s]" "$bar"
@@ -234,20 +242,17 @@ BAR_WIDTH=10
 line2_parts=()
 
 if [ -n "$ctx_pct" ]; then
-    bg=$(bg_color_for_pct "$ctx_pct" 50 70)
-    bar=$(make_centered_bar "$ctx_pct" "$bg" "$BAR_WIDTH")
+    bar=$(make_gradient_bar "$ctx_pct" 50 70 "$BAR_WIDTH")
     line2_parts+=("session $bar")
 fi
 
 if [ -n "$five_hr_pct" ]; then
-    bg=$(bg_color_for_pct "$five_hr_pct" 50 80)
-    bar=$(make_centered_bar "$five_hr_pct" "$bg" "$BAR_WIDTH")
+    bar=$(make_gradient_bar "$five_hr_pct" 50 80 "$BAR_WIDTH")
     line2_parts+=("5h $bar")
 fi
 
 if [ -n "$seven_day_pct" ]; then
-    bg=$(bg_color_for_pct "$seven_day_pct" 50 80)
-    bar=$(make_centered_bar "$seven_day_pct" "$bg" "$BAR_WIDTH")
+    bar=$(make_gradient_bar "$seven_day_pct" 50 80 "$BAR_WIDTH")
     line2_parts+=("7d $bar")
 fi
 
@@ -297,6 +302,6 @@ done
 
 # --- Output ---
 output="$line1"
-[ -n "$line2" ] && output="${output}\n${line2}"
-[ -n "$line3" ] && output="${output}\n${line3}"
-printf "%b" "$output"
+[ -n "$line2" ] && output="${output}"$'\n'"${line2}"
+[ -n "$line3" ] && output="${output}"$'\n'"${line3}"
+printf "%s" "$output"
