@@ -180,10 +180,23 @@
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
+   **Commit strategy**: Branch on fix type and verification strength:
+
+   | Scenario | Action |
+   |----------|--------|
+   | Lint/style only, cherry-pick flow | Amend into the breaking cherry-pick commit + force-push |
+   | Lint/style only, single parent commit clear | Amend + force-push feature branch |
+   | Lint/style only, multiple parent commits | `style:` commit + push |
+   | Trivial code fix + STRONG verification | New commit + push |
+   | Standard path or PARTIAL/WEAK verification | Stop before commit — present diagnosis and recommended next step |
+
+   **Detecting cherry-pick flow**: Check `git log --grep="cherry picked from commit"` on recent branch commits. If cherry-picked commits are present, trace which one last touched the lint-failing files (`git log -- <file>` filtered to cherry-picked SHAs) — that is the commit to amend into, not necessarily the latest.
+
+   **Force-push safety**: Force-push is only permitted on the current feature branch, never on main/master or shared branches.
+
+   **Amend mechanics**: Use the fixup+autosquash pattern when amending a non-tip commit:
    ```bash
    git commit --fixup=<originating-sha>
-   # repeat for each originating commit
    git rebase --autosquash <base>
    ```
 
@@ -255,7 +268,7 @@ Keep the updates compact, but do not defer all state changes to the end of the w
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone
-- Auto-fixing is a phase, not the contract; the command still stops before commit
+- Auto-fixing is a phase, not the contract; trivial fixes with STRONG verification commit and push automatically — standard-path and weak-verification fixes still stop before commit
 - Keep PROJECT.md updates command-owned, not skill-owned
 - If verification is weak or the root cause is ambiguous, stop instead of widening scope
 - `/review-code` is an internal phase here, not the expected next top-level user step

@@ -140,6 +140,7 @@ Update PROJECT.md with final review scores after this step.
 1. Implement the change
 2. Run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
 3. Update PROJECT.md (single update) — skip if no PROJECT.md exists and work completes without blockers
+4. If STRONG verification + review clean: commit (`feat:`) + push automatically. If PARTIAL or WEAK: commit — stop before push, note verification gap.
 
 If a meaningful decision surfaces during implementation, stop and present it clearly.
 
@@ -229,5 +230,6 @@ Use this checklist to verify you haven't skipped a gate:
 - Only pause when a real decision matters
 - Use test-first implementation by default for each slice; document why when it is blocked
 - `/review-code` is an internal phase here, not the expected next top-level user step
-- Stop before the final commit or PR action
+- Trivial path with STRONG verification: commit and push automatically — stop before creating a PR, that remains a user decision
+- Standard/moderate path: stop before the final commit or PR action
 - When resuming from a pre-built plan, enter at the implementation phase but still run review, QA, and pre-flight checks before declaring done
