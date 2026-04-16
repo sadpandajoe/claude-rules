@@ -26,23 +26,29 @@ Read PROJECT.md. Verify it contains a plan with at least one of:
 
 If no plan content found, stop: `"No plan found in PROJECT.md. Write a plan first, then run /review-plan."`
 
-### 2. Detect Applicable Reviewers
+### 2. Assess Plan Scope and Select Reviewers
 
-**Always run:**
-- `review-architecture`
-- `review-implementation`
-- `review-testplan`
+Assess the plan's complexity to determine reviewer depth:
 
-**Conditional:**
+| Plan scope | Reviewers | Cold read |
+|------------|-----------|-----------|
+| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `review-implementation` | `finalize-plan` |
+| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `review-architecture` + `review-implementation` + `review-testplan` | `finalize-plan` |
+
+**Conditional reviewers** (add to substantial plans when applicable):
 - `review-frontend` — if plan touches frontend (React, CSS, UI components)
 - `review-backend` — if plan touches backend (API, database, migrations)
 - `review-feature-brief` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
 
-State which reviewers are selected and why before launching.
+State the scope assessment, which reviewers are selected, and why before launching.
 
 ### 3. Review Iterations
 
-Launch all selected reviewer subagents in parallel (`model: "opus"`). Each reviewer:
+Launch selected reviewer subagents in parallel. **Choose the reviewer model based on the actual plan complexity**, per `rules/orchestration.md`:
+- **Moderate plan**: use `model: "sonnet"`.
+- **Substantial plan** (multi-system, real trade-offs, novel design, ambiguous constraints): use `model: "opus"`.
+
+When mixed, default to Sonnet and escalate the specific failing reviewer to Opus on re-run if the Sonnet pass scored low for shallow analysis (not for legitimate plan issues). Each reviewer:
 - Reads PROJECT.md for the plan content
 - Loads its own skill file (subagents load their own domain rules)
 - Produces a scored review block (X/10 with strengths, issues, suggestions)
@@ -100,15 +106,26 @@ Write final review scores to PROJECT.md:
 - [ ] PROJECT.md updated with final scores
 - [ ] Summary emitted
 
+## PROJECT.md Update Discipline
+
+- After review iterations complete: write final scores
+- If revisions were made: the plan sections in PROJECT.md are updated as part of each revision
+
 ## Continuation Checkpoint
 
-Phases: read-plan / detect-reviewers / review-iterations / cold-read / update / summarize
-
-State:
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /review-plan [flags]
+- Phase: read-plan / detect-reviewers / review-iterations / cold-read / update / summarize
+- Resume target: [current reviewer or iteration round]
+- Completed items: [reviewers already at 8/10]
+### State
 - Reviewers selected: [list]
 - Current scores: [reviewer: score, ...]
 - Cold read: [go / no-go / pending]
 - Revisions made: [count]
+```
 
 ## Notes
 - Standalone command — `/create-feature` step 4 does the same work inline, but this is for one-off use

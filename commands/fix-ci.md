@@ -27,46 +27,72 @@
 
 2. **Gather CI Logs**
 
-   Follow this decision tree to obtain failure logs:
+   Try `gh` first:
+   ```bash
+   # Get failed run
+   gh run list --branch <branch> --status failure --limit 1
+   gh run view <run-id> --log-failed
 
-   1. **Local file provided?** (log or zip from step 1)
-      - YES → Use it. For zips, unzip and locate failing logs; split multi-job bundles into per-failure units.
-      - NO → Continue.
+   # Or from PR
+   gh pr checks <number>
+   gh run view <run-id> --log-failed
+   ```
 
-   2. **`gh run view <run-id> --log-failed` produces output?**
-      ```bash
-      gh run list --branch <branch> --status failure --limit 1
-      gh run view <run-id> --log-failed
-      # Or from PR: gh pr checks <number> → gh run view <run-id> --log-failed
-      ```
-      - YES → Use it.
-      - NO (empty output or no failures listed) → Continue.
+   If `gh run list` returns no failures, check the check-runs endpoint — failures may be at the check-run level rather than the workflow-run level:
+   ```bash
+   gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
+     --jq '.check_runs[] | select(.conclusion == "failure")'
+   ```
 
-   3. **Check-run or per-job logs available?**
-      ```bash
-      # Check-runs (failures may be at check-run level, not workflow-run level)
-      gh api repos/{owner}/{repo}/commits/{sha}/check-runs \
-        --jq '.check_runs[] | select(.conclusion == "failure")'
+   If `gh run view --log-failed` returns empty output (exit 0 but no log lines), fall back to per-job logs:
+   ```bash
+   # List jobs for the run
+   gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
+     --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
 
-      # Per-job logs
-      gh api repos/{owner}/{repo}/actions/runs/{run-id}/jobs \
-        --jq '.jobs[] | select(.conclusion == "failure") | {id, name}'
-      gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
-      ```
-      - YES → Use them.
-      - NO → Continue.
+   # Fetch logs for each failed job
+   gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
+   ```
 
-   4. **All methods failed** (or CI is external — Jenkins, GitLab, etc.)
-      - Ask the user for a log file path or URL. Do not proceed to classification without actual log output.
+   If `gh` commands fail or CI is external (Jenkins, GitLab, etc.):
+   - Check whether a local log file or zip bundle was provided in step 1.
+   - If yes, use that file as the log source.
+   - If no, ask the user for a log file path or URL. Do not proceed to classification without actual log output.
+
+   If the input is a zip bundle:
+   - unzip it automatically
+   - locate the failing logs
+   - split multi-job bundles into per-failure units before classification
 
 3. **Classify Failures**
 
-   For each failure:
-   - identify the failing step
+   The orchestrator classifies failures inline by default — no subagent needed for most CI failures. Read the gathered logs and:
+   - identify the failing step for each failure
    - match known patterns where possible
-   - produce a root-cause hypothesis
-   - produce a narrow proposed fix
+   - produce a root-cause hypothesis per failure
+   - produce a narrow proposed fix per failure
    - state local verification approach
+   - rate each failure against the complexity signals in step 4
+
+   **Spawn a triage subagent** (`model: "sonnet"`, `subagent_type: "general-purpose"`) only when:
+   - Multiple independent failures need parallel analysis
+   - Logs are very large (>500 lines) and need focused extraction
+   - The failure pattern is novel and benefits from isolated reasoning
+
+   Expected classification shape:
+   ```
+   failures:
+     - name: <failing job/step>
+       root_cause: <hypothesis>
+       fix: <narrow proposed change>
+       verification: <how to verify locally>
+       complexity: trivial | moderate | standard
+       confidence: <0-10>
+       ours: true | false  # is this caused by our diff
+   notes: <any cross-failure context>
+   ```
+
+   Commit to a classification rather than punt. If genuinely blocked (e.g., logs are missing the actual error), surface the specific question to the user.
 
 4. **Complexity Gate**
 
@@ -86,20 +112,14 @@
    ```
    If SOME failures are ours and some are pre-existing, note the pre-existing ones and continue the workflow for the remaining failures.
 
-   Evaluate each classified failure against the complexity signals, then emit the Complexity Gate block per `rules/complexity-gate.md`.
-
-   Record lifecycle: `gate`
-
    Evaluate each classified failure against:
 
-   | Signal | Trivial | Standard |
-   |--------|---------|----------|
-   | Failure pattern | Known-pattern matches (all mechanical) | Novel failure, or mixed mechanical + behavioral |
-   | Files touched | 1-2 | 3+ or unclear |
-   | Fix type | Mechanical (format, dep, config) | Logic or behavioral change |
-   | Verification | STRONG or PARTIAL available | WEAK only |
-
-   Examples — TRIVIAL: lint failure from trailing whitespace (1 file, mechanical fix). STANDARD: test fails due to race condition in async setup (requires understanding test lifecycle, 3+ files).
+   | Signal | Trivial | Moderate | Standard |
+   |--------|---------|----------|----------|
+   | Failure pattern | Known-pattern (all mechanical) | Known-pattern but behavioral | Novel or mixed |
+   | Files touched | 1–2 | 2–4, single subsystem | 3+ or unclear scope |
+   | Fix type | Mechanical (format, dep, config) | Logic change, known pattern | Behavioral, cross-cutting |
+   | Verification | STRONG or PARTIAL available | STRONG or PARTIAL available | WEAK only |
 
    **Trivial path**: all signals are in the Trivial column and confidence is 8/10 or higher. Execute the trivial path directly — do not enter standard-path steps 5–7:
    1. Apply the fix (step 8)
@@ -109,6 +129,16 @@
       - **Any other diff**: invoke `/review-code` — must produce Review Gate block.
    4. Update PROJECT.md (single update)
    5. Emit summary (step 11)
+
+   **Moderate path**: signals are in the Moderate column and confidence is 8/10 or higher. Orchestrator works inline — no planning subagent:
+   1. Plan the fix inline (orchestrator reasons about approach in conversation)
+   2. Apply the fix (step 8)
+   3. Verify locally (step 9)
+   4. `/review-code` — still spawns a reviewer subagent (never review your own work)
+   5. Update PROJECT.md (single update)
+   6. Emit summary (step 11)
+
+   If the fix turns out more complex than expected during inline planning, escalate to STANDARD.
 
    **Standard path**: any signal is in the Standard column, or confidence is below 8/10. Continue to step 5.
 
@@ -136,19 +166,30 @@
 8. **Apply Safe Fixes**
 
    If the gate allows automatic action (or the complexity gate routed here directly):
-   - apply the narrow proposed fix
-   - keep scope limited to the failing surface
-   - hand off to `implement-change.md` only when code adaptation becomes non-mechanical
+
+   - **Trivial path** (mechanical fix, high confidence): orchestrator applies the proposed fix inline. No additional subagent.
+   - **Standard path** (non-mechanical fix, multi-file, or behavioral change): spawn a planning subagent (Agent tool, `subagent_type: "general-purpose"`). Choose the model per `rules/orchestration.md` based on the actual planning load:
+     - `model: "sonnet"` when the fix is non-mechanical but well-scoped (e.g., behavioral change confined to one module, or standard-path was triggered only by weak local verification).
+     - `model: "opus"` when the fix involves real trade-offs across files/systems, or the root cause is still partially ambiguous.
+
+     Pass the subagent the classification, RCA findings, gate result, and constraint that the plan must stay scoped to the failing surface. It returns a fix plan with file-level granularity and flags any cross-cutting concerns. The **orchestrator applies the plan** — the subagent does not edit files.
+
+   Keep scope limited to the failing surface in either path.
 
    Otherwise:
    - stop
    - present the diagnosis, uncertainty, and recommended next step
 
-   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, follow the fixup+autosquash pattern in `rules/implementation.md` (Commit Strategy section).
+   **Commit strategy**: The default is to stop before commit and let the user decide. When the user requests fixes folded back into originating commits, use the fixup+autosquash pattern:
+   ```bash
+   git commit --fixup=<originating-sha>
+   # repeat for each originating commit
+   git rebase --autosquash <base>
+   ```
 
-   Record lifecycle: `impl-complete`
+   Pre-commit hook warning: when staging files for commit A's fixup, hooks stash unstaged changes (including commit B's fix) and run checks against the incomplete state. Commit fixups in dependency order — fix the earliest commit first so later commits see clean state.
 
-9. **Verify Locally**
+9. **Verify Locally** (`build-engineer`)
 
 10. **Review Changed Files** (gate)
 
@@ -159,8 +200,6 @@
 
    For zero-logic diffs (formatting-only, lint-disable, import reorder), apply the skip rule from `rules/review-gate.md`.
    If the diff touches any logic, invoke `/review-code` — do not skip.
-
-   Record lifecycle: `review-gate`
 
 11. **Summary**
    **Full template** (standard path or trivial path with PARTIAL verification):
@@ -185,19 +224,34 @@
    Next: [specific next action]
    ```
 
-   Record lifecycle: `command-complete`
+## PROJECT.md Update Discipline
+
+**Standard path** — update `PROJECT.md` at these points:
+- after log collection and initial failure classification
+- after RCA validation when that path runs
+- after the action gate determines whether the fix will proceed automatically
+- after local verification and `/review-code`
+- at final completion with verification strength and commit recommendation
+
+Keep the updates compact, but do not defer all state changes to the end of the workflow.
 
 ## Continuation Checkpoint
 
-Phases: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
-
-State:
-- Complexity: <trivial / standard>
+```markdown
+## Continuation Checkpoint — [timestamp]
+### Workflow
+- Top-level command: /fix-ci <arguments>
+- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
+- Resume target: <run id, artifact, failing job, or changed file set>
+- Completed items: <finished phases or already-fixed failures>
+### State
+- Complexity: <trivial / moderate / standard>
 - Failure summary: <current best classification>
 - Gate result: <proceed / approval / stop>
 - Review status: <clean / blocked / pending>
 - Files changed so far: <files or none>
 - Pending blockers or decisions: <if any>
+```
 
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone
