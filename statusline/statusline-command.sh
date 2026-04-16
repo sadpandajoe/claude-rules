@@ -7,8 +7,7 @@ input=$(cat)
 RESET="\033[0m"
 WHITE="\033[97m"
 GRAY="\033[90m"
-BG_CHECK_A="\033[48;5;238m"
-BG_CHECK_B="\033[48;5;248m"
+BG_CHECK="\033[48;5;238m"
 BG_GREEN="\033[42m"
 BG_YELLOW="\033[43m"
 BG_RED="\033[41m"
@@ -51,9 +50,11 @@ make_gradient_bar() {
             fi
             bar+=$(printf "%b%b%s%b" "$bg" "$WHITE" "$ch" "$RESET")
         else
-            local cbg
-            if (( i % 2 == 0 )); then cbg="$BG_CHECK_A"; else cbg="$BG_CHECK_B"; fi
-            bar+=$(printf "%b%b%s%b" "$cbg" "$WHITE" "$ch" "$RESET")
+            if [ "$ch" = " " ]; then
+                bar+=$(printf "%b%b▚%b" "$BG_CHECK" "\033[38;5;248m" "$RESET")
+            else
+                bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
+            fi
         fi
     done
     printf "[%s]" "$bar"
