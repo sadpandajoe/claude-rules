@@ -6,10 +6,13 @@ input=$(cat)
 # Colors
 RESET="\033[0m"
 WHITE="\033[97m"
-DIM="\033[2m"
+GRAY="\033[90m"
 BG_GREEN="\033[42m"
 BG_YELLOW="\033[43m"
 BG_RED="\033[41m"
+FG_GREEN="\033[32m"
+FG_YELLOW="\033[33m"
+FG_RED="\033[31m"
 
 # --- Helpers ---
 
@@ -25,28 +28,32 @@ bg_color_for_pct() {
     fi
 }
 
-# make_pct_bar <percentage> <bg_color> [width=8]
-# Renders a background-color bar with the percentage as white text inside
-make_pct_bar() {
+# make_centered_bar <percentage> <bg_color> [inner_width=10]
+# Renders: [  XX%  ] — bg fill from the left, percentage text centered
+make_centered_bar() {
     local pct=$1
     local bg_color=$2
-    local width=${3:-8}
+    local width=${3:-10}
     (( pct < 0 )) && pct=0
     (( pct > 100 )) && pct=100
     local filled=$(( pct * width / 100 ))
-    # Left-align "XX%" text, padded with spaces to bar width
     local text
-    text=$(printf "%-${width}s" "$(printf "%d%%" "$pct")")
+    text=$(printf "%d%%" "$pct")
+    local tlen=${#text}
+    local pad_left=$(( (width - tlen) / 2 ))
+    local pad_right=$(( width - tlen - pad_left ))
+    local full_inner
+    full_inner=$(printf "%${pad_left}s%s%${pad_right}s" "" "$text" "")
     local bar="" i
     for ((i=0; i<width; i++)); do
-        local ch="${text:$i:1}"
+        local ch="${full_inner:$i:1}"
         if [ "$i" -lt "$filled" ]; then
             bar+=$(printf "%b%b%s%b" "$bg_color" "$WHITE" "$ch" "$RESET")
         else
-            bar+=$(printf "%b%s%b" "$DIM" "$ch" "$RESET")
+            bar+=$(printf "%b%s%b" "$GRAY" "$ch" "$RESET")
         fi
     done
-    printf "%s" "$bar"
+    printf "[%s]" "$bar"
 }
 
 # osc8_link <url> <text> → clickable terminal hyperlink
@@ -69,9 +76,9 @@ if [ -f "$settings_file" ]; then
     effort=$(jq -r '.effortLevel // empty' "$settings_file" 2>/dev/null)
     if [ -n "$effort" ]; then
         case "$effort" in
-            max)  effort_str=$(printf "\033[31m%s\033[0m" "$effort") ;;
-            high) effort_str=$(printf "\033[33m%s\033[0m" "$effort") ;;
-            *)    effort_str=$(printf "\033[2m%s\033[0m" "$effort") ;;
+            max)  effort_str=$(printf "%b%s%b" "$FG_RED"    "$effort" "$RESET") ;;
+            high) effort_str=$(printf "%b%s%b" "$FG_YELLOW" "$effort" "$RESET") ;;
+            *)    effort_str=$(printf "%b%s%b" "$GRAY"      "$effort" "$RESET") ;;
         esac
     fi
 fi
@@ -84,13 +91,13 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
     msg_count=$(wc -l < "$transcript" 2>/dev/null | tr -d ' ')
     if [ -n "$msg_count" ] && [ "$msg_count" -gt 0 ]; then
         if [ "$msg_count" -ge 100 ]; then
-            msg_color="\033[31m"
+            msg_color="$FG_RED"
         elif [ "$msg_count" -ge 50 ]; then
-            msg_color="\033[33m"
+            msg_color="$FG_YELLOW"
         else
-            msg_color="\033[32m"
+            msg_color="$FG_GREEN"
         fi
-        msg_str=$(printf "${msg_color}%d msgs\033[0m" "$msg_count")
+        msg_str=$(printf "%b%d msgs%b" "$msg_color" "$msg_count" "$RESET")
     fi
 
     # Session duration from transcript file birth time (macOS)
@@ -102,9 +109,9 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
         if [ "$minutes" -ge 60 ]; then
             hours=$(( minutes / 60 ))
             mins=$(( minutes % 60 ))
-            duration_str=$(printf "\033[2m%dh%02dm\033[0m" "$hours" "$mins")
+            duration_str=$(printf "session: %dh%02dm" "$hours" "$mins")
         else
-            duration_str=$(printf "\033[2m%dm\033[0m" "$minutes")
+            duration_str=$(printf "session: %dm" "$minutes")
         fi
     fi
 fi
@@ -115,13 +122,13 @@ cost_usd=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
 if [ -n "$cost_usd" ]; then
     cost_cents=$(printf "%.0f" "$(echo "$cost_usd * 100" | bc 2>/dev/null || echo 0)")
     if [ "$cost_cents" -ge 800 ]; then
-        cost_color="\033[31m"
+        cost_color="$FG_RED"
     elif [ "$cost_cents" -ge 300 ]; then
-        cost_color="\033[33m"
+        cost_color="$FG_YELLOW"
     else
-        cost_color="\033[32m"
+        cost_color="$FG_GREEN"
     fi
-    cost_str=$(printf "${cost_color}\$%.2f\033[0m" "$cost_usd")
+    cost_str=$(printf "cost %b\$%.2f%b" "$cost_color" "$cost_usd" "$RESET")
 fi
 
 # Current directory (condensed, fish-style)
@@ -136,6 +143,7 @@ fi
 branch=""
 repo_name=""
 github_base=""
+total_changes=0
 
 if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
     branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
@@ -152,18 +160,15 @@ if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
     # GitHub remote URL for OSC 8 links
     remote_url=$(git -C "$cwd" remote get-url origin 2>/dev/null)
     if [ -n "$remote_url" ]; then
-        # Strip trailing .git
         remote_clean="${remote_url%.git}"
-        # SSH: git@github.com:owner/repo → https://github.com/owner/repo
         if [[ "$remote_clean" =~ ^git@([^:]+):(.+)$ ]]; then
             github_base="https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
-        # HTTPS: https://github.com/owner/repo → as-is
         elif [[ "$remote_clean" =~ ^https?:// ]]; then
             github_base="$remote_clean"
         fi
     fi
 
-    # Git dirty indicator: staged + unstaged change counts
+    # Git dirty indicator: staged + unstaged + untracked
     staged=$(git -C "$cwd" diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
     unstaged=$(git -C "$cwd" diff --name-only 2>/dev/null | wc -l | tr -d ' ')
     untracked=$(git -C "$cwd" ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
@@ -191,46 +196,28 @@ if [ -n "$seven_day" ]; then
     seven_day_pct=$(printf "%.0f" "$seven_day")
 fi
 
-# --- Line 1: model effort | dir | duration msgs | $cost | branch | repo ---
+# --- Line 1: model effort | session dur | msgs | cost | time | diff ---
 line1_parts=()
+
+# Model + effort
 if [ -n "$model_name" ] && [ -n "$effort_str" ]; then
     line1_parts+=("$(printf "%s %s" "$model_name" "$effort_str")")
 elif [ -n "$model_name" ]; then
     line1_parts+=("$model_name")
 fi
-[ -n "$cwd_display" ] && line1_parts+=("$(printf "\033[2m%s\033[0m" "$cwd_display")")
-# Combine duration + msgs into one slot when both present
-if [ -n "$duration_str" ] && [ -n "$msg_str" ]; then
-    line1_parts+=("${duration_str} ${msg_str}")
-elif [ -n "$duration_str" ]; then
-    line1_parts+=("$duration_str")
-elif [ -n "$msg_str" ]; then
-    line1_parts+=("$msg_str")
-fi
+
+# Session duration
+[ -n "$duration_str" ] && line1_parts+=("$duration_str")
+
+# Message count
+[ -n "$msg_str" ] && line1_parts+=("$msg_str")
+
+# Cost
 [ -n "$cost_str" ] && line1_parts+=("$cost_str")
 
-# Branch with optional OSC 8 link
-if [ -n "$branch" ]; then
-    if [ -n "$github_base" ]; then
-        branch_link=$(osc8_link "${github_base}/tree/${branch}" "$branch")
-        line1_parts+=("$branch_link")
-    else
-        line1_parts+=("$branch")
-    fi
-fi
-
-# Repo name with optional dirty indicator and OSC 8 link
-if [ -n "$repo_name" ]; then
-    dirty_suffix=""
-    if [ "$total_changes" -gt 0 ]; then
-        dirty_suffix=$(printf " \033[33m+%d\033[0m" "$total_changes")
-    fi
-    if [ -n "$github_base" ]; then
-        repo_link=$(osc8_link "$github_base" "$repo_name")
-        line1_parts+=("${repo_link}${dirty_suffix}")
-    else
-        line1_parts+=("${repo_name}${dirty_suffix}")
-    fi
+# Git diff count
+if [ "$total_changes" -gt 0 ]; then
+    line1_parts+=("$(printf "%bdiff +%d%b" "$FG_YELLOW" "$total_changes" "$RESET")")
 fi
 
 line1=""
@@ -242,25 +229,25 @@ for part in "${line1_parts[@]}"; do
     fi
 done
 
-# --- Line 2: resource bars — Ctx, 5h, 7d ---
-BAR_WIDTH=8
+# --- Line 2: resource bars — ctx, session (5hr), 7d ---
+BAR_WIDTH=10
 line2_parts=()
 
 if [ -n "$ctx_pct" ]; then
     bg=$(bg_color_for_pct "$ctx_pct" 50 70)
-    bar=$(make_pct_bar "$ctx_pct" "$bg" "$BAR_WIDTH")
-    line2_parts+=("Ctx $bar")
+    bar=$(make_centered_bar "$ctx_pct" "$bg" "$BAR_WIDTH")
+    line2_parts+=("session $bar")
 fi
 
 if [ -n "$five_hr_pct" ]; then
     bg=$(bg_color_for_pct "$five_hr_pct" 50 80)
-    bar=$(make_pct_bar "$five_hr_pct" "$bg" "$BAR_WIDTH")
+    bar=$(make_centered_bar "$five_hr_pct" "$bg" "$BAR_WIDTH")
     line2_parts+=("5h $bar")
 fi
 
 if [ -n "$seven_day_pct" ]; then
     bg=$(bg_color_for_pct "$seven_day_pct" 50 80)
-    bar=$(make_pct_bar "$seven_day_pct" "$bg" "$BAR_WIDTH")
+    bar=$(make_centered_bar "$seven_day_pct" "$bg" "$BAR_WIDTH")
     line2_parts+=("7d $bar")
 fi
 
@@ -273,9 +260,43 @@ for part in "${line2_parts[@]}"; do
     fi
 done
 
-# Output both lines
-if [ -n "$line2" ]; then
-    printf "%s\n%s" "$line1" "$line2"
-else
-    printf "%s" "$line1"
+# --- Line 3: directory | branch | repo ---
+line3_parts=()
+
+# Directory
+[ -n "$cwd_display" ] && line3_parts+=("directory $cwd_display")
+
+# Branch with optional OSC 8 link
+if [ -n "$branch" ]; then
+    if [ -n "$github_base" ]; then
+        branch_link=$(osc8_link "${github_base}/tree/${branch}" "$branch")
+        line3_parts+=("branch $branch_link")
+    else
+        line3_parts+=("branch $branch")
+    fi
 fi
+
+# Repo name with optional OSC 8 link
+if [ -n "$repo_name" ]; then
+    if [ -n "$github_base" ]; then
+        repo_link=$(osc8_link "$github_base" "$repo_name")
+        line3_parts+=("repo $repo_link")
+    else
+        line3_parts+=("repo $repo_name")
+    fi
+fi
+
+line3=""
+for part in "${line3_parts[@]}"; do
+    if [ -z "$line3" ]; then
+        line3="$part"
+    else
+        line3="${line3} | ${part}"
+    fi
+done
+
+# --- Output ---
+output="$line1"
+[ -n "$line2" ] && output="${output}\n${line2}"
+[ -n "$line3" ] && output="${output}\n${line3}"
+printf "%b" "$output"
