@@ -40,15 +40,19 @@ make_gradient_bar() {
     for ((i=0; i<width; i++)); do
         local ch="${full_inner:$i:1}"
         if [ "$i" -lt "$filled" ]; then
-            local bg
+            local fg
             if [ "$i" -ge "$red_col" ]; then
-                bg="$BG_RED"
+                fg="$FG_RED"
             elif [ "$i" -ge "$yellow_col" ]; then
-                bg="$BG_YELLOW"
+                fg="$FG_YELLOW"
             else
-                bg="$BG_GREEN"
+                fg="$FG_GREEN"
             fi
-            bar+=$(printf "%b%b%s%b" "$bg" "$WHITE" "$ch" "$RESET")
+            if [ "$ch" = " " ]; then
+                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "$fg" "$RESET")
+            else
+                bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
+            fi
         else
             if [ "$ch" = " " ]; then
                 bar+=$(printf "%b%b▒%b" "$BG_CHECK" "\033[38;5;248m" "$RESET")
