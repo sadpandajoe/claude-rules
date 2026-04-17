@@ -51,6 +51,20 @@ When a bug-fix cherry-pick is rejected or has significant portions dropped due t
 2. If yes, surface it as a residual risk item in the Detailed Notes — not buried in adaptation notes, but called out as an actionable item (e.g., "the encoding bug likely affects the target branch via `ExecuteSqlCore` — needs a separate fix").
 3. The cherry-picking rules say "validate bug exists in target branch." That validation doesn't end when the fix is rejected — the bug's existence is still the user's problem.
 
+## Scope Leak Detection
+
+Conflict resolution is the primary vector for **scope leak** — where changes from adjacent commits on the source branch silently enter the cherry-pick through a resolved hunk.
+
+This happens when the source branch's version of a conflicting region includes changes from commits *other than* the one being cherry-picked. Accepting the source side wholesale (or resolving toward it) brings in those unrelated changes.
+
+After resolving each conflicting file:
+
+1. Get the source commit's original diff for that file: `git diff <commit>^..<commit> -- <file>`
+2. Compare against your resolution: any lines in the resolved version that aren't in the source commit's diff and weren't already on the target branch are leak candidates.
+3. If leak is detected, strip the unrelated lines and keep only the cherry-picked commit's changes adapted to the target branch's context.
+
+When in doubt about whether a line belongs to the cherry-picked commit or leaked from an adjacent one, check `git log --oneline <source-commit>..HEAD -- <file>` on the source branch to identify which commit introduced it.
+
 ## Escalation Triggers
 
 Stop and ask for user input when:
@@ -59,3 +73,4 @@ Stop and ask for user input when:
 - the adaptation changes externally visible behavior
 - the target branch lacks required architectural groundwork
 - dropping a bug fix leaves the underlying bug unaddressed on the target branch (surface the residual risk even if proceeding)
+- scope leak detection finds changes from adjacent commits that may be intentional prerequisites
