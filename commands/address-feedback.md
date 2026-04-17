@@ -104,12 +104,21 @@ Good question — auth is handled by middleware upstream. The changes here opera
 
 ### 6. Push + Post
 
+**Reply strategy — inline first, quote-reply fallback:**
+
+1. **Inline reply** (preferred): Use the review comment's reply endpoint. This threads the response directly under the reviewer's comment.
+   ```bash
+   gh api repos/<owner>/<repo>/pulls/comments/<comment-id>/replies \
+     -f body="<response>"
+   ```
+2. **Quote reply** (fallback only): Use this only when the comment has no `id` (e.g., a top-level PR body comment, not a line comment). Quote the relevant snippet so context is clear:
+   ```bash
+   gh pr comment <number> --body "> <quoted text>\n\n<response>"
+   ```
+3. **Never** post a bare new comment without quoting or threading — it loses the reviewer's context.
+
 ```bash
 git push
-
-# Reply to specific review comments
-gh api repos/<owner>/<repo>/pulls/comments/<comment-id>/replies \
-  -f body="<response>"
 ```
 
 **All-mechanical fixes** (typo, config, lint, formatting): Push and post replies automatically. No confirmation needed.
