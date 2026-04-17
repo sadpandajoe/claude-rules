@@ -80,7 +80,7 @@ ai-toolkit/
 │   ├── check-existing-fix.md   # Upstream fix check
 │   ├── action-gate.md       # Shared proceed/stop decision helper
 │   ├── shortcut-fetch.md    # Shortcut API retry wrapper
-│   ├── cherry-pick-*.md     # Cherry-pick phases (adapt, apply, investigate, plan, validate)
+│   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
 │   ├── ci-*.md              # CI/build tasks (classify-failure, verify-fix)
 │   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
 │   ├── qa-*.md              # QA tasks (analyze-use-cases, capture-evidence, execute/expand, file-bug, report-shortcut-results, triage-bug, validate-fix)

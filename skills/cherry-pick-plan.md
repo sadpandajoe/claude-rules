@@ -1,100 +1,113 @@
----
-model: sonnet
----
-
 # Cherry-Pick Plan
 
-Use this phase when the user provides multiple commits or PRs, or requests a plan-only dry run.
+Per-cherry application strategy. This phase runs as a subagent — model is set by the gate's difficulty classification (Sonnet for trivial, Opus for non-trivial).
 
 ## Goal
 
-Build a safe execution order, identify which changes can be applied automatically, and surface only the decisions that actually need user intervention.
+Produce a concrete plan for how to apply this specific cherry-pick to the target branch. The plan is reviewed by the main thread before apply proceeds.
 
-This is a batch-level planning phase. It should stay lightweight enough to order, dedupe, and triage the requested changes.
-Do not duplicate the deeper per-change risk gate owned by `cherry-pick-investigate.md`.
+This phase consumes investigation output and gate decision. Do not re-litigate whether the cherry-pick should happen — the gate already decided that.
 
-## Parallel Work
+## Inputs
 
-For each candidate change, run these analyses in parallel when possible:
+- Investigation output (source analysis, target compat, prereq scan, file lists)
+- Gate decision (difficulty tier, adapt required, any force-override warnings)
+- Target branch name
 
-1. Source analysis
-   - Resolve the PR or SHA to the actual commit(s)
-   - Inspect changed files, intent, and nearby history just enough to order and triage the batch
+## Plan Contents
 
-2. Dependency and overlap analysis
-   - Check which changes touch the same files or modules
-   - Detect imports, APIs, or modules introduced by one change and consumed by another
+Produce a plan covering:
 
-3. Existing-fix scan
-   - Check whether the target branch already appears to contain an equivalent fix
-   - Exclude duplicates before planning order
+### 1. File Strategy
 
-## Ordering Rules
+- **Include list**: files from the source commit that apply to the target
+- **Exclude list**: files to exclude and why (e.g., CI configs, submodule pointers, files not relevant to target)
+- **Modify/delete files**: files that exist on source but not target — will need `git rm` during apply
 
-- Build a dependency graph across all requested changes.
-- Topologically sort the graph.
-- Independent changes may be investigated in parallel.
-- Actual cherry-pick application on the target branch remains sequential.
-- Flag circular dependencies or ambiguous prerequisite chains as `Decision Required: YES`.
-- Reserve final per-change `Risk`, `Confidence`, and `Decision` ratings for the investigate phase. The plan phase may populate provisional values only.
+### 2. Conflict Forecast
 
-## Dry-Run Rule
+- **Expected conflicts**: based on investigation's target compat scan, list files likely to conflict and why
+- **Resolution approach per file**: adapt to target API, import path fix, trivial rename, etc.
+- **Unknown risks**: areas where the investigation couldn't determine compatibility
 
-For `--plan-only`, stop after planning and reporting.
+### 3. Adaptation Strategy (non-trivial only)
 
-Without `--plan-only`, the plan phase should classify each change as:
+- **API differences**: target-side APIs that differ from source, how to adapt
+- **Import/module changes**: paths or modules that need updating
+- **Logic adaptation**: behavioral changes needed to fit target architecture
+- **Scope boundary**: what parts of the commit to include, what to drop
 
-- `Auto` — low risk, high confidence, no decision required
-- `Needs approval` — plausible move, but requires a user decision
-- `Reject` — not suitable for cherry-pick in current form
+### 4. Validation Approach
 
-Treat these as provisional until the investigate phase confirms them.
+- **Minimum checks**: lint/type-check commands to run
+- **Targeted tests**: specific test files/suites covering the changed area
+- **Build verification**: whether a build step is needed
+- **Gaps**: validation that would be ideal but requires environment setup
 
-## Output
-
-Always produce a plan summary before execution:
+## Output Format
 
 ```markdown
-## Cherry-Pick Plan
+## Cherry-Pick Plan: <sha-short> (<summary>)
 
-### Target Branch
-<branch>
+### File Strategy
+Include: [N files]
+Exclude: [list with reasons or "none"]
+Modify/delete expected: [list or "none"]
 
-### Dependency Graph
-| Change | Depends On | Independent |
-|--------|------------|-------------|
-| PR #123 | — | Yes |
+### Conflict Forecast
+Expected conflicts: [list with resolution approach or "none expected"]
+Unknown risks: [list or "none"]
 
-<short summary of whether inter-change dependencies were detected>
+### Adaptation Strategy
+[For non-trivial: detailed per-file approach]
+[For trivial: "Clean apply expected, no adaptation needed"]
+
+### Validation Approach
+Checks: [specific commands]
+Tests: [specific test files/suites or "none identified"]
+Gaps: [what can't be validated locally]
 
 ### Execution Table
-| # | SHA | PR | Description | Depends On | Risk | Confidence | Decision | Status | Adaptation | Validation | Notes |
-|---|-----|----|-------------|------------|------|------------|----------|--------|------------|------------|-------|
-| 1 | `<sha>` | #123 | <summary> | — | LOW | 9/10 | Auto | Planned | None | Not run | Clean apply expected |
-| 2 | `<sha>` | #124 | <summary> | #123 | MED | 7/10 | Approval | Planned | Minor | Not run | Needs prerequisite first |
+| SHA | PR | Description | Risk | Confidence | Decision | Status | Adaptation | Validation | Notes |
+|-----|----|-------------|------|------------|----------|--------|------------|------------|-------|
+| `<sha>` | #NNN | <summary> | LOW/MED/HIGH | X/10 | Auto/Approval/Escalate | Planned | None/Minor/Medium/High | Not run | <notes> |
+
+### Risk Summary
+Overall risk: LOW / MED / HIGH
+Key concern: [one line or "none"]
 ```
 
-Use these field meanings:
+The execution table is required for every cherry-pick (single or batch). It is the tracking artifact that follows the cherry through apply → adapt → validate, updated at each phase.
 
-- `Risk`: `LOW`, `MED`, or `HIGH`
-- `Confidence`: confidence in the move as `X/10`
-- `Decision`: `Auto`, `Approval`, or `Escalate`
-- `Status`: `Planned`, `Applied`, `Partial`, `Blocked`, `Rejected`, or `Skipped`
-  - `Partial` = applied but significant portions dropped due to architecture mismatch, missing prerequisites, or target incompatibility. Always requires a Detailed Notes entry explaining what was dropped and why.
-- `Adaptation`: `None`, `Minor`, `Medium`, or `High`
-  - `None` = applied mechanically, no conflict resolution
-  - `Minor` = resolved import paths, renamed variables, or trivial API differences
-  - `Medium` = rewrote logic to fit target-side APIs or extracted functional subset from a mixed commit
-  - `High` = dropped significant chunks (entire functions, files, or bug fixes) because the target lacks required architecture. Requires user awareness — always pair with a Detailed Notes entry.
-- `Validation`: `Not run`, `Tested`, `Checked`, `Build-only`, `Structural`, or a short repo-specific equivalent
+## Plan Review Cycle
 
-Do not overload the `Risk` field with prose. Put the explanation in `Notes`.
+This plan will be reviewed by the main thread (Opus). If the review sends feedback:
 
-After execution, update the same execution table rather than emitting a separate parallel format.
+1. Read the feedback carefully
+2. Revise the plan to address concerns
+3. Re-emit the full plan (not just the changed sections)
+4. Repeat until approved
 
-Below the table, include detailed sections only for non-trivial rows:
+Common review feedback:
+- "Missing file X from exclude list" — add it with justification
+- "Conflict approach for Y is wrong, target uses Z API" — revise adaptation strategy
+- "Risk is understated" — re-evaluate and adjust
+- "This should be rejected, not planned" — the plan subagent does not override the gate, but can note disagreement for the reviewer
 
-- `Needs adaptation`
-- `Blocked`
-- `Rejected`
-- `Intervention required`
+## Adaptation Severity Definitions
+
+Used in execution tables across cherry-pick phases:
+
+- `None` = applied mechanically, no conflict resolution
+- `Minor` = resolved import paths, renamed variables, or trivial API differences
+- `Medium` = rewrote logic to fit target-side APIs or extracted functional subset from a mixed commit
+- `High` = dropped significant chunks (entire functions, files, or bug fixes) because the target lacks required architecture. Requires user awareness — always pair with detailed notes.
+
+## Bundled PRs
+
+When a single PR contains multiple independent fixes:
+
+- List each sub-fix and its applicability to the target
+- Recommend which to include/exclude
+- If sub-fixes are entangled, treat atomically
+- Note in plan: "N of M sub-fixes planned for inclusion"

@@ -4,18 +4,11 @@ model: opus
 
 # Cherry-Pick Investigation
 
-Use this phase before applying a cherry-pick.
+Produces the raw analysis that the gate and plan phases consume. This phase does not make the go/no-go decision — that belongs to `cherry-pick-gate.md`.
 
 ## Goal
 
-Determine whether the candidate change should:
-
-- proceed automatically
-- proceed after user approval
-- stop and escalate to planning
-
-This is the final per-change risk gate before apply.
-Do not rebuild the batch dependency graph here unless the plan phase missed a prerequisite that materially changes the outcome.
+Understand the change deeply enough for the gate to decide whether to proceed and for the plan to determine how.
 
 ## Parallel Work
 
@@ -23,15 +16,16 @@ Run these tracks in parallel when possible:
 
 1. Source analysis
    - Resolve PR URL to commit(s) if needed
-   - Inspect commit message, changed files, and nearby history in enough detail to confirm or override the provisional plan assessment
+   - Inspect commit message, changed files, and nearby history
    - Classify the change as functional, structural, dependency-related, or mixed
+   - For bundled PRs: identify and list distinct sub-fixes
 
 2. Target compatibility scan
    - Check whether touched files and modules exist on the target branch
    - Compare imports, APIs, and obvious dependency differences
    - Detect deleted or renamed target-side modules
-   - **Flag modify/delete risk**: when source files don't exist on target, explicitly note this in the output — the apply phase needs to know it will hit modify/delete conflicts and must use `git rm`, not post-apply revert. List the specific files.
-   - If `package.json`, lockfiles, or equivalent dependency manifests changed, treat validation as non-routine and call out whether build or CI verification is needed
+   - **Flag modify/delete risk**: when source files don't exist on target, explicitly list the specific files — downstream phases need this
+   - If `package.json`, lockfiles, or equivalent dependency manifests changed, flag as dependency change
 
 3. Prerequisite scan
    - Look for earlier commits the change appears to depend on
@@ -40,68 +34,51 @@ Run these tracks in parallel when possible:
 
 ## Bundled PRs
 
-When a single PR or commit contains multiple independent fixes (e.g., "fix 7 bugs" squashed into one commit):
+When a single PR or commit contains multiple independent fixes:
 
-- Identify and list the distinct sub-fixes during source analysis.
-- Assess each sub-fix individually against the target branch — some may apply cleanly while others hit architecture mismatches.
-- If sub-fixes are independent, they can be included or excluded individually. Use `Partial` status when some sub-fixes are dropped.
-- If sub-fixes are entangled (shared code paths, interdependent changes), treat the commit atomically — apply all or reject all.
-- Note in the execution table's `Notes` column how many sub-fixes the PR contains and how many were included (e.g., "5 of 7 sub-fixes applied, 2 dropped — see Detailed Notes").
+- Identify and list the distinct sub-fixes during source analysis
+- Assess each sub-fix individually against the target branch — some may apply cleanly while others hit architecture mismatches
+- If sub-fixes are independent, they can be included or excluded individually
+- If sub-fixes are entangled (shared code paths, interdependent changes), note they must be treated atomically
 
 ## Batch Execution
 
-This file describes per-change investigation. When investigating multiple independent changes, prefer parallel subagents (one per change) over sequential investigation in the main context. The within-change tracks (source, target, prereq) are typically fast enough to run sequentially inside a single agent — the bigger parallelism win is across changes.
+When investigating multiple independent changes, prefer parallel subagents (one per change) over sequential investigation in the main context. The within-change tracks (source, target, prereq) are typically fast enough to run sequentially inside a single agent — the bigger parallelism win is across changes.
 
-## Risk Assessment
+## Output
 
-Use `action-gate.md` for the final proceed/stop decision.
-
-Always end with the shared execution gate block — this is required even for LOW/Auto changes:
+Keep investigation output compact. Produce:
 
 ```markdown
-## Execution Gate
-Risk: LOW / MED / HIGH
-Confidence: X/10
-Decision Required: YES / NO
-Verification Strength: STRONG / PARTIAL / WEAK
-Recommendation: Proceed automatically / Ask for approval / Stop and escalate
+## Investigation: <sha-short> (<summary>)
+
+### Source Analysis
+Change type: functional / structural / dependency / mixed
+Files changed: [N]
+Key files: [list of most significant files]
+Sub-fixes: [if bundled PR, list them; otherwise "N/A"]
+
+### Target Compatibility
+Compatible files: [N of total]
+Modify/delete risk: [list of files or "none"]
+API differences: [list or "none detected"]
+Import/module mismatches: [list or "none detected"]
+Dependency changes: [list or "none"]
+
+### Prerequisites
+Required prior commits: [list or "none identified"]
+Existing fix status: [output from check-existing-fix.md or "not a bug fix"]
+Ordering constraints: [list or "none"]
+
+### Raw Signals for Gate
+Files touched: [N]
+New dependencies: YES / NO
+Lockfile changes: YES / NO
+Target APIs compatible: YES / NO / PARTIALLY
+Conflicts expected: YES / NO / LIKELY
+Prerequisite needed: YES / NO
 ```
 
-For cherry-pick work, set `Verification Strength` based on whether routine target-side validation is localized (`STRONG` / `PARTIAL`) or would require non-routine rebuild or environment refresh (`WEAK`).
+Avoid exhaustive file-by-file tables when most files apply cleanly. A summary line ("12 files apply cleanly, 2 need adaptation, 1 doesn't exist on target") is better than a 12-row table with "OK" repeated.
 
-**Fast path**: For single changes rated `Risk: LOW` / `Confidence >= 8/10` / `Decision: NO`, emit the gate block and proceed directly to apply without a separate presentation step. The gate block is still required — the presentation pause is what gets skipped.
-
-## Rating Rules
-
-Set `Risk: LOW` only when all of the following are true:
-
-- the change is primarily functional, not structural
-- no new dependencies, lockfile changes, or migrations are required
-- no prerequisite commit is needed
-- target-side APIs and modules are compatible or trivially adaptable
-- expected validation is routine and localized
-
-Set `Decision Required: YES` if any of the following are true:
-
-- multiple prerequisite sequences are plausible
-- the cherry-pick would require dropping or rewriting meaningful behavior
-- the change touches architecture, schema, or cross-cutting wiring
-- the right target branch or scope is ambiguous
-
-## Cherry-Pick-Specific Auto-Proceed Exceptions
-
-Even if the shared action gate would otherwise allow automatic action, stop and surface the decision instead when:
-
-- destructive cleanup is needed
-- a multi-commit sequencing choice is still unresolved
-
-When this phase overrides the batch plan, update the execution table rather than carrying two competing assessments.
-
-## Presentation
-
-Keep investigation output compact. Focus on:
-- files to exclude and why
-- key risks and adaptation needs
-- the execution gate block
-
-Avoid exhaustive file-by-file tables when most files apply cleanly. A summary line ("12 files apply cleanly, 2 excluded, 1 needs adaptation") is better than a 12-row table with "OK" repeated.
+The "Raw Signals for Gate" block is required — it provides the structured input the gate uses for its difficulty classification.
