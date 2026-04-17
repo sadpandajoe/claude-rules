@@ -18,7 +18,7 @@ FG_RED="\033[31m"
 # --- Helpers ---
 
 # make_gradient_bar <percentage> <yellow_threshold> <red_threshold> [inner_width=10]
-# Renders: [  XX%  ] — filled cells use green/yellow/red gradient based on position
+# Renders: [  XX%  ] — filled cells use zone color based on current percentage
 make_gradient_bar() {
     local pct=$1
     local yellow=$2
@@ -27,8 +27,15 @@ make_gradient_bar() {
     (( pct < 0 )) && pct=0
     (( pct > 100 )) && pct=100
     local filled=$(( pct * width / 100 ))
-    local yellow_col=$(( yellow * width / 100 ))
-    local red_col=$(( red * width / 100 ))
+    # Zone color: determined by where pct falls, not cell position
+    local zone_fg
+    if [ "$pct" -ge "$red" ]; then
+        zone_fg="$FG_RED"
+    elif [ "$pct" -ge "$yellow" ]; then
+        zone_fg="$FG_YELLOW"
+    else
+        zone_fg="$FG_GREEN"
+    fi
     local text
     text=$(printf "%d%%" "$pct")
     local tlen=${#text}
@@ -40,16 +47,8 @@ make_gradient_bar() {
     for ((i=0; i<width; i++)); do
         local ch="${full_inner:$i:1}"
         if [ "$i" -lt "$filled" ]; then
-            local fg
-            if [ "$i" -ge "$red_col" ]; then
-                fg="$FG_RED"
-            elif [ "$i" -ge "$yellow_col" ]; then
-                fg="$FG_YELLOW"
-            else
-                fg="$FG_GREEN"
-            fi
             if [ "$ch" = " " ]; then
-                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "$fg" "$RESET")
+                bar+=$(printf "%b%b▒%b" "$BG_CHECK" "$zone_fg" "$RESET")
             else
                 bar+=$(printf "%b%b%s%b" "$BG_CHECK" "$WHITE" "$ch" "$RESET")
             fi
