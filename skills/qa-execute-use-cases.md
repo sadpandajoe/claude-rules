@@ -23,15 +23,13 @@ Run the relevant scenarios against a real environment, record the outcomes clear
 
 ## Evidence Capture
 
-After execution, capture only the evidence that materially improves confidence:
+After execution, capture video evidence for every UI scenario:
 
-1. Capture the smallest useful artifact set for each scenario:
-   - screenshot for visual failures
-   - Playwright video for repro-heavy UI paths
-   - console, network, or API output when it explains the failure
-2. Keep naming descriptive and tied to the scenario or issue.
-3. Save artifacts under a stable local structure such as `qa-evidence/<scenario>/`.
-4. Record which artifact actually proves the behavior instead of dumping everything.
+1. **Default to video**: When testing via Playwright, always record video (`recordVideo: { dir: 'qa-evidence/videos/', size: { width: 1280, height: 720 } }`). One video per logical flow — not one giant recording.
+2. Name files descriptively: `sc-<id>-<what-was-tested>.webm` or `<scenario-name>.webm`.
+3. Save artifacts under `qa-evidence/<scenario>/`.
+4. Supplement with console logs or API output when they explain a failure that video alone doesn't capture.
+5. Identify the single best proof artifact for each scenario.
 
 ## Output
 

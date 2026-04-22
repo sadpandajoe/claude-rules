@@ -1,6 +1,7 @@
 # /run-test-plan - Standalone QA Validation
 
 @{{TOOLKIT_DIR}}/rules/input-detection.md
+@{{TOOLKIT_DIR}}/rules/preset-environments.md
 @{{TOOLKIT_DIR}}/skills/review-testplan.md
 
 > **When**: You want to validate a feature area, story, PR, or existing test-plan doc without fixing code in the same workflow.
@@ -51,19 +52,32 @@
 
 5. **Capture Evidence**
 
-   Capture only the artifacts that materially improve confidence or explain failures.
+   Record Playwright video for every UI scenario. One video per logical flow.
+   Use `recordVideo: { dir: 'qa-evidence/videos/', size: { width: 1280, height: 720 } }` when launching the Playwright browser context.
+   Name files descriptively: `sc-<id>-<scenario>.webm` or `<scenario>.webm`.
+   Supplement with console logs or API output only when video alone doesn't explain a failure.
 
-6. **Display Findings**
+6. **Report Findings**
 
-   Summarize the results locally.
-   Do not:
-   - auto-file bugs
-   - auto-route into `/fix-bug`
-   - auto-report to Shortcut
+   Post a narrative report using the QA Verification template from `shortcut-report.md`.
 
-   External reporting remains a separate manual follow-up.
+   **If a Shortcut story is known** (provided as input, or from PROJECT.md):
+   - Upload video evidence to the story
+   - Post the report as a story comment
+
+   **If a GitHub PR is known** (provided as input):
+   - Upload video evidence to the story if one is linked, otherwise note local paths
+   - Post the report as a PR comment
+
+   **Otherwise**:
+   - Display the report locally using the same template, with video file paths
+
+   Do not auto-file bugs or auto-route into `/fix-bug`.
 
 7. **Summary**
+
+   Always display locally, regardless of whether external reporting happened:
+
    ```markdown
    ## Run-Test-Plan Complete
 
@@ -80,7 +94,11 @@
    - [PASS / FAIL / BLOCKED / SKIP by scenario]
 
    ### Evidence
+   - [Video files with paths]
    - [Best proof for failures or high-value passes]
+
+   ### Reported To
+   - [Shortcut story link / GitHub PR link / local only]
 
    ### Risks / Blockers
    - [What could not be executed or remains unclear]
