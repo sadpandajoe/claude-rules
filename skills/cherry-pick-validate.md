@@ -1,12 +1,10 @@
----
-model: sonnet
----
-
 # Cherry-Pick Validate
 
 Use this phase after a cherry-pick applies cleanly or after conflict resolution completes.
 
 **This phase must always run as a subagent**, never inline in the orchestrator thread. The thread that applied the cherry-pick must not validate its own work.
+
+**Model selection**: Set by the gate's difficulty classification — Sonnet for trivial, Opus for non-trivial. The caller (main thread or orchestrator) is responsible for spawning this subagent with the correct model.
 
 ## Goal
 
@@ -29,21 +27,63 @@ Avoid parallel validation when the project's test/build tooling fights for the s
 
 Run this **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
 
-**This step is mandatory for every cherry-pick, including clean applies with zero conflicts.** Clean applies are the highest-risk vector for scope leak — git silently picks up the source branch's current state of conflicting regions, which may include changes from adjacent commits that happened to touch the same lines. No conflicts are raised, no scrutiny is triggered, and the leaked code ships.
+**This step is mandatory for every cherry-pick, including clean applies with zero conflicts.** This intentionally re-checks scope even when the adapt phase already ran its own leak detection — defense in depth. Do not skip this because adapt "already checked." Clean applies are the highest-risk vector for scope leak — git silently picks up the source branch's current state of conflicting regions, which may include changes from adjacent commits that happened to touch the same lines. No conflicts are raised, no scrutiny is triggered, and the leaked code ships.
+
+### Step 1: Mechanical Pre-Check (bash — run first)
+
+Run these commands to produce a mechanical comparison. These are not LLM judgment calls — they are deterministic checks that flag discrepancies for investigation.
+
+```bash
+# 1. File list comparison
+SOURCE_FILES=$(git diff --name-only <source-commit>^..<source-commit> | sort)
+RESULT_FILES=$(git diff --name-only HEAD^..HEAD | sort)
+
+# 2. Find extra files in cherry-pick result that weren't in source
+EXTRA_FILES=$(comm -13 <(echo "$SOURCE_FILES") <(echo "$RESULT_FILES"))
+
+# 3. Find missing files (in source but not in result — may be legitimate exclusion)
+MISSING_FILES=$(comm -23 <(echo "$SOURCE_FILES") <(echo "$RESULT_FILES"))
+
+# 4. Per-file line count comparison for shared files
+SHARED_FILES=$(comm -12 <(echo "$SOURCE_FILES") <(echo "$RESULT_FILES"))
+for f in $SHARED_FILES; do
+  SOURCE_LINES=$(git diff --stat <source-commit>^..<source-commit> -- "$f" | tail -1)
+  RESULT_LINES=$(git diff --stat HEAD^..HEAD -- "$f" | tail -1)
+  echo "$f | source: $SOURCE_LINES | result: $RESULT_LINES"
+done
+```
+
+**Interpretation rules (mechanical, no judgment):**
+- **Extra files found** → scope leak until proven otherwise. Each must be investigated in step 2.
+- **Line count differs by >20% for a shared file** → flag for hunk-level investigation in step 2. Minor differences are expected from adaptation (import paths, API names).
+- **Both checks clean** → still run step 2 (LLM hunk audit), but with higher confidence. Note "mechanical pre-check clean" in the scope audit.
+
+### Step 2: LLM Hunk-Level Audit
+
+Now investigate anything the mechanical check flagged, plus do a full hunk comparison:
 
 1. Get the source commit's diff: `git diff <source-commit>^..<source-commit>`
 2. Get the cherry-pick result diff: `git diff HEAD^..HEAD`
 3. Compare file-by-file:
-   - **Extra files**: any file changed in the cherry-pick that wasn't in the source commit is a leak. Revert it with `git checkout HEAD^ -- <file>` and amend.
+   - **Extra files** (already flagged by mechanical check): revert with `git checkout HEAD^ -- <file>` and amend. No exceptions unless the file is a legitimate adaptation (new test file for the cherry-picked change).
    - **Extra hunks**: within a shared file, any hunk in the cherry-pick diff that has no corresponding change in the source diff is a leak candidate. It may be a legitimate adaptation (e.g., import path change for the target branch) or an accidental pickup from an adjacent commit.
 4. For each extra hunk, determine origin: `git log --oneline --all -S "<leaked line>" -- <file>` — if it belongs to a different commit than the one being cherry-picked, it's a leak.
-5. Report findings as a **Scope Audit** block:
+
+### Step 3: Report
 
 ```markdown
 ## Scope Audit
+
+### Mechanical Pre-Check
 Files in source: [N] | Files in cherry-pick: [M]
 Extra files: [list or "none"]
+Missing files: [list or "none"]
+Line count divergence: [list of flagged files or "none"]
+Mechanical verdict: CLEAN / FLAGGED
+
+### Hunk-Level Audit
 Extra hunks: [list with origin commit or "none"]
+Legitimate adaptations: [list or "none"]
 Verdict: [clean / leaked — reverted / leaked — kept with justification]
 ```
 

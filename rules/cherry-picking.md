@@ -1,43 +1,19 @@
 # Cherry-Pick Principles
 
 ## Golden Rules
-- [ ] **Understand before changing** — analyze full scope
+- [ ] **Understand before changing** — investigate fully before deciding
+- [ ] **Gate before planning** — decide whether to cherry at all before planning how
 - [ ] **Always use `cherry-pick -x`** — preserves source commit reference
 - [ ] **Always use `cherry-pick --continue` to commit** — never `git commit` directly after resolving conflicts. `--continue` preserves original author, cherry-pick metadata, and the `(cherry picked from commit ...)` trailer.
-- [ ] **Verify `.git/CHERRY_PICK_HEAD` exists before `--continue`** — if it doesn't, the cherry-pick state was lost (e.g., aborted or already committed). Running `--continue` without it will error or operate on stale state.
+- [ ] **Verify `.git/CHERRY_PICK_HEAD` exists before `--continue`** — if it doesn't, the cherry-pick state was lost. Running `--continue` without it will error or operate on stale state.
 - [ ] **Validate bug exists in target branch** — before cherry-picking a fix, confirm it's present
 - [ ] **Preserve working functionality**
 - [ ] **Adapt rather than force** — work with target architecture
 - [ ] **Verify imports/modules exist** in target branch
 - [ ] **Prefer functional over structural** — extract value, not architecture
-- [ ] **Audit cherry-pick scope** — after resolution, diff-audit the result against the source commit to detect leaked changes from adjacent commits (see validate phase)
-- [ ] **Document decisions** — what accepted, rejected, why
-
-## Accept vs Reject
-
-| Accept | Reject |
-|--------|--------|
-| Bug fixes | Architecture changes |
-| Isolated features | Unverified imports |
-| Algorithm improvements | Breaking API changes |
-| Test additions | Build system changes |
-| Documentation | File restructuring |
-
-## Decision Framework
-
-```
-Can I extract just functional improvement?
-  YES → Extract and adapt
-  NO  → Consider if needed
-
-Does target have equivalent?
-  YES → Enhance existing
-  NO  → Add without breaking
-
-Will forcing this break existing?
-  YES → Reject or find alternative
-  NO  → Proceed with caution
-```
+- [ ] **Plan is reviewed before apply** — the plan subagent's work is always reviewed by a different agent
+- [ ] **Audit cherry-pick scope** — diff-audit the result against the source commit to detect leaked changes from adjacent commits
+- [ ] **Document decisions** — what accepted, rejected, why, and any `--force` overrides
 
 ## Conflict Resolution
 

@@ -9,7 +9,10 @@
 Safely move one or more isolated changes onto the target branch.
 
 ### In Scope
-- reorder requested cherries when needed
+- reorder requested cherries when needed (batch only)
+- gate each change: should we cherry at all?
+- plan each cherry-pick's application strategy
+- review each plan before applying
 - auto-apply low-risk changes
 - adapt conflicts when source intent can be preserved on the target branch
 - run repo-standard validation that does not require environment rebuild or refresh
@@ -37,155 +40,184 @@ If the workflow would cross a contract boundary, stop and ask the user before pr
 
 ## Usage
 ```
-/cherry-pick <pr-url>                   # Cherry-pick from a PR
-/cherry-pick <sha>                      # Cherry-pick a specific commit
-/cherry-pick <sha> --target <branch>    # Cherry-pick to specific branch
-/cherry-pick <sha-1> <sha-2> <sha-3>    # Plan and execute multiple changes
-/cherry-pick <sha-1> <sha-2> --plan-only # Plan only, do not apply
+/cherry-pick <pr-url>                          # Cherry-pick from a PR
+/cherry-pick <sha>                             # Cherry-pick a specific commit
+/cherry-pick <sha> --target <branch>           # Cherry-pick to specific branch
+/cherry-pick <sha> --force                     # Override reject-category gate
+/cherry-pick <sha-1> <sha-2> <sha-3>           # Batch: plan and execute multiple changes
+/cherry-pick <sha-1> <sha-2> --plan-only       # Plan only, do not apply
 ```
 
-## Steps
+## Single Cherry-Pick Flow
 
-1. **Plan Order if Needed**
+Each cherry-pick follows this sequence. No phase may be skipped.
 
-   If multiple PRs or SHAs are provided, or if `--plan-only` is set:
+### 1. Investigate (always Opus)
 
-   This phase owns dependency analysis, ordering, and the initial execution table.
+Run `cherry-pick-investigate.md`.
 
-   If `--plan-only` is set, stop after producing the plan report.
+- Source analysis: resolve PR to commit(s), inspect changed files, classify as functional/structural/dependency/mixed
+- Target compatibility scan: check file/module existence, API differences, detect modify/delete risk
+- Prerequisite scan: identify dependencies, check for existing fixes
 
-2. **Investigate Each Change in Order**
+Investigation produces the raw analysis. It does not make the go/no-go decision — that belongs to the gate.
 
-   For a single input, investigate that change directly.
-   For multiple inputs, process the planned sequence one change at a time.
+### 2. Gate
 
-   When the change is intended to resolve a bug, run `check-existing-fix.md` and produce its formal output block (the `## Existing Fix Status` summary with status, confidence, and evidence). The check itself is not enough — the normalized output is required so the calling workflow can branch on it.
+Run `cherry-pick-gate.md` against the investigation output.
 
-   **Bug classification**: if the PR is tagged `fix`/`bugfix` or the commit message indicates corrective behavior, treat it as a bug fix. When ambiguous (e.g., `refactor` that also fixes a defect), run the check — a false positive (checking unnecessarily) costs less than a false negative (skipping and cherry-picking a fix that's already on the target). **Exception**: skip the check for dependency upgrades, version bumps, or mixed PRs where the primary change is not an isolated defect — see `check-existing-fix.md` skip rules. When skipping, still emit the output block with `Status: SKIPPED`.
+This phase decides:
+- **Should we cherry at all?** Accept/reject based on `rules/cherry-picking.md` matrix. `--force` overrides rejection with warnings.
+- **Difficulty classification**: TRIVIAL vs NON-TRIVIAL, which determines model selection for plan and validate phases.
+- **Adapt required?** Trivial changes skip the adapt phase.
 
-   This phase produces the risk assessment for each change.
+If the gate rejects without `--force`, stop here. Record status as `Rejected` with the reason.
 
-   **Per-change complexity classification**: After investigation, classify each change:
+### 3. Plan (subagent — model set by gate)
 
-   | Signal | Mechanical | Non-Mechanical |
-   |--------|-----------|----------------|
-   | Files touched | 1–2 | 3+ |
-   | Change type | Version bump, config, import fix, one-liner | Logic change, behavioral, multi-component |
-   | Conflicts | Clean apply (no conflicts) | Conflicts expected or detected |
-   | Dependency | No new dependencies | Adds/changes dependencies |
+Run `cherry-pick-plan.md` as a subagent. Model is Sonnet for trivial, Opus for non-trivial (per gate output).
 
-   Emit a classification block per change:
-   ```markdown
-   ### Change Classification: <sha>
-   Classification: MECHANICAL / NON-MECHANICAL
-   Confidence: X/10
-   Reason: [one line]
-   ```
+The plan covers this specific cherry-pick's application strategy:
+- File exclusions and why
+- Expected conflicts and resolution approach
+- Adaptation strategy (if non-trivial)
+- Validation approach
 
-   - **Mechanical + confidence 8/10+**: fast path — apply directly, skip full adapt cycle. **Still runs diff audit via validate subagent** — clean applies are the primary scope leak vector. If a single change and `Risk: LOW`, combine investigate and apply into one phase.
-   - **Non-mechanical**: full path — investigate, adapt if needed, validate, and stop for user decisions when required.
+### 4. Plan Review (main thread)
 
-   Auto-proceed only when the helper rates the change low-risk, high-confidence, and not decision-bound.
-   Otherwise record the status in the execution table and stop for user input only where required.
+The main thread (or orchestrator in batch mode) reviews the subagent's plan.
 
-3. **Apply Each Auto-Approved Cherry-Pick Sequentially**
+Review criteria:
+- Does the plan match the investigation findings?
+- Are file exclusions justified?
+- Is the conflict resolution approach sound?
+- Are there risks the plan missed?
 
-   ```bash
-   git checkout <target-branch>
-   git cherry-pick -x <commit-hash>
-   ```
+If the plan is not acceptable, send feedback to the plan subagent and cycle back to step 3. Repeat until the plan is approved.
 
-   Always apply on the target branch sequentially, never in parallel.
+### 5. Apply (Opus)
 
-4. **Adapt Conflicts if Needed**
+Run `cherry-pick-apply.md`.
 
-   This phase owns conflict classification and code-level adaptation.
-   If the cherry-pick state is lost, do not continue blindly; return to the apply phase.
-   If a prerequisite or behavior decision is required, stop and ask the user.
+```bash
+git checkout <target-branch>
+git cherry-pick -x <commit-hash>
+```
 
-5. **Validate Each Applied Change (subagent — mandatory)**
+Always apply on the target branch. Always use `-x` to preserve source reference.
 
-   **Always run validation as a subagent**, never inline in the orchestrator thread. The thread that applied the cherry-pick must not validate its own work — the same separation principle as code review. Use `model: "sonnet"` per `rules/orchestration.md`.
+### 6. Adapt (Opus — non-trivial only)
 
-   **The diff audit is mandatory for every cherry-pick, including clean applies.** Clean applies are the highest-risk vector for scope leak — when git resolves without conflicts, nobody scrutinizes the result, and changes from adjacent commits on the source branch silently enter the target. The #38809 incident (SC-104110, P1) was a clean cherry-pick that leaked the `hideTab` guard from an adjacent commit.
+Run `cherry-pick-adapt.md`. Only when the gate classified the change as NON-TRIVIAL or when conflicts are detected during apply.
 
-   The subagent runs `cherry-pick-validate.md` which includes:
-   1. **Diff audit** — compare source commit diff vs cherry-pick result diff, flag extra files/hunks
-   2. **Build/lint/type-check** — repo-standard checks
-   3. **Targeted tests** — covering the changed area
+If a trivial change unexpectedly hits conflicts during apply, escalate to adapt — the gate classification was wrong, and adapt should treat it as non-trivial.
 
-   If the diff audit finds scope leak, the subagent reverts the leaked hunks and reports back. The orchestrator then amends the cherry-pick before pushing.
+### 7. Validate (subagent — model set by gate)
 
-   This phase also owns validation depth for dependency-manifest changes.
-   If stronger validation would require rebuilding or refreshing the environment, stop for intervention instead of doing it automatically.
+Run `cherry-pick-validate.md` as a subagent. Model is Sonnet for trivial, Opus for non-trivial (per gate output).
 
-   **Push after each successful cherry-pick**: After local validation passes, push immediately so CI runs against the change.
-   ```bash
-   git push
-   ```
+**Always run validation as a subagent**, never inline. The thread that applied the cherry-pick must not validate its own work.
 
-6. **Document the Plan and Outcome**
+**The diff audit is mandatory for every cherry-pick, including clean applies.** Clean applies are the highest-risk vector for scope leak — when git resolves without conflicts, nobody scrutinizes the result, and changes from adjacent commits on the source branch silently enter the target. The #38809 incident (SC-104110, P1) was a clean cherry-pick that leaked the `hideTab` guard from an adjacent commit.
 
-   **Planning phase** uses the full execution table (12 columns) defined in `cherry-pick-plan.md`. That table is the working artifact during investigation and apply.
+The subagent runs `cherry-pick-validate.md` which includes:
+1. **Diff audit** — compare source commit diff vs cherry-pick result diff, flag extra files/hunks
+2. **Build/lint/type-check** — repo-standard checks
+3. **Targeted tests** — covering the changed area
 
-   **Final report** uses a condensed format. Lead with the ticket outcome (what the user cares about), then the execution table, then actionable residuals:
+If the diff audit finds scope leak, the subagent reverts the leaked hunks and reports back. The orchestrator then amends the cherry-pick before pushing.
 
-   ```markdown
-   ## Cherry-Pick Summary
+**Push after each successful cherry-pick**: After local validation passes, push immediately so CI runs against the change.
+```bash
+git push
+```
 
-   [1-2 lines answering the user's original question — e.g., "The StructuredContentStripperMiddleware (the encoding fix) is now active on this branch." or "The fix from #38837 is applied; CI re-run needed to confirm."]
+## Batch Cherry-Pick Flow
 
-   [X of N applied, Y rejected, Z partial] → <target branch>
+When multiple PRs or SHAs are provided, the main agent acts as a **thin orchestrator**. It must not accumulate per-cherry context — each cherry runs in isolation.
 
-   ### Results
-   | SHA | PR | Status | Validation | Notes |
-   |-----|----|--------|------------|-------|
-   | `<sha>` | #123 | Applied | Tested | Clean apply |
-   | `<sha>` | #124 | Partial | Checked | 5 of 7 sub-fixes applied; encoding fix dropped — see below |
-   | `<sha>` | #125 | Rejected | — | Missing decorator infrastructure on target |
+### Orchestrator Responsibilities
 
-   ### Detailed Notes
-   #### `<sha>` — <summary>
-   - **Why non-trivial**: [conflict, rejection reason, or intervention point]
-   - **Adaptation details**: [What was modified and why]
-   - **What was dropped**: [specific functions, files, or sub-fixes omitted]
-   - **Residual risk**: [What remains uncertain]
+1. **Sequence planning**: Run `cherry-pick-batch-sequence.md` (Sonnet subagent) to determine execution order based on dependencies and overlap.
 
-   ### What to do next
-   - [Actionable residual items — e.g., "encoding bug likely affects target via different code path — needs separate fix"]
-   - [Validation gaps — e.g., "run pytest tests/unit_tests/mcp_service/ before merging"]
-   - [Pending PRs to monitor — e.g., "#38676 still open — pick when merged"]
-   ```
+2. **Per-cherry execution**: For each cherry in sequence, spawn a subagent that runs the full single cherry-pick flow (steps 1-7 above). Each subagent gets its own clean context.
 
-   Keep the dependency graph from the planning phase if inter-change dependencies were detected.
-   The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
-   Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
+3. **Status tracking**: After each subagent completes, record the result in the execution table. If one fails, do NOT continue with subsequent picks that depend on it. Independent subsequent picks may continue.
 
-   Record lifecycle: `command-complete`
+4. **Escalation handling**: If a subagent escalates a decision, the orchestrator surfaces it to the user, gets the answer, and relays it back.
 
-   ## Continuation Checkpoint
+5. **Final report**: Collect results from all subagents and produce the document phase output.
 
-   Phases: plan / investigate / apply / adapt / validate / document
+### Why Isolation Matters
 
-   State:
-   - Target branch: <branch>
-   - Current execution table snapshot: [latest status summary]
-   - Pending intervention points: [any user decisions still needed]
+With 15 cherry-picks, if the main agent processes each one inline, by cherry #10 the context is polluted with prior diffs, conflict resolutions, and adaptation decisions. Quality degrades. Each cherry in its own subagent gets a clean context window.
+
+### `--plan-only` for Batch
+
+If `--plan-only` is set, run only the sequence planning step and per-cherry investigate + gate (in parallel where independent). Produce the execution table without applying anything.
 
 ## Sequential Cherry-Pick Safety
 
 When cherry-picking multiple commits in sequence:
 - Verify each cherry-pick completes before starting the next
-- If one fails mid-chain, do NOT continue with subsequent picks
+- If one fails mid-chain, do NOT continue with dependent picks
+- Independent picks may continue if they don't share files/modules with the failed pick
 - Clean up the failed state (`git cherry-pick --abort`) before deciding next steps
 - Document which picks succeeded and which didn't
+
+## Document the Plan and Outcome
+
+**Per-cherry tracking** uses the execution table defined in `cherry-pick-plan.md`. Every cherry-pick (single or batch) produces one. In batch mode, the orchestrator also maintains the full batch execution table from `cherry-pick-batch-sequence.md`.
+
+**Final report** uses a condensed format. Lead with the ticket outcome (what the user cares about), then the execution table, then actionable residuals:
+
+```markdown
+## Cherry-Pick Summary
+
+[1-2 lines answering the user's original question — e.g., "The StructuredContentStripperMiddleware (the encoding fix) is now active on this branch." or "The fix from #38837 is applied; CI re-run needed to confirm."]
+
+[X of N applied, Y rejected, Z partial] -> <target branch>
+
+### Results
+| SHA | PR | Status | Validation | Notes |
+|-----|----|--------|------------|-------|
+| `<sha>` | #123 | Applied | Tested | Clean apply |
+| `<sha>` | #124 | Partial | Checked | 5 of 7 sub-fixes applied; encoding fix dropped — see below |
+| `<sha>` | #125 | Rejected | — | Feature change, no --force |
+
+### Detailed Notes
+#### `<sha>` — <summary>
+- **Why non-trivial**: [conflict, rejection reason, or intervention point]
+- **Gate decision**: [PROCEED / REJECT / FORCE-PROCEED + criteria]
+- **Adaptation details**: [What was modified and why]
+- **What was dropped**: [specific functions, files, or sub-fixes omitted]
+- **Residual risk**: [What remains uncertain]
+
+### What to do next
+- [Actionable residual items — e.g., "encoding bug likely affects target via different code path — needs separate fix"]
+- [Validation gaps — e.g., "run pytest tests/unit_tests/mcp_service/ before merging"]
+- [Pending PRs to monitor — e.g., "#38676 still open — pick when merged"]
+```
+
+Keep the dependency graph from the planning phase if inter-change dependencies were detected.
+The full 12-column execution table remains in the planning output — the compact table replaces it only in the final report.
+Add detailed notes for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
+
+Record lifecycle: `command-complete`
+
+## Continuation Checkpoint
+
+Phases: investigate / gate / plan / plan-review / apply / adapt / validate / document
+
+State:
+- Target branch: <branch>
+- Current execution table snapshot: [latest status summary]
+- Pending intervention points: [any user decisions still needed]
 
 ## Notes
 
 - **PROJECT.md**: Cherry-picks are branch-movement operations — the parent workflow owns any PROJECT.md update, not this command.
-
 - Always use `cherry-pick -x` to preserve source reference
-- Default to low-intervention flow when the investigation rates the move low-risk and no decision is required
-- Prefer functional over structural changes
+- `--force` overrides the gate's accept/reject decision, not any downstream phase
 - When in doubt, reject
 - Use `--plan-only` when you want dependency ordering and risk classification without applying anything
