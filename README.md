@@ -67,7 +67,6 @@ ai-toolkit/
 │   ├── testing.md          # Test strategy
 │   ├── troubleshooting.md  # Emergency recovery
 │   ├── resource-management.md  # Worktrees, Docker, heavy tasks
-│   ├── cherry-picking.md   # Cross-branch work
 │   ├── code-review.md      # Review guidelines
 │   ├── complexity-gate.md  # Complexity classification and fast-path
 │   ├── review-gate.md      # Review gate output contract
@@ -256,7 +255,6 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/update-tests`, `/run-test-plan` |
 | `rules/troubleshooting.md` | Emergency recovery |
-| `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |
 | `rules/complexity-gate.md` | `/create-feature`, `/fix-bug` (trivial vs standard routing) |
 | `rules/review-gate.md` | `/review-code`, `/create-feature`, `/fix-bug` (review output contract) |

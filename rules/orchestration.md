@@ -23,7 +23,7 @@ Match subagent model to the **actual reasoning load of this specific task**, not
 
 **The decision rule**: assess the *substance* of this specific task before choosing. Default to `sonnet`. Drop to `haiku` only for purely mechanical work. Escalate to `opus` only when this specific instance genuinely requires deep reasoning. Role labels (e.g., "architecture reviewer") do not auto-promote to Opus — the actual scope does.
 
-**Cherry-pick model tiering**: Cherry-pick phases use gate-driven model selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines models for plan, validate, and adapt phases. See `cherry-pick-gate.md` for the tier table.
+**Cherry-pick model tiering**: Cherry-pick phases use gate-driven model selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines models for plan, validate, and adapt phases. See `skills/cherry-pick/references/gate.md` for the tier table.
 
 The orchestrator (main thread) may run on any model the user has selected — these tiers apply to **subagents** spawned from it. A Sonnet orchestrator escalating to an Opus subagent for genuinely hard work is the canonical cost-efficient pattern.
 
