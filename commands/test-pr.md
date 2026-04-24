@@ -76,7 +76,7 @@ Decision:
 
 ### 4. Assess Impact
 
-Run `qa-assess-impact.md` on the PR diff and changed files. This classifies the touched workflows as CORE, STANDARD, or PERIPHERAL and determines how many smoke scenarios to generate.
+Run the `qa` skill's [references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff and changed files. This classifies the touched workflows as CORE, STANDARD, or PERIPHERAL and determines how many smoke scenarios to generate.
 
 ### 5. Derive Smoke Scenarios
 

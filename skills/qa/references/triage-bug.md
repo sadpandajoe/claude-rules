@@ -19,7 +19,7 @@ Turn a loose bug report into a concrete QA handoff with repro steps, expected be
 1. Restate the reported problem in user-facing terms.
 2. Identify the environment, data, feature flags, and accounts needed to reproduce it.
 3. Attempt a fast first-pass reproduction or explain why it cannot be reproduced yet.
-4. Decide whether local app startup is required before reliable reproduction is possible.
+4. Decide whether local app startup is required before reliable reproduction is possible — if yes, hand off to the `prepare-environment` skill.
 5. For UI paths, prefer Playwright MCP once the app is runnable.
 6. Record expected behavior versus actual behavior.
 7. Capture artifacts that increase confidence: screenshots, logs, failing steps, or URLs.

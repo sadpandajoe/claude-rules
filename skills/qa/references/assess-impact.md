@@ -1,14 +1,12 @@
 ---
-name: qa-assess-impact
-description: Assess functional impact of a changeset — which user-facing workflows are affected and how critical they are.
 model: sonnet
 ---
 
-# QA Assess Impact
+# Assess Impact
 
 Determine the functional impact of a changeset by tracing which user-facing workflows it touches. This complements `classify-diff.md` (which assesses structure) with a functional lens: not "how big is the change" but "how critical is what it touches."
 
-A 2-line CSS change to a login modal is TRIVIAL by size but CORE by impact. This skill catches that.
+A 2-line CSS change to a login modal is TRIVIAL by size but CORE by impact. This phase catches that.
 
 ## Required Context
 
@@ -77,7 +75,7 @@ Overall Impact: CORE / STANDARD / PERIPHERAL
 ```
 
 ## Notes
-- This skill traces functional impact, not structural complexity. A one-liner in auth middleware is CORE. A 500-line refactor of an admin debug tool is PERIPHERAL.
+- This phase traces functional impact, not structural complexity. A one-liner in auth middleware is CORE. A 500-line refactor of an admin debug tool is PERIPHERAL.
 - When uncertain whether a workflow is CORE or STANDARD, check: "does every user hit this in a normal session?" If yes → CORE.
 - The evidence column is important — it shows the trace from changed code to user-facing workflow, making the assessment auditable.
-- Consumed by `/review-code` and `/review-pr` alongside `classify-diff.md`. Together they answer: which reviewers (classify-diff), how critical (this skill).
+- Consumed by `/review-code` and `/review-pr` alongside `classify-diff.md`. Together they answer: which reviewers (classify-diff), how critical (this phase).

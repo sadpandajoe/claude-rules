@@ -62,7 +62,7 @@ Record lifecycle: `gate`
 
 ### 3. Assess Impact + Understand the Problem
 
-Run `qa-assess-impact.md` on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
+Run the `qa` skill's [references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
 
 **Impact escalation**: If impact is CORE, escalate regardless of complexity tier:
 - TRIVIAL + CORE → run full review team (not just code quality)

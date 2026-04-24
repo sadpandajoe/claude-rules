@@ -76,7 +76,7 @@ This gate runs before investigation on the standard path and before implementati
 
 Enter plan mode. Inside plan mode, produce validated investigation and RCA:
 
-**a. Triage and repro**: use `qa-triage-bug.md` for repro requirements. For UI and workflow bugs, run `prepare-environment.md` so repro can actually execute — first-pass triage from the report, then full Playwright MCP repro once the environment is runnable.
+**a. Triage and repro**: use the `qa` skill's [references/triage-bug.md](../skills/qa/references/triage-bug.md) for repro requirements. For UI and workflow bugs, run `prepare-environment.md` so repro can actually execute — first-pass triage from the report, then full Playwright MCP repro once the environment is runnable.
 
 **b. Investigate**: use `investigate-change.md` (follow "When Investigating a Bug"). Re-run repro with stronger evidence once the environment is ready before moving into RCA.
 
@@ -119,7 +119,7 @@ Implementation and review run as one tight loop. Test-first when feasible — wr
 
 Before removing or renaming any public function, method, class, or API endpoint, check for callers outside the immediate fix scope. Removing something other code depends on is a breaking change — raise it as a user decision, don't treat it as cleanup.
 
-**Standard path**: spawn `implement-change.md` (use the "For Bug Fixes" RED/GREEN mode). After the fix lands, run `/review-code` as an internal loop until only nitpicks remain. For UI/workflow bugs, run `qa-validate-fix.md` when the app is runnable — prefer Playwright MCP.
+**Standard path**: spawn `implement-change.md` (use the "For Bug Fixes" RED/GREEN mode). After the fix lands, run `/review-code` as an internal loop until only nitpicks remain. For UI/workflow bugs, run the `qa` skill's [references/validate-fix.md](../skills/qa/references/validate-fix.md) when the app is runnable — prefer Playwright MCP.
 
 **Moderate path**: orchestrator investigates inline (no investigation-lane subagents), writes the test, implements the fix inline, then spawns one reviewer subagent via `/review-code`.
 

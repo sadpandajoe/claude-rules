@@ -81,7 +81,7 @@ ai-toolkit/
 │   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
 │   ├── ci-*.md              # CI/build tasks (classify-failure, verify-fix)
 │   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
-│   ├── qa-*.md              # QA tasks (analyze-use-cases, capture-evidence, execute/expand, file-bug, report-shortcut-results, triage-bug, validate-fix)
+│   ├── qa/                  # QA umbrella skill — references for triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── implement-change.md  # Focused implementation
 │   ├── investigate-*.md     # Investigation phases (bug, change)
 │   ├── plan-*.md            # Planning phases (change, feature)

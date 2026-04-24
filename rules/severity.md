@@ -24,7 +24,7 @@ Impact labels for plan and design review findings (`review-architecture.md`, `re
 
 ## QA Bug Severity
 
-For bug reports filed by QA skills (`qa-file-bug.md`):
+For bug reports filed by the `qa` skill (`references/file-bug.md`):
 
 | Severity | Indicators |
 |----------|-----------|
