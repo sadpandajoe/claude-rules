@@ -21,4 +21,4 @@ Then hand control back to the calling command. "Stop" does not mean abandon the 
 
 ## Scope
 
-This rule applies to review/fix loops (`review-code-quality.md`), plan review iterations, and any other iterative quality loop. It does not override command-specific stop conditions that are stricter.
+This rule applies to review/fix loops (`review/references/code-quality.md`), plan review iterations, and any other iterative quality loop. It does not override command-specific stop conditions that are stricter.

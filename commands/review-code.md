@@ -51,7 +51,7 @@ Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the
 ### 3. Classify and Assess Impact
 
 Run these two skills in parallel on the changeset:
-- **`classify-diff.md`** — determines which review domains apply (structure: which reviewers)
+- **`review/references/classify-diff.md`** — determines which review domains apply (structure: which reviewers)
 - **`qa` skill → [references/assess-impact.md](../skills/qa/references/assess-impact.md)** — determines functional impact: CORE, STANDARD, or PERIPHERAL (function: how critical)
 
 **Impact escalation**: If the impact is CORE, escalate regardless of complexity tier:

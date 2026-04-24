@@ -34,7 +34,7 @@ The caller provides:
 
    | Review Domain | Trigger | Skill |
    |---------------|---------|-------|
-   | Code quality | Always | `review-code-quality.md` |
+   | Code quality | Always | `review/references/code-quality.md` |
    | Architecture | STANDARD + logic changes in source files (not just config/test) | `review-architecture.md` |
    | Tests | STANDARD + test files exist in diff OR test files exist for changed source files | `testing/references/review-tests.md` |
    | Test plan | STANDARD + no test files exist in diff AND no test files found for changed source files | `testing/references/review-testplan.md` |
@@ -68,7 +68,7 @@ Files analyzed: [count]
 ### Triggered Reviewers
 | Review Domain | Trigger Reason | Skill |
 |---------------|----------------|-------|
-| Code quality | Always | review-code-quality.md |
+| Code quality | Always | review/references/code-quality.md |
 | [domain] | [specific trigger reason] | [skill file] |
 
 ### File Domain Summary

@@ -81,7 +81,7 @@ If the premise is valid, proceed to team review with that understanding as conte
 
 ### 4. Detect Reviewer Team
 
-Use `classify-diff.md` to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The skill returns triggered reviewers with reasons.
+Use the `review` skill's [references/classify-diff.md](../skills/review/references/classify-diff.md) to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The reference returns triggered reviewers with reasons.
 
 Pass the impact assessment from step 3 to all reviewer subagents so they can calibrate severity — CORE workflow findings get stricter treatment per `rules/code-review.md` calibration.
 
@@ -95,7 +95,7 @@ Additionally, for Standard PRs (or CORE-escalated), always include:
 **Standard**: Launch all review lanes in parallel:
 
 **Lane 1 — Regular team** (foreground subagents, `model: "opus"`):
-Each reviewer subagent runs with context isolation per `rules/orchestration.md`. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `classify-diff.md` plus pattern analysis (step 6).
+Each reviewer subagent runs with context isolation per `rules/orchestration.md`. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `review/references/classify-diff.md` plus pattern analysis (step 6).
 
 **Lane 2 — Codex second opinion** (if available):
 Check if the Codex plugin is available. If unavailable, skip silently and note "Codex: skipped (plugin not available)" in the summary.
