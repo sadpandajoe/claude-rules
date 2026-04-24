@@ -1,8 +1,7 @@
 ---
 name: debug
-description: Use when a workflow needs diagnosis: root-cause investigation, CI failure classification, RCA review, prior-fix search, or CI fix verification. Do NOT use for implementing the fix, writing tests, reviewing final code, or generic feature planning.
+description: Use when investigating a bug, diagnosing a failure, finding the root cause, classifying a CI failure, reviewing an RCA, searching for an existing upstream fix, or verifying a CI fix landed. Trigger phrases include "investigate", "diagnose", "what broke", "why is X failing", "find the root cause", "RCA". Do NOT use for implementing the fix itself, writing or reviewing tests, reviewing final code quality, or planning new features.
 user-invocable: false
-disable-model-invocation: true
 ---
 
 # Debug
