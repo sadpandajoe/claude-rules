@@ -1,4 +1,8 @@
 ---
+name: pm-plan-milestones
+description: Break a feature into product-facing milestones with verifiable success conditions. Use when work needs milestone framing beyond a single small implementation slice. Internal helper called during feature planning.
+user-invocable: false
+disable-model-invocation: true
 model: opus
 ---
 

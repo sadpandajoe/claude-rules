@@ -1,6 +1,8 @@
 ---
 name: finalize-plan
-description: Fresh-eyes final review of a plan for coherence, contradictions, and implementability.
+description: Fresh-eyes final review of a plan for coherence, contradictions, and implementability. Cold read with no prior review history. Returns Go / No-Go with blocking issues and risks. Internal helper called by iterate-plan-review and similar.
+user-invocable: false
+disable-model-invocation: true
 model: opus
 ---
 

@@ -1,4 +1,8 @@
 ---
+name: pm-create-feature-brief
+description: Turn a raw feature request into a product-facing brief with goals, non-goals, acceptance criteria, assumptions, dependencies, and risks. Active investigation, not just reformatting. Internal helper called during feature planning.
+user-invocable: false
+disable-model-invocation: true
 model: opus
 ---
 

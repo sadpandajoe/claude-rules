@@ -98,14 +98,14 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
 
    These tracks are independent and can run together:
    - `qa-triage-bug.md` for first-pass triage and repro requirements
-   - `investigate-bug.md`
+   - `investigate-change.md` (use the "When Investigating a Bug" section for bug-specific framing)
    - `check-existing-fix.md`
    - `prepare-environment.md` when UI or workflow validation is likely
 
    Determine whether to spin up subagents (via the Agent tool) for parallel investigation or run the lanes sequentially in the main thread. Subagents are worth it when multiple lanes involve non-trivial work (e.g., code investigation + upstream scan + environment prep). For simpler bugs, sequential in the main thread is fine.
 
    When using subagents, choose the model per `rules/orchestration.md`:
-   - `qa-triage-bug`, `investigate-bug`: `model: "sonnet"` — classification and bounded investigation
+   - `qa-triage-bug`, `investigate-change`: `model: "sonnet"` — classification and bounded investigation
    - `check-existing-fix`: `model: "sonnet"` (or `haiku` if it's pure issue-tracker search with no judgment required)
    - `prepare-environment`: `model: "sonnet"` — mostly mechanical but may need light judgment
 
@@ -199,7 +199,7 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    - use `implement-change.md`
 
    For non-trivial fixes:
-   - spawn a planning subagent (Agent tool, `subagent_type: "general-purpose"`) using `plan-change.md`. Choose the model per `rules/orchestration.md`:
+   - spawn a planning subagent (Agent tool, `subagent_type: "general-purpose"`) using `plan-implementation.md` (follow the "For Bug Fixes" guidance). Choose the model per `rules/orchestration.md`:
      - `model: "sonnet"` when the fix is non-mechanical but well-scoped (one module, clear constraints)
      - `model: "opus"` when the fix spans systems, has architectural trade-offs, or the failure surface is still partially ambiguous
    - the subagent returns the plan; the orchestrator applies it via `implement-change.md`

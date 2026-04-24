@@ -1,4 +1,8 @@
 ---
+name: investigate-change
+description: Investigate or run RCA on broken behavior as an internal phase of a larger workflow. Identifies root cause with evidence and hands a compact summary back. Use the "When Investigating a Bug" section for bug-specific framing fields. Internal helper.
+user-invocable: false
+disable-model-invocation: true
 model: opus
 ---
 
@@ -44,10 +48,31 @@ Return a compact handoff:
 - Open questions: <remaining uncertainty>
 ```
 
-### Bug-Specific Additions (Optional)
+## When Investigating a Bug
 
-When investigating a bug, also include these fields in the summary:
+A bug investigation is the same process as above, with three extra expectations for how you frame the work:
+
+1. **Restate the reported problem in code-level terms** — trace from the user-visible symptom to the code path responsible.
+2. **Attempt local reproduction when practical** — if reproduction is not possible, explain why and what indirect evidence substitutes.
+3. **Frame findings in terms of user impact** — connect the root cause back to the observable failure the user reported.
+
+And extend the output with these fields:
 
 - **Affected area**: files, services, or flows involved
 - **Introducing change**: commit or PR that introduced the regression, or "unknown"
 - **Existing local safeguards**: tests, guards, or defensive checks that should have caught this (present / absent / partial)
+
+Full extended output:
+
+```markdown
+## Bug Investigation
+
+- Problem: <user-visible symptom, in code-level terms>
+- Affected area: <files, services, flows>
+- Likely root cause: <most plausible cause>
+- Evidence: <key proof points>
+- Introducing change: <commit / PR / unknown>
+- Existing local safeguards: <present / absent / partial>
+- Existing fix: <yes/no and where>
+- Open questions: <remaining uncertainty>
+```

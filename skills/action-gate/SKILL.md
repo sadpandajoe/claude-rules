@@ -1,4 +1,8 @@
 ---
+name: action-gate
+description: Emit an Execution Gate block (Risk / Confidence / Decision Required / Verification Strength) after an investigation or classification phase. Provides the auto-proceed rule and rating guidance. Internal helper called by /fix-bug, /create-feature, and similar workflows.
+user-invocable: false
+disable-model-invocation: true
 model: sonnet
 ---
 
