@@ -72,6 +72,14 @@ sync_skill_links() {
     for source in "$source_root"/*; do
         if [[ -e "$source" ]]; then
             local name=$(basename "$source")
+            # Skip top-level docs that are not skills (e.g., README.md)
+            if [[ -f "$source" && "$name" == "README.md" ]]; then
+                continue
+            fi
+            # Skip directories without SKILL.md (defensive — flat skills are still allowed)
+            if [[ -d "$source" && ! -f "$source/SKILL.md" ]]; then
+                continue
+            fi
             create_symlink "$source" "$target_root/$name"
         fi
     done
@@ -210,7 +218,7 @@ echo ""
 COMMAND_COUNT=$(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 SKILL_COUNT=$({
     find "$REPO_DIR/skills" -maxdepth 2 -name "SKILL.md" 2>/dev/null
-    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" 2>/dev/null
+    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" ! -name "README.md" 2>/dev/null
 } | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
 ls "$BUILD_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
@@ -220,7 +228,7 @@ echo ""
 info "Available skills ($SKILL_COUNT):"
 {
     find "$REPO_DIR/skills" -maxdepth 2 -name "SKILL.md" -exec dirname {} \; 2>/dev/null | xargs -I {} basename {}
-    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" -exec basename {} .md \; 2>/dev/null
+    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" ! -name "README.md" -exec basename {} .md \; 2>/dev/null
 } | sort | while read skill; do
     echo "  $skill"
 done
