@@ -80,7 +80,7 @@ ai-toolkit/
 │   ├── stop-rules.md       # Universal stop conditions for iterative loops
 │   ├── shortcut-api.md     # Shortcut REST API routing hint
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
-├── skills/                  # Directory skills with SKILL.md; references load lazily
+├── skills/                  # Directory skills with SKILL.md; references load lazily (see skills/README.md for anatomy)
 │   ├── planning/            # Technical planning — plan-implementation, iterate-review, finalize, feedback-classify
 │   ├── pm/                  # Product management — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
 │   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation
@@ -101,7 +101,8 @@ ai-toolkit/
 │   └── workstreams/         # Post-parallel-implementation fan-in and merge sequencing
 ├── hooks/
 │   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
-│   └── check-resources.sh         # Warn on constrained resources before tests
+│   ├── check-resources.sh         # Warn on constrained resources before tests
+│   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
 ├── extensions/
 │   └── pgm/                 # Program management (optional, install with --with-pgm)
 │       ├── commands/         # /create-status-report, /create-velocity-report

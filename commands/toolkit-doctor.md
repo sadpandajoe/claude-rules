@@ -83,7 +83,16 @@ Compare README.md content against the actual filesystem. Each mismatch is DRIFT,
 2. **Extension self-containment**: If `extensions/pgm/` exists, verify its files only reference their own tree or core paths (not other extensions).
 3. **PGM install state**: If PGM is installed (commands exist in `build/commands/`), verify the extension commands resolve. If not installed, verify no PGM commands appear in `build/commands/`.
 
-#### G. Permission Health
+#### G. Skill Cross-References
+
+For each `skills/*/SKILL.md` (and any flat `skills/*.md`), verify the skill's internal structure resolves. All checks here are FAIL when broken — a missing reference means the skill is silently broken at invocation time.
+
+1. **Reference link resolution.** Extract every markdown link in `SKILL.md` matching `references/*.md`, `templates/*.md`, `examples/*.md`, `assets/*`, or `scripts/*`. For each, verify the target file exists relative to the skill folder.
+2. **Reference orphans.** For each `references/*.md` file in the skill folder, verify it is linked from `SKILL.md` (or another reference within the same skill). Unlinked references are DRIFT — they bloat the skill folder without participating in the routing table.
+3. **Description boundaries.** Each `SKILL.md` description must contain both a "Use when" / "Use for" trigger phrase **and** a "Do NOT use" boundary clause. Missing either is DRIFT — the description is then a poor classifier.
+4. **Capitalization consistency.** Files named `GOTCHAS.md`, `LESSONS.md`, or `RULES.md` (uppercase) are DRIFT — the convention is lowercase `gotchas.md`, `lessons.md`, `rules.md` to match the "Before Starting" line in every SKILL.md.
+
+#### H. Permission Health
 
 Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP] Permission health — no settings.json found` and move on.
 
@@ -97,7 +106,7 @@ Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP
 
 All checks in this section are DRIFT (recommendations), never FAIL.
 
-#### H. Runtime Capabilities
+#### I. Runtime Capabilities
 
 Check for optional external tools that specific commands depend on. All checks are **DRIFT** (never FAIL) since these are optional capabilities.
 
