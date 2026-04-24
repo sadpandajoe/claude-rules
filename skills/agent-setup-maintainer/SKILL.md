@@ -29,3 +29,15 @@ description: Use when auditing or updating Claude Code commands, skills, CLAUDE.
 - Are lessons/gotchas read at the start of each skill?
 - Are commands phrased as workflow triggers, not magical skill invocations?
 - Are README, installer, and doctor checks updated when skill structure changes?
+
+## Recommended Cadence
+
+Drift accumulates between commits — a skill description goes stale, a reference link breaks, a "Do NOT use" boundary stops matching reality. Run a structural audit weekly to catch these before they bite during real work.
+
+**Manual:** `/audit-agent-setup` whenever the toolkit feels off.
+
+**Scheduled:** `/schedule weekly /audit-agent-setup` to set up an autonomous weekly audit. Output goes into your usual scheduled-task review flow. Pair with `/toolkit-doctor` for the structural-health side of the same coin (broken symlinks, path leaks, stale build).
+
+The two checks are complementary:
+- `/toolkit-doctor` = mechanical (does it resolve?)
+- `/audit-agent-setup` = semantic (is it well-designed?)
