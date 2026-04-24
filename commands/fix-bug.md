@@ -286,6 +286,14 @@ On exit, plan mode produces a plan file. Step 11 reads it: flush findings to PRO
    </details>
    ```
 
+   **Record metrics**: call the `metrics-emit` skill with:
+   - `command`: `fix-bug`
+   - `complexity`: classification from the complexity gate (`trivial` / `moderate` / `standard`)
+   - `status`: outcome from the Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)
+   - `rounds`: total review iteration rounds (0 for trivial path)
+   - `gate_decisions`: `{ complexity: <gate>, existing_fix: <FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED>, action_gate: <gate>, review: <gate> }`
+   - `models_used`: subagent model invocation counts
+
 ## PROJECT.md Update Discipline
 
 Update `PROJECT.md` at these points:

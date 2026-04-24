@@ -59,7 +59,6 @@ ai-toolkit/
 ├── rules/
 │   ├── universal.md        # Core principles (loaded first)
 │   ├── orchestration.md    # Multi-agent workflow rules
-│   ├── planning.md         # Project planning + PROJECT.md defaults
 │   ├── context-management.md   # Context depth thresholds and checkpoint protocol
 │   ├── rule-maintenance.md     # How to strengthen, update, or extract rules
 │   ├── investigation.md    # Debugging & root cause
@@ -115,10 +114,9 @@ ai-toolkit/
     ├── create-pr.md             # Generate PR title + description from diff/commits
     ├── review-code-adversarial.md # Red-team review for security and edge cases
     ├── custom-skills-info.md    # Print toolkit reference card
-    ├── checkpoint.md            # Save workflow state before /clear
+    ├── checkpoint.md            # Save workflow state, log progress, or full save-and-clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
-    ├── update-project-file.md   # Manual PROJECT.md status refresh
     ├── archive-project-file.md  # Archive completed work
     └── toolkit-doctor.md        # Structural health check
 ```
@@ -155,8 +153,7 @@ ai-toolkit/
 ### Project State
 | Command | Purpose |
 |---------|---------|
-| `/checkpoint` | Save workflow state to PROJECT.md and clear context |
-| `/update-project-file` | Manual PROJECT.md status refresh |
+| `/checkpoint` | Save workflow state to PROJECT.md (also for quick progress logs and full save-and-clear) |
 | `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
 
 ### Learning & Memory
@@ -249,7 +246,6 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 |------|--------------|
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
-| `rules/planning.md` | `/create-feature`, `/update-project-file` |
 | `rules/context-management.md` | Always (checkpoint protocol, loaded via CLAUDE.md) |
 | `rules/investigation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` when RCA matters |
 | `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |

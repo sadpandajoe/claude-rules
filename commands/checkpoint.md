@@ -1,87 +1,97 @@
 # /checkpoint - Save Workflow State
 
-> **When**: Context depth is at or above ~70%, or you want to save progress mid-workflow.
-> **Produces**: Continuation checkpoint in PROJECT.md. Optionally commits work and/or clears context.
+> **When**: Anytime you want to update PROJECT.md state — saving resume context before `/clear`, ending the session, or just logging progress mid-workflow.
+> **Produces**: Continuation Checkpoint + Current Status refresh + optional Progress Update entry in PROJECT.md.
 
-No `@`-imports — lightweight utility that must work in any context state.
+This is the single command for updating PROJECT.md state. It absorbed the older `/update-project-file` — for quick progress logs, use `/checkpoint "message"`.
 
 ## Usage
 
 ```
-/checkpoint                                    # Write checkpoint only (safe default)
-/checkpoint --commit                           # Write checkpoint + commit uncommitted work
-/checkpoint --clear                            # Write checkpoint + clear context
-/checkpoint --commit --clear                   # Full protocol: checkpoint + commit + clear
-/checkpoint "review-iterations" "PR #42"       # With phase/target hints
+/checkpoint                                        # Write checkpoint + refresh status (no log entry)
+/checkpoint "completed auth module, on to tests"   # Same + append a Progress Update entry
+/checkpoint --clear                                # Write, then /clear
+/checkpoint --quit                                 # Write, then quit the session
+/checkpoint "msg" --clear                          # Write with log entry, then /clear
+/checkpoint "msg" --phase implement --target "PR #42"  # Override autodetected fields
 ```
 
-**Flags**:
-- `--commit`: Stage and commit uncommitted work after writing the checkpoint
-- `--clear`: Run `/clear` to reset conversation context after writing the checkpoint
-- Flags can be combined. Without flags, only the checkpoint is written to PROJECT.md.
+**Flags:**
+- `--clear` — Run `/clear` after writing.
+- `--quit` — Quit the session after writing (falls back to printing "Run /quit to exit." if programmatic quit isn't available).
 
-**Arguments** (positional, optional): hints to override autodetection:
-- First argument: current phase
-- Second argument: resume target
+**Positional argument (optional):** a short message describing what just happened or where you left off. Becomes the "Where we left off" line in a Progress Update entry.
+
+**Named overrides (optional):**
+- `--phase <phase>` — override autodetected phase
+- `--target "<text>"` — override autodetected "Where we left off" text
+- `--learnings "<note>"` — explicit learnings (otherwise auto-detect from conversation if obvious)
 
 ## Steps
 
 ### 1. Identify Current State
 
 Read the conversation context and PROJECT.md (if it exists) to determine:
-- **Top-level command**: the user-facing command in progress (e.g., `/create-feature`, `/fix-bug`)
-- **Phase**: current internal phase (e.g., `plan-mode`, `implement`, `review-code`)
-- **Resume target**: current item being worked on (story, PR, file set, blocker)
-- **Completed items**: phases or decisions already finished
-- **Key state**: scores, files changed, pending blockers
+- **Top-level command**: the user-facing command in progress (e.g., `/create-feature`, `/fix-bug`) or `none` for ad-hoc work
+- **Phase**: current internal phase (e.g., `plan-mode`, `implement`, `review-code`) or `ad-hoc`
+- **Active plan**: `PLAN.md` if one exists at repo root, otherwise `none`
+- **Where we left off**: the next concrete action — file + line context, ticket, or specific item to pick up
+- **Done / In Progress / Next / Blocked** for the Current Status block
 
-If arguments were provided, use them for phase and resume target instead of autodetecting.
+If positional/named arguments were provided, use them instead of autodetecting.
 
-### 2. Write Checkpoint to PROJECT.md
+### 2. Write to PROJECT.md
 
-Write or replace the `## Continuation Checkpoint` section in PROJECT.md using this canonical format:
+The three templates below are the canonical format — other commands and reporting templates reference them and should not duplicate them. Write or update three sections (creating PROJECT.md if it doesn't exist):
+
+**a. `## Continuation Checkpoint` — overwrite (only one exists at a time):**
+
+The checkpoint header is intentionally light — workflow metadata only. State details live in Current Status; resume specifics live in the Progress Update message. Do not duplicate across sections.
 
 ```markdown
-## Continuation Checkpoint — [timestamp]
+## Continuation Checkpoint — [ISO timestamp]
 ### Workflow
-- Top-level command: [the user-facing command to resume]
-- Phase: [current internal phase]
-- Resume target: [current item, PR, SHA, file, or blocker]
-- Completed items: [items already finished]
-### State
-- [Key decisions made]
-- [Current scores/results if in review loop]
-- [Files modified so far]
-- [Any pending issues or blockers]
+- Top-level command: [command or "none — ad-hoc work"]
+- Phase: [phase]
+- Active plan: PLAN.md | none
 ```
 
-If no PROJECT.md exists, create one with just the checkpoint section.
+**b. `## Current Status` — refresh in place:**
 
-Also update the `## Current Status` section if it exists — refresh **In Progress** and **Next** to reflect the checkpoint state.
+```markdown
+## Current Status
 
-### 3. Commit Uncommitted Work (only with `--commit`)
+**Done:**
+- [x] [completed items]
 
-Skip this step unless `--commit` was specified.
+**In Progress:**
+- [ ] [current work]
 
-If there are uncommitted changes relevant to the current workflow:
-- Stage the changed files
-- Commit with message: `chore: checkpoint [top-level command] at [phase]`
-- If nothing to commit, skip
+**Next:** [upcoming task or "none"]
+**Blocked:** [blocker or "none"]
+```
 
-Do not commit PROJECT.md (it must never be committed to git).
+When a previously-In-Progress item completes, move it to Done. When Next becomes the new focus, move it to In Progress.
 
-### 4. Clear Context (only with `--clear`)
+**c. `### [timestamp] — Progress Update` — append to Development Log:**
 
-Skip this step unless `--clear` was specified.
+Only write this section if a positional message was provided OR a learning was detected.
 
-Run `/clear` to reset conversation context.
+```markdown
+### [ISO timestamp] — Progress Update
+**Where we left off:** [the message arg, or autodetected resume context]
+**Learnings:** [optional — observations worth capturing for future rule/command/skill updates]
+```
 
-The user resumes by running `/start`, which reads the checkpoint from PROJECT.md and automatically continues the saved workflow.
+The Learnings field is for things you noticed during work that should inform later improvements (rule updates, skill changes, common pitfalls). Skip the field if there's nothing to capture.
 
-## Notes
-- Without flags, this command only writes the checkpoint — safe to run at any time.
-- With `--commit --clear`, this command performs the full save-commit-clear protocol.
-- This command does NOT resume. `/start` handles resume.
-- The checkpoint format above is the canonical definition. Other commands reference it but should not duplicate it.
-- Only one checkpoint exists at a time — writing a new one replaces the previous.
-- PROJECT.md must never be committed to git.
+### 3. Run `--clear` or `--quit` (if specified)
+
+- `--clear`: invoke `/clear` to reset context. The user resumes by running `/start`, which reads the checkpoint and continues the saved workflow.
+- `--quit`: invoke `/quit` if available; otherwise emit `"Checkpoint saved. Run /quit to exit."` as the final message and stop.
+
+Skip both if neither flag was specified.
+
+---
+
+This command does not resume. `/start` handles that — it reads the Continuation Checkpoint and auto-continues the saved workflow.

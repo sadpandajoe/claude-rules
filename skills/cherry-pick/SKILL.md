@@ -126,6 +126,14 @@ Use the format in [examples/final-report.md](examples/final-report.md). Lead wit
 
 The full 12-column execution table format is in [examples/execution-table.md](examples/execution-table.md). The compact table replaces it only in the final report.
 
+**Record metrics**: call the `metrics-emit` skill with:
+- `command`: `cherry-pick`
+- `complexity`: from gate (`trivial` / `non-trivial`); use `standard` for batch
+- `status`: aggregate result (`clean` if all Applied, `blocked` if any Blocked/Rejected requiring intervention, etc.)
+- `rounds`: total plan-review iterations across all cherries (0 if all clean)
+- `gate_decisions`: `{ verdict: PROCEED | REJECT | FORCE-PROCEED, scope_audit: <CLEAN | LEAKED>, batch_size: <N> }`
+- `models_used`: subagent model invocation counts
+
 Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint

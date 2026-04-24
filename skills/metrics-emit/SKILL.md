@@ -1,6 +1,8 @@
 ---
 name: metrics-emit
-description: Append a structured workflow event to .claude/metrics.jsonl for observability.
+description: Append a structured workflow event to .claude/metrics.jsonl for observability. Called at the end of an end-to-end command's summary step so /metrics and /complete-project can aggregate later.
+user-invocable: false
+disable-model-invocation: true
 model: haiku
 ---
 

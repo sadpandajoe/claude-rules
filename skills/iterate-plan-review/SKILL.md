@@ -82,7 +82,7 @@ Spawn `finalize-plan` as a fresh-eyes final check. Match the model to the plan's
 
 ### 5. Write Final Scores
 
-Append or update the scores in the plan location (usually PROJECT.md):
+Append the scores to the plan location the caller specified (typically `PLAN.md` for standard-path workflows; sometimes a section of PROJECT.md for moderate-path):
 
 ```markdown
 ## Plan Review Scores
@@ -94,6 +94,8 @@ Append or update the scores in the plan location (usually PROJECT.md):
 | [conditional reviewers] | X/10 |
 | Cold Read | Go / No-Go |
 ```
+
+Do NOT write a per-iteration change log. The caller prints a brief summary in conversation for approval / next step instead — the persistent artifact is the scores, not the diff.
 
 ### 6. Action Gate (optional)
 

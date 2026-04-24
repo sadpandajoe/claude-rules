@@ -28,6 +28,7 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
    - Read the checkpoint state:
      - top-level command
      - phase
+     - **active plan** (PLAN.md or none)
      - resume target
      - completed items
      - key workflow state
@@ -38,8 +39,10 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
      - Resuming from: [checkpoint timestamp]
      - Command: [top-level command from checkpoint]
      - Phase: [saved phase]
+     - Active plan: [PLAN.md or none]
      - Resume target: [saved item or iteration]
      ```
+   - **Defer loading PLAN.md.** Read PROJECT.md alone for orientation. Only load PLAN.md when the next phase actually requires it (entering review iterations or starting an implementation slice). This keeps context lean for resumes that are just status checks or fix-it work.
    - **Automatically resume the saved top-level command** from the checkpoint. Do not prompt the user.
    - The resumed command loads its own rules, skills, and supporting files on demand.
    - After the resume succeeds, clear or replace the stale checkpoint so the same state is not resumed twice unintentionally.
@@ -72,21 +75,24 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
 
 4. **Recommend Archiving When Useful**
 
-   If PROJECT.md appears cluttered with completed-phase material, recommend `/archive-project-file` before the next major phase.
+   Run these checks against PROJECT.md and the repo root:
 
-   Common signals:
-   - long Development Log sections for work that is already complete
-   - resolved blockers still taking space in active sections
-   - completed investigations, implementations, or milestones that are no longer active
-   - active work becoming hard to find quickly
+   **Concrete signals** (high-confidence — surface the suggestion explicitly):
+   - PROJECT.md contains one or more `Completed: <date> — <feature>` entries (workflow finished, content not yet archived)
+   - A stale `PLAN.md` exists at the repo root with no Continuation Checkpoint pointing to it (workflow finished but the plan file still sits there)
 
-   Recommend archiving, but do not auto-run it.
+   **Soft signals** (lower-confidence — mention only if a concrete signal already fired):
+   - Long Development Log sections for work already complete
+   - Resolved blockers still in active sections
+   - Active work becoming hard to find
 
-## Notes
-- This command initializes or resumes workflow state
-- Specific workflows load their own rules, skills, and supporting files as needed
-- If a continuation checkpoint exists, resumes automatically — no prompt
-- After `/clear`, use `/start` as the only supported resume path
-- Do not try to resume from chat history alone
-- Recommends archiving when PROJECT.md is bloated, but archiving remains an explicit user action
-- Always start here for a new session
+   If any **concrete signal** fires, surface the nudge prominently — before suggesting next commands — using this format:
+
+   ```
+   📦 Archive suggestion: [N] completed phase(s) detected, [stale PLAN.md present | no stale plan].
+       Run /archive-project-file to clean up before the next major phase.
+   ```
+
+   If only soft signals fire, mention briefly at the end of the session entry.
+
+   Always recommend, never auto-run. `/archive-project-file` is the only deletion path; workflows do not auto-delete.

@@ -237,6 +237,14 @@
    Next: [specific next action]
    ```
 
+   **Record metrics**: call the `metrics-emit` skill with:
+   - `command`: `fix-ci`
+   - `complexity`: classification from the complexity gate (`trivial` / `moderate` / `standard`)
+   - `status`: outcome from the Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)
+   - `rounds`: total review iteration rounds
+   - `gate_decisions`: `{ complexity: <gate>, action_gate: <gate>, review: <gate>, verification_strength: <STRONG | PARTIAL | WEAK> }`
+   - `models_used`: subagent model invocation counts
+
 ## PROJECT.md Update Discipline
 
 **Standard path** — update `PROJECT.md` at these points:

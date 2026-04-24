@@ -9,7 +9,7 @@
 - [ ] **Gather evidence** — logs, stack traces, reproduction steps
 - [ ] **Verify assumptions** — dependencies, imports, file existence
 
-When investigation is complete (root cause documented, evidence gathered, approach clear), move to planning per `rules/planning.md`.
+When investigation is complete (root cause documented, evidence gathered, approach clear), move to planning — for non-trivial work that means entering plan mode and producing a PLAN.md (see `/create-feature` or `/fix-bug` standard-path flow); for trivial work, go straight to implementation.
 
 ## Common Mistakes
 
