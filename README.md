@@ -73,7 +73,8 @@ ai-toolkit/
 │   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
 ├── skills/                  # Flat directory — all skills at top level
-│   ├── review-*.md          # Shared reviewers (adversarial, architecture, backend, code-quality, feature-brief, frontend, implementation, rca, testplan, tests)
+│   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation (fired by iterate-plan-review)
+│   ├── review/              # Code-reviewer lenses + dispatch — classify-diff, code-quality, adversarial (fired by /review-code)
 │   ├── finalize-plan.md     # Fresh-eyes final plan review
 │   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, ci-classify-failure, ci-verify-fix
 │   ├── action-gate.md       # Shared proceed/stop decision helper

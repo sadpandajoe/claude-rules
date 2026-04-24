@@ -32,12 +32,12 @@ Assess the plan's complexity to determine reviewer depth:
 
 | Plan scope | Reviewers | Cold read |
 |------------|-----------|-----------|
-| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `review-implementation` | `finalize-plan` |
-| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `review-architecture` + `review-implementation` + `testing/references/review-testplan.md` | `finalize-plan` |
+| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `plan-review/references/implementation.md` | `finalize-plan` |
+| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `finalize-plan` |
 
 **Conditional reviewers** (add to substantial plans when applicable):
-- `review-frontend` — if plan touches frontend (React, CSS, UI components)
-- `review-backend` — if plan touches backend (API, database, migrations)
+- `plan-review/references/frontend.md` — if plan touches frontend (React, CSS, UI components)
+- `plan-review/references/backend.md` — if plan touches backend (API, database, migrations)
 - `pm/references/review-feature-brief.md` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
 
 State the scope assessment, which reviewers are selected, and why before launching.

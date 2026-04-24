@@ -59,7 +59,7 @@ Run the complexity gate as one sequence: classify → emit → route.
 **c. Route** per the classification. These are the feature-specific overrides to the rule's canonical paths:
 
 - **Trivial**: skip to step 5. Update PROJECT.md with action items only (no PLAN.md).
-- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then run the `iterate-plan-review` skill with `reviewer set: [review-implementation]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
+- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then run the `iterate-plan-review` skill with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
 - **Standard**: continue to step 2 — produces a formal plan in PLAN.md.
 
 ### 2. Plan Mode → Exploration + Design
@@ -105,8 +105,8 @@ Run the `iterate-plan-review` skill with these inputs:
 - **Plan location**: `PLAN.md` (written in step 3)
 - **PM brief review**: include when PM planning was used in step 2
 - **Reviewer set**:
-  - Always: `review-architecture`, `review-implementation`, `testing/references/review-testplan.md`
-  - Conditional: `review-frontend` when the plan touches UI; `review-backend` when it touches API / DB / migrations
+  - Always: `plan-review/references/architecture.md`, `plan-review/references/implementation.md`, `testing/references/review-testplan.md`
+  - Conditional: `plan-review/references/frontend.md` when the plan touches UI; `plan-review/references/backend.md` when it touches API / DB / migrations
 - **Scope**: same classification produced in step 1 (trivial / moderate / substantial) so the helper picks the right reviewer model
 - **Action gate**: include (run the `action-gate` skill after cold read)
 

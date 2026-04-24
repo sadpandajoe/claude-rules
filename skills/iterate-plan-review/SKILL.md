@@ -42,14 +42,14 @@ When the caller provides PM context:
 
 Launch all applicable technical reviewers **in parallel** as subagents. Always-on reviewers:
 
-- `review-architecture`
-- `review-implementation`
+- `plan-review/references/architecture.md`
+- `plan-review/references/implementation.md`
 - `testing/references/review-testplan.md`
 
 Add conditional reviewers when the plan touches their area:
 
-- `review-frontend` — React, CSS, UI components
-- `review-backend` — API, database, migrations
+- `plan-review/references/frontend.md` — React, CSS, UI components
+- `plan-review/references/backend.md` — API, database, migrations
 
 **Model selection** per the scope input (see `rules/orchestration.md`):
 
