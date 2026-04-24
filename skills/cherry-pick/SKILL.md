@@ -134,8 +134,6 @@ The full 12-column execution table format is in [examples/execution-table.md](ex
 - `gate_decisions`: `{ verdict: PROCEED | REJECT | FORCE-PROCEED, scope_audit: <CLEAN | LEAKED>, batch_size: <N> }`
 - `models_used`: subagent model invocation counts
 
-Record lifecycle: `command-complete`
-
 ## Continuation Checkpoint
 
 Phases: investigate / gate / plan / plan-review / apply / adapt / validate / document

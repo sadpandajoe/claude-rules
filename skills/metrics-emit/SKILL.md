@@ -57,4 +57,3 @@ File: .claude/metrics.jsonl
 - The `.claude/` directory is user-local, not checked into git
 - Commands should call this skill at the very end of their summary step, after all gates have resolved
 - `/metrics` command reads this file and produces aggregate summaries
-- Commands using `workflow-lifecycle.md` emit phase events that include `command-complete` — equivalent to this skill's output. Those commands do not need to call `metrics-emit` separately.

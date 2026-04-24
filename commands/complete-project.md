@@ -95,5 +95,3 @@ After emitting the summary, call the `metrics-emit` skill with:
 - `rounds`: 0 (no review loop)
 - `gate_decisions`: include any user decisions made during memory promotion
 - `models_used`: track subagent invocations from this command
-
-Record lifecycle: `command-complete`

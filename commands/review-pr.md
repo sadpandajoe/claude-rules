@@ -56,8 +56,6 @@ Examples — TRIVIAL: docs-only PR (3 files, 30 lines, no behavior change). STAN
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate`
-
 **Trivial + confidence 8/10+**: Code quality review only — unless impact assessment (step 3) escalates.
 
 ### 3. Assess Impact + Understand the Problem
@@ -217,8 +215,6 @@ PR #[number]: [title] — [Approve / Request Changes / Comment]
 - **Author asked you to address feedback**: `/address-feedback <number>`
 ```
 
-Record lifecycle: `command-complete`
-
 ## Batch Path
 
 When step 1 detects multiple PRs, use this path instead of steps 2–11. Reviews are read-only — no worktrees needed, just parallel subagents.
@@ -258,8 +254,6 @@ After all subagents complete, aggregate:
 - PR #[N]: [why it needs manual follow-up]
 - {Or "All PRs reviewed cleanly"}
 ```
-
-Record lifecycle: `command-complete`
 
 ## Non-Negotiable Gates
 

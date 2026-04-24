@@ -43,8 +43,6 @@ Examples — TRIVIAL: renamed a variable in one file (10 lines, no logic). STAND
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate`
-
 - **Trivial**: Code quality reviewer only.
 - **Standard**: Full review team.
 
@@ -106,8 +104,6 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-Record lifecycle: `review-gate`
-
 ### 8. Adversarial Suggestion
 
 If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
@@ -162,8 +158,6 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 - **Security-sensitive areas detected**: `/review-code-adversarial` for red-team review
 - **Test gaps identified**: `/create-tests` or `/update-tests` to fill coverage
 ```
-
-Record lifecycle: `command-complete`
 
 ## Notes
 - This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`

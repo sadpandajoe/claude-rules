@@ -107,8 +107,6 @@
    - [Manual next steps only]
    ```
 
-   Record lifecycle: `command-complete`
-
 ## Continuation Checkpoint
 
 Phases: resolve-plan / review-plan / execute / capture-evidence / summarize

@@ -149,8 +149,6 @@ Impact: CORE / STANDARD / PERIPHERAL
 [Blocked:] Resolve blockers above and re-run `/test-pr <number>`.
 ```
 
-Record lifecycle: `command-complete`
-
 ## Continuation Checkpoint
 
 Phases: resolve-pr / detect-url / assess-impact / derive-scenarios / confirm-scenarios / execute / report

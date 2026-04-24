@@ -63,8 +63,6 @@
    - [Ready for manual commit / needs more work]
    ```
 
-   Record lifecycle: `command-complete`
-
 ## Continuation Checkpoint
 
 Phases: scope / review-tests / write-tests / verify / review / summarize

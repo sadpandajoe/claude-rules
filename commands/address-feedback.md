@@ -171,8 +171,6 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - `gate_decisions`: `{ complexity: <gate>, triage: <fix N / skip N / discuss N>, review: <gate> }`
 - `models_used`: subagent model invocation counts
 
-Record lifecycle: `command-complete`
-
 ## Non-Negotiable Gates
 
 - [ ] Complexity Gate block emitted

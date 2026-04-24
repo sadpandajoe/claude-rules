@@ -98,8 +98,6 @@ Commits: [N]
 - `gate_decisions`: `{ pr_created: <yes | no>, draft: <yes | no> }`
 - `models_used`: subagent model invocation counts
 
-Record lifecycle: `command-complete`
-
 ## Notes
 - This command generates and creates the PR — it does not review the code
 - For code review before PR, use `/review-code` first

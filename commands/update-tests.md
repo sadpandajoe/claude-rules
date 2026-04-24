@@ -118,8 +118,6 @@
    - [Created `test:` commit / no commit and why]
    ```
 
-   Record lifecycle: `command-complete`
-
 ## Continuation Checkpoint
 
 Phases: scope / gap-analysis / update-tests / verify / review / commit / summarize
