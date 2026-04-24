@@ -48,7 +48,7 @@ Do not parallelize if:
 - If a prerequisite change is truly required, stop and escalate — do not silently pull it in
 - Reject the cherry-pick if preserving source intent would require a broad refactor
 - Record adaptation severity as `None`, `Minor`, `Medium`, or `High` (see [plan.md](plan.md)). When dropping significant chunks, use `High` — not `Minor`.
-- **Never use `git checkout --theirs` or `git checkout --ours`** — in cherry-pick context these take the full file from one side, silently discarding the other's changes. See [../GOTCHAS.md](../GOTCHAS.md). Always resolve by reading markers and editing surgically.
+- **Never use `git checkout --theirs` or `git checkout --ours`** — in cherry-pick context these take the full file from one side, silently discarding the other's changes. See [../gotchas.md](../gotchas.md). Always resolve by reading markers and editing surgically.
 
 ## Residual Bug Surfacing
 
@@ -58,7 +58,7 @@ When a bug-fix cherry-pick is rejected or has significant portions dropped due t
 2. If yes, surface it as a residual risk item in the Detailed Notes — not buried in adaptation notes, but called out as an actionable item (e.g., "the encoding bug likely affects the target branch via `ExecuteSqlCore` — needs a separate fix").
 3. The cherry-picking rules say "validate bug exists in target branch." That validation doesn't end when the fix is rejected — the bug's existence is still the user's problem.
 
-See [../GOTCHAS.md](../GOTCHAS.md) for the dropped-fix failure mode.
+See [../gotchas.md](../gotchas.md) for the dropped-fix failure mode.
 
 ## Scope Leak Detection During Resolution
 

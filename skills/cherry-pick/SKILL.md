@@ -11,7 +11,7 @@ Safely move one or more isolated changes (bug fixes, isolated features) onto a t
 
 ## Before Starting
 
-Read any sibling `rules.md`, `lessons.md`, and `gotchas.md`/`GOTCHAS.md` files if present. Cherry-picking has a small set of recurring failure modes; do not relearn them.
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present. Cherry-picking has a small set of recurring failure modes; do not relearn them.
 
 ## Contract
 
@@ -36,7 +36,7 @@ If the workflow would cross a contract boundary, stop and ask — do not cross f
 
 ## Single Cherry-Pick Flow
 
-Each cherry-pick runs all 7 phases. No phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see GOTCHAS.md).
+Each cherry-pick runs all 7 phases. No phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see gotchas.md).
 
 ### 1. Investigate (Opus)
 
@@ -79,7 +79,7 @@ Always `-x` to preserve source reference. For merge commits, add `-m 1`. For mod
 
 ### 6. Adapt (Opus — non-trivial only)
 
-Resolve conflicts surgically. **Never** use `git checkout --theirs` or `--ours` (see GOTCHAS.md).
+Resolve conflicts surgically. **Never** use `git checkout --theirs` or `--ours` (see gotchas.md).
 
 If a trivial change unexpectedly hits conflicts, escalate to adapt — the gate classification was wrong.
 
@@ -87,7 +87,7 @@ If a trivial change unexpectedly hits conflicts, escalate to adapt — the gate 
 
 ### 7. Validate (model from gate)
 
-**Invariant: the agent that applied must not validate its own work.** Self-validation misses scope leak — the failure in GOTCHAS.md (#38809) was caught exactly because validation happened in a fresh context. Use a subagent, a new session, or any mechanism that gives validation a clean view — the *how* is flexible, the *fresh context* is not.
+**Invariant: the agent that applied must not validate its own work.** Self-validation misses scope leak — the failure in gotchas.md (#38809) was caught exactly because validation happened in a fresh context. Use a subagent, a new session, or any mechanism that gives validation a clean view — the *how* is flexible, the *fresh context* is not.
 
 The diff audit is **mandatory for every cherry-pick, including clean applies**. Clean applies are the highest-risk vector for scope leak.
 

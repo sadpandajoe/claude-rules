@@ -26,7 +26,7 @@ Avoid parallel validation when the project's test/build tooling fights for the s
 
 Run this **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
 
-**Mandatory for every cherry-pick, including clean applies with zero conflicts.** This intentionally re-checks scope even when adapt already ran its own leak detection — defense in depth. Do not skip because adapt "already checked." See [../GOTCHAS.md](../GOTCHAS.md) for the scope-leak failure mode.
+**Mandatory for every cherry-pick, including clean applies with zero conflicts.** This intentionally re-checks scope even when adapt already ran its own leak detection — defense in depth. Do not skip because adapt "already checked." See [../gotchas.md](../gotchas.md) for the scope-leak failure mode.
 
 ### Step 1: Mechanical Pre-Check
 
@@ -112,7 +112,7 @@ When targeted tests exist and are runnable but were not executed, flag the gap �
 - why they weren't run (time constraint, environment not set up)
 - recommended follow-up ("run before merging")
 
-Recording `Checked` or `Structural` when `Tested` was achievable without extraordinary effort is an undercount that must be called out. See [../GOTCHAS.md](../GOTCHAS.md).
+Recording `Checked` or `Structural` when `Tested` was achievable without extraordinary effort is an undercount that must be called out. See [../gotchas.md](../gotchas.md).
 
 ## Dependency Manifest Rule
 

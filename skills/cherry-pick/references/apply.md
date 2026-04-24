@@ -46,9 +46,9 @@ If conflicts occur:
 2. If missing, do not run `git cherry-pick --continue`.
 3. Re-establish state: `git cherry-pick --abort`, then re-run from the start of apply.
 
-**Why CHERRY_PICK_HEAD may be missing** (see also [../GOTCHAS.md](../GOTCHAS.md)): Some git versions drop it when all conflicts are modify/delete (no content conflicts remain). It can also disappear after an abort that wasn't followed by a fresh cherry-pick. If re-running reproduces the same modify/delete-only situation and CHERRY_PICK_HEAD is still missing, resolve with `git rm` + `git commit` (manually writing the cherry-pick message with the `-x` reference) rather than falling back to `git apply`.
+**Why CHERRY_PICK_HEAD may be missing** (see also [../gotchas.md](../gotchas.md)): Some git versions drop it when all conflicts are modify/delete (no content conflicts remain). It can also disappear after an abort that wasn't followed by a fresh cherry-pick. If re-running reproduces the same modify/delete-only situation and CHERRY_PICK_HEAD is still missing, resolve with `git rm` + `git commit` (manually writing the cherry-pick message with the `-x` reference) rather than falling back to `git apply`.
 
-**Never use `git checkout --theirs` or `git checkout --ours`** (see GOTCHAS.md). Always resolve surgically by reading conflict markers.
+**Never use `git checkout --theirs` or `git checkout --ours`** (see gotchas.md). Always resolve surgically by reading conflict markers.
 
 ## Escalation Ladder
 
