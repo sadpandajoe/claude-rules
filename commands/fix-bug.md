@@ -64,7 +64,7 @@ Run the complexity gate as one sequence: classify → emit → route.
 
 ### 2. Check Existing Fix
 
-Run the `check-existing-fix.md` skill. It returns a normalized block with `Status: FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED`.
+Run the `debug` skill's [references/check-existing-fix.md](../skills/debug/references/check-existing-fix.md). It returns a normalized block with `Status: FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED`.
 
 - **FIXED_UPSTREAM**: route to `/cherry-pick`. It owns the rest of the flow — return here only to emit the final summary. Do not auto-commit beyond the cherry-pick result.
 - **FIX_PENDING_PR**: stop. Surface the PR reference and recommend monitor / adopt / supersede. Do not auto-review or merge the PR inside `/fix-bug`.
@@ -78,9 +78,9 @@ Enter plan mode. Inside plan mode, produce validated investigation and RCA:
 
 **a. Triage and repro**: use the `qa` skill's [references/triage-bug.md](../skills/qa/references/triage-bug.md) for repro requirements. For UI and workflow bugs, run the `preflight` skill's [references/prepare-environment.md](../skills/preflight/references/prepare-environment.md) so repro can actually execute — first-pass triage from the report, then full Playwright MCP repro once the environment is runnable.
 
-**b. Investigate**: use `investigate-change.md` (follow "When Investigating a Bug"). Re-run repro with stronger evidence once the environment is ready before moving into RCA.
+**b. Investigate**: use the `debug` skill's [references/investigate-change.md](../skills/debug/references/investigate-change.md) (follow "When Investigating a Bug"). Re-run repro with stronger evidence once the environment is ready before moving into RCA.
 
-**c. Validate the RCA**: spawn a reviewer subagent using `review-rca.md`. Model per `rules/orchestration.md` — `sonnet` when the RCA is well-bounded, `opus` when multiple plausible root causes exist or the failure crosses systems.
+**c. Validate the RCA**: spawn a reviewer subagent using the `debug` skill's [references/review-rca.md](../skills/debug/references/review-rca.md). Model per `rules/orchestration.md` — `sonnet` when the RCA is well-bounded, `opus` when multiple plausible root causes exist or the failure crosses systems.
 
 Decide whether to parallelize investigation lanes via subagents per `rules/orchestration.md` — worth it when multiple lanes have non-trivial work; sequential in the main thread is fine otherwise.
 

@@ -30,7 +30,7 @@ Evaluate the change against the accept/reject matrix:
 
 When the change is a bug fix:
 
-- Consume the existing-fix status from the investigation output (investigate already ran `check-existing-fix.md` — do not re-run it).
+- Consume the existing-fix status from the investigation output (investigate already ran `debug/references/check-existing-fix.md` — do not re-run it).
 - `Status: FIXED_UPSTREAM` with high confidence → stop, the fix is already there.
 - `Status: FIX_PENDING_PR` → surface the pending PR, ask whether to wait or proceed.
 - `Status: UNFIXED` or `SKIPPED` → continue.

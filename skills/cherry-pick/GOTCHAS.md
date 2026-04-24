@@ -44,7 +44,7 @@ Format per entry: **Symptom** → **Why** → **Do instead** → **First seen**.
 
 ## Re-running `check-existing-fix` after the gate already consumed it
 
-**Symptom:** Duplicate work — the investigate phase ran `check-existing-fix.md`, then the gate re-ran it, then the plan phase considered re-running it.
+**Symptom:** Duplicate work — the investigate phase ran `debug/references/check-existing-fix.md`, then the gate re-ran it, then the plan phase considered re-running it.
 
 **Why:** Investigation already runs the existing-fix check. The gate consumes the result; it does not re-check. Downstream phases must trust the gate's decision.
 

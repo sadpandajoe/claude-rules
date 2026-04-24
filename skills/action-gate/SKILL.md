@@ -47,7 +47,7 @@ Default tier definitions:
 - **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command
 - **WEAK**: code review only, no local execution
 
-When `ci-verify-fix.md` is in play, use that skill's expanded definitions instead.
+When `debug/references/ci-verify-fix.md` is in play, use that reference's expanded definitions instead.
 
 ## Rating Guidance
 

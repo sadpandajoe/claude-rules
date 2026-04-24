@@ -75,15 +75,13 @@ ai-toolkit/
 ├── skills/                  # Flat directory — all skills at top level
 │   ├── review-*.md          # Shared reviewers (adversarial, architecture, backend, code-quality, feature-brief, frontend, implementation, rca, testplan, tests)
 │   ├── finalize-plan.md     # Fresh-eyes final plan review
-│   ├── check-existing-fix.md   # Upstream fix check
+│   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, ci-classify-failure, ci-verify-fix
 │   ├── action-gate.md       # Shared proceed/stop decision helper
 │   ├── shortcut-fetch.md    # Shortcut API retry wrapper
 │   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
-│   ├── ci-*.md              # CI/build tasks (classify-failure, verify-fix)
 │   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
 │   ├── qa/                  # QA umbrella skill — references for triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── implement-change.md  # Focused implementation
-│   ├── investigate-*.md     # Investigation phases (bug, change)
 │   ├── plan-*.md            # Planning phases (change, feature)
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
 │   └── testing/             # Test-harness work — create/update suites, review tests + test plans

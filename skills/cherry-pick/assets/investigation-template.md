@@ -27,7 +27,7 @@ Dependency changes: [list or "none"]
 
 ### Prerequisites
 Required prior commits: [list or "none identified"]
-Existing fix status: [output from check-existing-fix.md or "not a bug fix"]
+Existing fix status: [output from debug/references/check-existing-fix.md or "not a bug fix"]
 Ordering constraints: [list or "none"]
 
 ### Raw Signals for Gate
