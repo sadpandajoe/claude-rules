@@ -73,19 +73,22 @@ ai-toolkit/
 │   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
 ├── skills/                  # Flat directory — all skills at top level
-│   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation (fired by iterate-plan-review)
-│   ├── review/              # Code-reviewer lenses + dispatch — classify-diff, code-quality, adversarial (fired by /review-code)
-│   ├── finalize-plan.md     # Fresh-eyes final plan review
+│   ├── planning/            # Technical planning — plan-implementation, iterate-review, finalize, feedback-classify
+│   ├── pm/                  # Product management — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
+│   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation
+│   ├── review/              # Code-reviewer lenses + dispatch — classify-diff, code-quality, adversarial
 │   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, ci-classify-failure, ci-verify-fix
-│   ├── action-gate.md       # Shared proceed/stop decision helper
-│   ├── shortcut-fetch.md    # Shortcut API retry wrapper
-│   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
-│   ├── pm/                  # Product management umbrella — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
-│   ├── qa/                  # QA umbrella skill — references for triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
-│   ├── implement-change.md  # Focused implementation
-│   ├── plan-*.md            # Planning phases (change, feature)
+│   ├── qa/                  # QA — triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
+│   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
-│   └── testing/             # Test-harness work — create/update suites, review tests + test plans
+│   ├── cherry-pick/         # Cherry-pick workflow — investigate, gate, plan, apply, adapt, validate, batch-sequence
+│   ├── action-gate.md       # Shared proceed/stop decision helper
+│   ├── implement-change/    # Focused implementation
+│   ├── reporting/           # Structural rules + per-command summary/checkpoint templates
+│   ├── metrics-emit/        # Telemetry skill — final command-complete event
+│   ├── archive-project-file/ # Archive lifecycle command
+│   ├── sync-workstreams.md  # Post-parallel-implementation merge + slice status
+│   └── shortcut-*.md        # Shortcut API wrappers (project-specific — moving to preset-level)
 ├── hooks/
 │   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
 │   └── check-resources.sh         # Warn on constrained resources before tests

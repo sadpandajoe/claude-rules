@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Test-harness work — create first suite, update existing suite, review test quality, review test plan adequacy. Internal helper for /create-tests, /update-tests, /review-code, iterate-plan-review. Covers HOW to test (harness + suite craft), not WHAT to test (that's the qa skill).
+description: Test-harness work — create first suite, update existing suite, review test quality, review test plan adequacy. Internal helper for /create-tests, /update-tests, /review-code, planning/iterate-review. Covers HOW to test (harness + suite craft), not WHAT to test (that's the qa skill).
 user-invocable: false
 disable-model-invocation: true
 ---
@@ -29,7 +29,7 @@ A QA scenario list feeds testing; testing implements the suite that protects tho
 
 - `create-tests` / `update-tests` — orchestrator spawns as implementation subagent with handoff back for `/review-code`
 - `review-tests` — reviewer subagent dispatched by `/review-code` when tests exist in the diff
-- `review-testplan` — reviewer subagent dispatched by `iterate-plan-review` when reviewing a plan's test strategy
+- `review-testplan` — reviewer subagent dispatched by `planning/references/iterate-review.md` when reviewing a plan's test strategy
 
 ## Notes
 

@@ -74,10 +74,10 @@ After collecting scores:
 
 ### 4. Cold Read
 
-Spawn `finalize-plan` as a fresh-eyes final check. Match the model to the plan's reasoning load (same rule as step 2).
+Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match the model to the plan's reasoning load (same rule as step 2).
 
 - **Go** → proceed to step 5
-- **No-Go** with blocking issues → revise and re-run `finalize-plan`
+- **No-Go** with blocking issues → revise and re-run sibling [finalize.md](finalize.md)
 - **No-Go** after two revisions → stop and surface the blocking issues to the user
 
 ### 5. Write Final Scores

@@ -1,6 +1,6 @@
 ---
 name: plan-review
-description: Reviewer lenses that critique a plan (not code) — architecture, backend, frontend, implementation feasibility. Internal helper dispatched by iterate-plan-review during plan iteration. Different from review/ (which reviews shipped code) and pm/review-feature-brief (which reviews a brief).
+description: Reviewer lenses that critique a plan (not code) — architecture, backend, frontend, implementation feasibility. Internal helper dispatched by planning/iterate-review during plan iteration. Different from review/ (which reviews shipped code) and pm/review-feature-brief (which reviews a brief).
 user-invocable: false
 disable-model-invocation: true
 ---
@@ -13,7 +13,7 @@ Umbrella for reviewer lenses that critique a *technical plan* before implementat
 
 | Umbrella | Reviews | When |
 |----------|---------|------|
-| `plan-review/` (this skill) | Technical plan | During `iterate-plan-review` loop (pre-implementation) |
+| `plan-review/` (this skill) | Technical plan | During `planning/references/iterate-review.md` loop (pre-implementation) |
 | `pm/review-feature-brief` | Feature brief (scope/AC/milestones) | During PM iteration (pre-planning) |
 | `review/` | Shipped code | `/review-code`, `/review-pr` (post-implementation) |
 | `testing/review-tests` and `review-testplan` | Test code and test strategy | During review (code) or plan-review (strategy) |
@@ -31,7 +31,7 @@ Umbrella for reviewer lenses that critique a *technical plan* before implementat
 
 ## Invocation
 
-Each reference is a subagent prompt. `iterate-plan-review` dispatches them in parallel:
+Each reference is a subagent prompt. The `planning` skill's iterate-review reference dispatches them in parallel:
 
 ```
 Agent(subagent_type: "general-purpose", model: "opus", prompt: <reference contents>)

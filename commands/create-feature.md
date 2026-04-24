@@ -59,7 +59,7 @@ Run the complexity gate as one sequence: classify → emit → route.
 **c. Route** per the classification. These are the feature-specific overrides to the rule's canonical paths:
 
 - **Trivial**: skip to step 5. Update PROJECT.md with action items only (no PLAN.md).
-- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then run the `iterate-plan-review` skill with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
+- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then run the `planning` skill's [references/iterate-review.md](../skills/planning/references/iterate-review.md) with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
 - **Standard**: continue to step 2 — produces a formal plan in PLAN.md.
 
 ### 2. Plan Mode → Exploration + Design
@@ -70,7 +70,7 @@ Enter plan mode. Inside plan mode, produce a draft plan:
 
 **b. Create the feature brief**: If PM planning is needed, use the `pm` skill's [references/create-feature-brief.md](../skills/pm/references/create-feature-brief.md) with milestones via [references/plan-milestones.md](../skills/pm/references/plan-milestones.md). If skipped, synthesize a minimal brief from the request.
 
-**c. Create the technical plan**: Use `plan-implementation.md` (follow the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
+**c. Create the technical plan**: Use the `planning` skill's [references/plan-implementation.md](../skills/planning/references/plan-implementation.md) (follow the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 
 The deliverable from this step is a **draft plan** — a feature brief (when applicable) and a technical plan. Step 3 writes that draft to PLAN.md. Polish happens in step 4 review iterations, not here.
 
@@ -100,7 +100,7 @@ This gate ensures the plan is durable before review iterations begin. PLAN.md is
 
 ### 4. Review Iterations + Action Gate
 
-Run the `iterate-plan-review` skill with these inputs:
+Run the `planning` skill's [references/iterate-review.md](../skills/planning/references/iterate-review.md) with these inputs:
 
 - **Plan location**: `PLAN.md` (written in step 3)
 - **PM brief review**: include when PM planning was used in step 2
@@ -110,7 +110,7 @@ Run the `iterate-plan-review` skill with these inputs:
 - **Scope**: same classification produced in step 1 (trivial / moderate / substantial) so the helper picks the right reviewer model
 - **Action gate**: include (run the `action-gate` skill after cold read)
 
-The helper handles parallel launch, 8/10 iteration loop, shallow-analysis escalation (Sonnet → Opus), cold read via `finalize-plan`, and appends final scores to PLAN.md. See its file for the full procedure.
+The helper handles parallel launch, 8/10 iteration loop, shallow-analysis escalation (Sonnet → Opus), cold read via `planning/references/finalize.md`, and appends final scores to PLAN.md. See its file for the full procedure.
 
 After the helper returns, **print a brief summary in conversation** for approval / next step:
 - What scored where (final scores per reviewer)

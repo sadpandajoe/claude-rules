@@ -32,8 +32,8 @@ Assess the plan's complexity to determine reviewer depth:
 
 | Plan scope | Reviewers | Cold read |
 |------------|-----------|-----------|
-| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `plan-review/references/implementation.md` | `finalize-plan` |
-| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `finalize-plan` |
+| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `plan-review/references/implementation.md` | `planning/references/finalize.md` |
+| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `planning/references/finalize.md` |
 
 **Conditional reviewers** (add to substantial plans when applicable):
 - `plan-review/references/frontend.md` — if plan touches frontend (React, CSS, UI components)
@@ -61,7 +61,7 @@ After collecting scores:
 
 ### 4. Cold Read
 
-Run `finalize-plan` as a fresh-eyes final check:
+Run `planning/references/finalize.md` as a fresh-eyes final check:
 - If **Go** → proceed to step 5
 - If **No-Go** with blocking issues → revise the plan and re-run finalize-plan
 - If **No-Go** after two revisions → stop and surface the blocking issues to the user
