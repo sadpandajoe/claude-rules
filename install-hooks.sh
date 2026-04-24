@@ -57,15 +57,21 @@ if [[ "${1:-}" == "--remove" ]]; then
     cp "$SETTINGS" "$BACKUP"
     info "Backed up to: $BACKUP"
 
-    # Remove PreToolUse entries that reference our hooks directory
+    # Remove PreToolUse and Stop entries that reference our hooks directory
     jq --arg repo "$REPO_DIR" '
-        if .hooks.PreToolUse then
+        (if .hooks.PreToolUse then
             .hooks.PreToolUse |= [.[] | select(
                 (.hooks // []) | all(.command | test($repo) | not)
             )] |
-            if .hooks.PreToolUse == [] then del(.hooks.PreToolUse) else . end |
-            if .hooks == {} then del(.hooks) else . end
-        else . end
+            if .hooks.PreToolUse == [] then del(.hooks.PreToolUse) else . end
+        else . end) |
+        (if .hooks.Stop then
+            .hooks.Stop |= [.[] | select(
+                (.hooks // []) | all(.command | test($repo) | not)
+            )] |
+            if .hooks.Stop == [] then del(.hooks.Stop) else . end
+        else . end) |
+        if .hooks == {} then del(.hooks) else . end
     ' "$SETTINGS" > "$SETTINGS.tmp" && mv "$SETTINGS.tmp" "$SETTINGS"
 
     info "Toolkit hooks removed."
@@ -97,18 +103,34 @@ HOOK_ENTRIES=$(cat <<HOOKJSON
 HOOKJSON
 )
 
+STOP_HOOK_ENTRIES=$(cat <<HOOKJSON
+[
+  {
+    "hooks": [{"type": "command", "command": "bash $REPO_DIR/hooks/check-plan-drift.sh"}]
+  }
+]
+HOOKJSON
+)
+
 # Merge: remove existing toolkit hooks (by repo path), then append new ones
 # This makes the operation idempotent
-jq --argjson new_hooks "$HOOK_ENTRIES" --arg repo "$REPO_DIR" '
+jq --argjson new_hooks "$HOOK_ENTRIES" --argjson new_stop_hooks "$STOP_HOOK_ENTRIES" --arg repo "$REPO_DIR" '
     # Initialize hooks.PreToolUse if it does not exist
     .hooks //= {} |
     .hooks.PreToolUse //= [] |
+    .hooks.Stop //= [] |
     # Remove any existing entries that reference our repo (idempotent re-run)
     .hooks.PreToolUse |= [.[] | select(
         (.hooks // []) | all(.command | test($repo) | not)
     )] |
+    .hooks.Stop |= [.[] | select(
+        (.hooks // []) | all(.command | test($repo) | not)
+    )] |
     # Append new entries
-    .hooks.PreToolUse += $new_hooks
+    .hooks.PreToolUse += $new_hooks |
+    .hooks.Stop += $new_stop_hooks |
+    # Drop empty arrays for cleanliness
+    if .hooks.Stop == [] then del(.hooks.Stop) else . end
 ' "$SETTINGS" > "$SETTINGS.tmp"
 
 # Validate the output is valid JSON before replacing
@@ -125,10 +147,11 @@ mv "$SETTINGS.tmp" "$SETTINGS"
 step "Verifying..."
 
 HOOK_COUNT=$(jq '.hooks.PreToolUse | length' "$SETTINGS" 2>/dev/null)
+STOP_COUNT=$(jq '(.hooks.Stop // []) | length' "$SETTINGS" 2>/dev/null)
 TOTAL_KEYS=$(jq 'keys | length' "$SETTINGS" 2>/dev/null)
 BACKUP_KEYS=$(jq 'keys | length' "$BACKUP" 2>/dev/null)
 
-info "Hooks installed: $HOOK_COUNT PreToolUse entries"
+info "Hooks installed: $HOOK_COUNT PreToolUse + $STOP_COUNT Stop entries"
 info "Settings keys preserved: $TOTAL_KEYS (was $BACKUP_KEYS)"
 
 if [[ "$TOTAL_KEYS" -lt "$BACKUP_KEYS" ]]; then
@@ -143,6 +166,7 @@ echo ""
 info "Hooks:"
 echo "  prevent-project-commit — Blocks commit if PROJECT.md is staged"
 echo "  check-resources        — Warns when tests run with constrained resources"
+echo "  check-plan-drift       — Warns at turn end when PLAN.md outpaces PROJECT.md"
 echo ""
 info "To remove: ./install-hooks.sh --remove"
 echo ""
