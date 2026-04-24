@@ -44,7 +44,7 @@ Launch all applicable technical reviewers **in parallel** as subagents. Always-o
 
 - `review-architecture`
 - `review-implementation`
-- `review-testplan`
+- `testing/references/review-testplan.md`
 
 Add conditional reviewers when the plan touches their area:
 

@@ -30,8 +30,8 @@ Wrap Claude's built-in `/review` in a repo-standard loop:
 3. Classify findings as `[major]`, `[minor]`, or `[nitpick]`.
 4. For bug-fix reviews: grep the codebase for the same pattern that caused the bug (e.g., if the fix changed `e.target` to `e.currentTarget`, search for other occurrences of the broken pattern). Report matches as findings.
 5. **Check test coverage for changed behavior.** For each changed file that introduces or modifies behavior, verify that a corresponding test exists. Missing tests are a `[major]` finding. This applies to the original diff **and** to any fixes made during this review loop — if you fix code in step 6, that fix also needs test coverage. Exception: if the test gap is explicitly tracked as a follow-up in PROJECT.md with a clear plan and owner, note it in the summary's Remaining section instead of classifying it as a finding.
-   - **No tests found for changed logic**: After flagging as `[major]`, trigger the test suggestion reviewer (`review-testplan.md`) to recommend specific tests to write.
-   - **Tests found**: Trigger the test quality reviewer (`review-tests.md`) to evaluate whether they catch regressions, plus test suggestions for additional coverage.
+   - **No tests found for changed logic**: After flagging as `[major]`, trigger the test suggestion reviewer (`testing/references/review-testplan.md`) to recommend specific tests to write.
+   - **Tests found**: Trigger the test quality reviewer (`testing/references/review-tests.md`) to evaluate whether they catch regressions, plus test suggestions for additional coverage.
 6. Fix all `[major]` and `[minor]` items directly — including adding tests for uncovered behavior.
 7. Re-run targeted tests after each fix to catch regressions.
 8. Re-run review on the changed files — including files you just fixed and tests you just added. Review your own fix as if someone else wrote it: check error paths, async ordering, state consistency, and boundary conditions. The re-review is not a formality.

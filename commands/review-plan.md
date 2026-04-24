@@ -33,7 +33,7 @@ Assess the plan's complexity to determine reviewer depth:
 | Plan scope | Reviewers | Cold read |
 |------------|-----------|-----------|
 | **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `review-implementation` | `finalize-plan` |
-| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `review-architecture` + `review-implementation` + `review-testplan` | `finalize-plan` |
+| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `review-architecture` + `review-implementation` + `testing/references/review-testplan.md` | `finalize-plan` |
 
 **Conditional reviewers** (add to substantial plans when applicable):
 - `review-frontend` — if plan touches frontend (React, CSS, UI components)

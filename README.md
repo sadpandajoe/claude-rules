@@ -86,8 +86,7 @@ ai-toolkit/
 │   ├── investigate-*.md     # Investigation phases (bug, change)
 │   ├── plan-*.md            # Planning phases (change, feature)
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
-│   ├── create-tests.md      # First-suite test creation
-│   └── update-tests.md      # Existing suite maintenance
+│   └── testing/             # Test-harness work — create/update suites, review tests + test plans
 ├── hooks/
 │   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
 │   └── check-resources.sh         # Warn on constrained resources before tests

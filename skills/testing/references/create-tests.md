@@ -14,10 +14,10 @@ Write the smallest set of high-signal tests that establishes real regression pro
 
 1. Determine the exact code or behavior under test.
 2. Confirm there is no meaningful existing suite to improve.
-3. Use `review-tests` to identify the minimum high-signal coverage needed.
+3. Use the sibling [review-tests.md](review-tests.md) to identify the minimum high-signal coverage needed.
 4. Choose the narrowest useful test layer.
 5. Write the first meaningful tests with a bias toward behavioral signal over quantity.
-6. Run the tests, confirm they fail when the behavior breaks, then re-run `review-tests` if needed.
+6. Run the tests, confirm they fail when the behavior breaks, then re-run the sibling [review-tests.md](review-tests.md) if needed.
 
 ## Output
 

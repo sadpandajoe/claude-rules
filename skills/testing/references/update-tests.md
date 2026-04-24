@@ -13,7 +13,7 @@ Raise regression signal in the current suite with the smallest useful set of cha
 ## Core Steps
 
 1. Confirm the existing suite and the exact behaviors in scope.
-2. Use `review-tests` findings and any QA use-case analysis to lock the must-update-now set.
+2. Use sibling [review-tests.md](review-tests.md) findings and any QA use-case analysis to lock the must-update-now set.
 3. Update existing tests first; add tests only where they fit the suite naturally.
 4. Replace or remove low-signal tests only when the replacement is clearly stronger.
 5. Write the failing test first when feasible. If blocked, record why before changing the suite.

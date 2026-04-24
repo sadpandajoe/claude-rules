@@ -105,7 +105,7 @@ Run the `iterate-plan-review` skill with these inputs:
 - **Plan location**: `PLAN.md` (written in step 3)
 - **PM brief review**: include when PM planning was used in step 2
 - **Reviewer set**:
-  - Always: `review-architecture`, `review-implementation`, `review-testplan`
+  - Always: `review-architecture`, `review-implementation`, `testing/references/review-testplan.md`
   - Conditional: `review-frontend` when the plan touches UI; `review-backend` when it touches API / DB / migrations
 - **Scope**: same classification produced in step 1 (trivial / moderate / substantial) so the helper picks the right reviewer model
 - **Action gate**: include (run the `action-gate` skill after cold read)

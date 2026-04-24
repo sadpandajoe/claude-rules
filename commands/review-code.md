@@ -119,7 +119,7 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 | Reviewer | Why |
 |----------|-----|
 | Code quality | Always |
-| Tests / Test plan | Tests exist → review-tests.md; no tests → review-testplan.md |
+| Tests / Test plan | Tests exist → testing/references/review-tests.md; no tests → testing/references/review-testplan.md |
 | Architecture | Logic changes in source files |
 | Codex (GPT-5.4) | Standard complexity (or: skipped — plugin not available) |
 

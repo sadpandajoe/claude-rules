@@ -1,6 +1,6 @@
 # /create-tests - Create the First Meaningful Tests
 
-@{{TOOLKIT_DIR}}/skills/review-tests.md
+@{{TOOLKIT_DIR}}/skills/testing/references/review-tests.md
 
 > **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
 > **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.
@@ -23,7 +23,7 @@
 
 2. **Create Initial Tests**
 
-   Use `create-tests.md`. This helper owns:
+   Use the `testing` skill's [references/create-tests.md](../skills/testing/references/create-tests.md). This helper owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
    - creating the first meaningful tests for the target area

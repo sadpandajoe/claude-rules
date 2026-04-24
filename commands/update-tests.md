@@ -1,6 +1,6 @@
 # /update-tests - Improve an Existing Test Suite
 
-@{{TOOLKIT_DIR}}/skills/review-tests.md
+@{{TOOLKIT_DIR}}/skills/testing/references/review-tests.md
 
 > **When**: You want to improve an existing test suite in a specific area, path, or function and have the workflow analyze gaps, update tests, verify, review, and auto-commit when confidence is strong.
 > **Produces**: Scoped test updates, verification results, remaining follow-up gaps, and either an automatic `test:` commit or a clear handoff.
@@ -58,7 +58,7 @@
 
 6. **Update the Tests**
 
-   Use `update-tests.md`:
+   Use the `testing` skill's [references/update-tests.md](../skills/testing/references/update-tests.md):
 
    This helper owns:
    - updating existing tests first

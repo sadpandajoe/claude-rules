@@ -36,8 +36,8 @@ The caller provides:
    |---------------|---------|-------|
    | Code quality | Always | `review-code-quality.md` |
    | Architecture | STANDARD + logic changes in source files (not just config/test) | `review-architecture.md` |
-   | Tests | STANDARD + test files exist in diff OR test files exist for changed source files | `review-tests.md` |
-   | Test plan | STANDARD + no test files exist in diff AND no test files found for changed source files | `review-testplan.md` |
+   | Tests | STANDARD + test files exist in diff OR test files exist for changed source files | `testing/references/review-tests.md` |
+   | Test plan | STANDARD + no test files exist in diff AND no test files found for changed source files | `testing/references/review-testplan.md` |
    | Frontend | Frontend files changed | `review-frontend.md` |
    | Backend | Backend files changed | `review-backend.md` |
 
