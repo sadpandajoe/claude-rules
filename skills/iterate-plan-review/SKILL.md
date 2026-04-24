@@ -20,7 +20,7 @@ The caller provides:
   - Always: whichever reviewers the caller designates as mandatory
   - Conditional: add based on what the plan actually touches
 - **Scope**: `trivial` / `moderate` / `substantial` — determines model tier
-- **Optional PM brief review**: when the plan has a feature brief that needs `review-feature-brief`
+- **Optional PM brief review**: when the plan has a feature brief that needs `pm/references/review-feature-brief.md`
 - **Optional action gate**: when the caller wants an action gate block after cold read
 
 ## Threshold
@@ -33,7 +33,7 @@ Default: **8/10 or better** on every applicable reviewer, plus a **Go** from col
 
 When the caller provides PM context:
 
-- Spawn `review-feature-brief` as a subagent
+- Spawn `pm/references/review-feature-brief.md` as a subagent
 - Model: `sonnet` by default; escalate to `opus` only when the brief covers multi-system rollout or material business risk
 - Revise the brief until 8/10
 - If the brief reaches 8/10 after the first pass, proceed to technical plan review

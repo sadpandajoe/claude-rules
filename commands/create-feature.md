@@ -68,7 +68,7 @@ Enter plan mode. Inside plan mode, produce a draft plan:
 
 **a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
 
-**b. Create the feature brief**: If PM planning is needed, use `pm-create-feature-brief.md` with milestones via `pm-plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
+**b. Create the feature brief**: If PM planning is needed, use the `pm` skill's [references/create-feature-brief.md](../skills/pm/references/create-feature-brief.md) with milestones via [references/plan-milestones.md](../skills/pm/references/plan-milestones.md). If skipped, synthesize a minimal brief from the request.
 
 **c. Create the technical plan**: Use `plan-implementation.md` (follow the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 

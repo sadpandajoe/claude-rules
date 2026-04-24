@@ -13,7 +13,7 @@
 /review-plan --pm
 ```
 
-`--pm`: Include PM brief review (`review-feature-brief`) in addition to technical reviewers.
+`--pm`: Include PM brief review (`pm/references/review-feature-brief.md`) in addition to technical reviewers.
 
 ## Steps
 
@@ -38,7 +38,7 @@ Assess the plan's complexity to determine reviewer depth:
 **Conditional reviewers** (add to substantial plans when applicable):
 - `review-frontend` — if plan touches frontend (React, CSS, UI components)
 - `review-backend` — if plan touches backend (API, database, migrations)
-- `review-feature-brief` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
+- `pm/references/review-feature-brief.md` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
 
 State the scope assessment, which reviewers are selected, and why before launching.
 

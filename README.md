@@ -79,7 +79,7 @@ ai-toolkit/
 │   ├── action-gate.md       # Shared proceed/stop decision helper
 │   ├── shortcut-fetch.md    # Shortcut API retry wrapper
 │   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
-│   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
+│   ├── pm/                  # Product management umbrella — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
 │   ├── qa/                  # QA umbrella skill — references for triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── implement-change.md  # Focused implementation
 │   ├── plan-*.md            # Planning phases (change, feature)
