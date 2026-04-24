@@ -85,7 +85,7 @@ ai-toolkit/
 │   ├── implement-change.md  # Focused implementation
 │   ├── investigate-*.md     # Investigation phases (bug, change)
 │   ├── plan-*.md            # Planning phases (change, feature)
-│   ├── prepare-environment.md   # Local environment setup
+│   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
 │   ├── create-tests.md      # First-suite test creation
 │   └── update-tests.md      # Existing suite maintenance
 ├── hooks/

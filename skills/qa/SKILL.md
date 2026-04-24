@@ -42,5 +42,5 @@ Common combinations:
 ## Notes
 
 - References hold the per-phase steps and output templates. SKILL.md only routes.
-- `prepare-environment` is a separate skill — used outside QA contexts (implementation env prep too). Triage and validate-fix link to it when env prep is required.
+- Environment prep lives in the `preflight` skill (`preflight/references/prepare-environment.md`) — used outside QA contexts too (implementation env prep). Triage and validate-fix link to it when env prep is required.
 - `file-bug` includes the Shortcut posting protocol for workflows that push results back.
