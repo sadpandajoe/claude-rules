@@ -64,7 +64,7 @@ Run the complexity gate as one sequence: classify → emit → route.
 
 ### 2. Check Existing Fix
 
-Run the `debug` skill's [references/check-existing-fix.md](../skills/debug/references/check-existing-fix.md). It returns a normalized block with `Status: FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED`.
+Follow [skills/debug/references/check-existing-fix.md](../skills/debug/references/check-existing-fix.md). It returns a normalized block with `Status: FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED`.
 
 - **FIXED_UPSTREAM**: route to `/cherry-pick`. It owns the rest of the flow — return here only to emit the final summary. Do not auto-commit beyond the cherry-pick result.
 - **FIX_PENDING_PR**: stop. Surface the PR reference and recommend monitor / adopt / supersede. Do not auto-review or merge the PR inside `/fix-bug`.
@@ -76,11 +76,11 @@ This gate runs before investigation on the standard path and before implementati
 
 Enter plan mode. Inside plan mode, produce validated investigation and RCA:
 
-**a. Triage and repro**: use the `qa` skill's [references/triage-bug.md](../skills/qa/references/triage-bug.md) for repro requirements. For UI and workflow bugs, run the `preflight` skill's [references/prepare-environment.md](../skills/preflight/references/prepare-environment.md) so repro can actually execute — first-pass triage from the report, then full Playwright MCP repro once the environment is runnable.
+**a. Triage and repro**: follow [skills/qa/references/triage-bug.md](../skills/qa/references/triage-bug.md) for repro requirements. For UI and workflow bugs, follow [skills/preflight/references/prepare-environment.md](../skills/preflight/references/prepare-environment.md) so repro can actually execute — first-pass triage from the report, then full Playwright MCP repro once the environment is runnable.
 
-**b. Investigate**: use the `debug` skill's [references/investigate-change.md](../skills/debug/references/investigate-change.md) (follow "When Investigating a Bug"). Re-run repro with stronger evidence once the environment is ready before moving into RCA.
+**b. Investigate**: follow [skills/debug/references/investigate-change.md](../skills/debug/references/investigate-change.md) (use "When Investigating a Bug"). Re-run repro with stronger evidence once the environment is ready before moving into RCA.
 
-**c. Validate the RCA**: spawn a reviewer subagent using the `debug` skill's [references/review-rca.md](../skills/debug/references/review-rca.md). Model per `rules/orchestration.md` — `sonnet` when the RCA is well-bounded, `opus` when multiple plausible root causes exist or the failure crosses systems.
+**c. Validate the RCA**: spawn a reviewer subagent with [skills/debug/references/review-rca.md](../skills/debug/references/review-rca.md). Model per `rules/orchestration.md` — `sonnet` when the RCA is well-bounded, `opus` when multiple plausible root causes exist or the failure crosses systems.
 
 Decide whether to parallelize investigation lanes via subagents per `rules/orchestration.md` — worth it when multiple lanes have non-trivial work; sequential in the main thread is fine otherwise.
 
@@ -119,7 +119,7 @@ Implementation and review run as one tight loop. Test-first when feasible — wr
 
 Before removing or renaming any public function, method, class, or API endpoint, check for callers outside the immediate fix scope. Removing something other code depends on is a breaking change — raise it as a user decision, don't treat it as cleanup.
 
-**Standard path**: spawn `implement-change.md` (use the "For Bug Fixes" RED/GREEN mode). After the fix lands, run `/review-code` as an internal loop until only nitpicks remain. For UI/workflow bugs, run the `qa` skill's [references/validate-fix.md](../skills/qa/references/validate-fix.md) when the app is runnable — prefer Playwright MCP.
+**Standard path**: spawn `implement-change/` (use the "For Bug Fixes" RED/GREEN mode). After the fix lands, run `/review-code` as an internal loop until only nitpicks remain. For UI/workflow bugs, follow [skills/qa/references/validate-fix.md](../skills/qa/references/validate-fix.md) when the app is runnable — prefer Playwright MCP.
 
 **Moderate path**: orchestrator investigates inline (no investigation-lane subagents), writes the test, implements the fix inline, then spawns one reviewer subagent via `/review-code`.
 
@@ -153,7 +153,7 @@ Lead with whether the user's reported symptom is fixed — if the user gave you 
 
 **Do not delete PLAN.md.** It persists in place after completion. Cleanup happens when the user explicitly runs `/archive-project-file` — workflows do not auto-delete files.
 
-**Record metrics**: call the `metrics-emit` skill with:
+**Record metrics**: include `metrics-emit` context with:
 - `command`: `fix-bug`
 - `complexity`: classification from step 1 (`trivial` / `moderate` / `standard`)
 - `status`: outcome from step 5 Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)

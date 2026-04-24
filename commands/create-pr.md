@@ -90,7 +90,7 @@ Base: [base branch] ← [head branch]
 Commits: [N]
 ```
 
-**Record metrics**: call the `metrics-emit` skill with:
+**Record metrics**: include `metrics-emit` context with:
 - `command`: `create-pr`
 - `complexity`: `standard`
 - `status`: `clean` if the PR was created, `blocked` otherwise

@@ -1,11 +1,15 @@
 ---
 name: debug
-description: Diagnosis toolkit — open investigation, pattern-match CI classification, RCA review, prior-work scan, CI fix verification. Internal helper for /fix-bug, /fix-ci, /cherry-pick, and any workflow that needs to find or validate a root cause.
+description: Use when a workflow needs diagnosis: root-cause investigation, CI failure classification, RCA review, prior-fix search, or CI fix verification. Do NOT use for implementing the fix, writing tests, reviewing final code, or generic feature planning.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Debug
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for all diagnostic work — finding root causes, validating them, and confirming fixes. References have distinct shapes (investigation / classifier / reviewer / search workflow / verification) unified by the common goal of *understanding what broke*.
 

@@ -1,6 +1,6 @@
 ---
 name: cherry-pick
-description: Move one or more commits or PRs onto another branch with safety gates, scope-leak detection, and per-change validation. Use when the user asks to cherry-pick, backport, port a fix, or apply a commit to a different branch.
+description: Use when the user asks to cherry-pick, backport, port a fix, or apply commits/PRs onto another branch. Covers safety gates, scope-leak detection, adaptation, and per-change validation. Do NOT use for ordinary same-branch bug fixes, broad refactors, dependency upgrades, or behavior-changing rewrites without an explicit cross-branch move.
 argument-hint: [pr-url | sha...] [--target branch] [--force] [--plan-only]
 allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Edit
 ---
@@ -9,7 +9,9 @@ allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Edit
 
 Safely move one or more isolated changes (bug fixes, isolated features) onto a target branch.
 
-**Before starting** — read [GOTCHAS.md](GOTCHAS.md). Cherry-picking has a small set of recurring failure modes; do not relearn them.
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md`/`GOTCHAS.md` files if present. Cherry-picking has a small set of recurring failure modes; do not relearn them.
 
 ## Contract
 
@@ -126,7 +128,7 @@ Use the format in [examples/final-report.md](examples/final-report.md). Lead wit
 
 The full 12-column execution table format is in [examples/execution-table.md](examples/execution-table.md). The compact table replaces it only in the final report.
 
-**Record metrics**: call the `metrics-emit` skill with:
+**Record metrics**: include `metrics-emit` context with:
 - `command`: `cherry-pick`
 - `complexity`: from gate (`trivial` / `non-trivial`); use `standard` for batch
 - `status`: aggregate result (`clean` if all Applied, `blocked` if any Blocked/Rejected requiring intervention, etc.)

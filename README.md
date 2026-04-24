@@ -2,6 +2,12 @@
 
 One-stop setup repo for AI-assisted coding with Claude Code and Codex CLI.
 
+## Mental Model
+
+- **Rules** are always-on constraints and routing hints. Keep them short and use them as an index.
+- **Skills** are selected from their descriptions. Descriptions should say when to use the skill and when not to.
+- **Commands** expand prompts. They can reference skill paths to bias selection, but they do not directly call skills.
+
 ## Quick Start
 
 ```bash
@@ -35,6 +41,8 @@ claude
 |------|---------|
 | `~/.claude/CLAUDE.md` | Global instructions (auto-generated from config/CLAUDE.md) |
 | `~/.claude/commands/` | Custom slash commands |
+| `~/.claude/skills/` | Repo-managed Claude skills |
+| `~/.codex/skills/<skill>` | Repo-managed Codex skill links |
 
 ### Claude Code 2.1.x Features Used
 | Feature | Purpose |
@@ -70,9 +78,9 @@ ai-toolkit/
 │   ├── complexity-gate.md  # Complexity classification and fast-path
 │   ├── review-gate.md      # Review gate output contract
 │   ├── stop-rules.md       # Universal stop conditions for iterative loops
-│   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
+│   ├── shortcut-api.md     # Shortcut REST API routing hint
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
-├── skills/                  # Flat directory — all skills at top level
+├── skills/                  # Directory skills with SKILL.md; references load lazily
 │   ├── planning/            # Technical planning — plan-implementation, iterate-review, finalize, feedback-classify
 │   ├── pm/                  # Product management — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
 │   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation
@@ -82,13 +90,15 @@ ai-toolkit/
 │   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
 │   ├── cherry-pick/         # Cherry-pick workflow — investigate, gate, plan, apply, adapt, validate, batch-sequence
-│   ├── action-gate.md       # Shared proceed/stop decision helper
+│   ├── agent-setup-maintainer/ # Maintains commands, skills, rules, and agent workflow docs
+│   ├── action-gate/         # Shared proceed/stop decision helper
 │   ├── implement-change/    # Focused implementation
 │   ├── reporting/           # Structural rules + per-command summary/checkpoint templates
 │   ├── metrics-emit/        # Telemetry skill — final command-complete event
 │   ├── archive-project-file/ # Archive lifecycle command
-│   ├── sync-workstreams.md  # Post-parallel-implementation merge + slice status
-│   └── shortcut-*.md        # Shortcut API wrappers (project-specific — moving to preset-level)
+│   ├── shortcut/            # Shortcut REST fetch/report helpers
+│   ├── superset-local/      # Superset-specific local stack + Playwright helpers
+│   └── workstreams/         # Post-parallel-implementation fan-in and merge sequencing
 ├── hooks/
 │   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
 │   └── check-resources.sh         # Warn on constrained resources before tests
@@ -118,6 +128,7 @@ ai-toolkit/
     ├── checkpoint.md            # Save workflow state, log progress, or full save-and-clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
+    ├── audit-agent-setup.md     # Audit commands, skills, rules, and agent docs
     ├── archive-project-file.md  # Archive completed work
     └── toolkit-doctor.md        # Structural health check
 ```
@@ -175,6 +186,7 @@ ai-toolkit/
 ### Toolkit Maintenance
 | Command | Purpose |
 |---------|---------|
+| `/audit-agent-setup` | Audit command/skill/rule/docs layout against the agentic primer model |
 | `/toolkit-doctor` | Validate symlinks, build output, imports, path portability, and README accuracy |
 | `/custom-skills-info` | Print reference card of all commands with gates |
 

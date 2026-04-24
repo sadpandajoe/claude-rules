@@ -12,6 +12,11 @@
 - **Checkpoint when context is deep** — see `rules/context-management.md` for thresholds and protocol
 - **Rules evolve from usage** — see `rules/rule-maintenance.md` for how to strengthen, update, or extract rules
 
+## Agent Context Model
+- **Rules are always-on constraints and routing hints** — keep them short; point to commands, skills, or deeper docs instead of carrying task libraries.
+- **Commands expand prompts** — they create context for a workflow and may reference skill paths, but skills are selected from descriptions and the expanded prompt.
+- **Skill descriptions are classifiers** — make trigger and non-trigger boundaries explicit. Put skill-only rules, lessons, and gotchas beside the skill.
+
 ## Communication Rules
 - **Be direct about errors** — no unnecessary apologies
 - **Show, don't tell** — include actual commands, outputs, evidence

@@ -166,9 +166,9 @@ verify_link() {
 verify_link "$CLAUDE_DIR/CLAUDE.md"
 verify_link "$CLAUDE_DIR/commands"
 verify_link "$CLAUDE_DIR/skills"
-# Verify a sample of Codex skill links (flat .md files)
+# Verify Codex repo-managed skill links
 CODEX_LINK_COUNT=0
-for link in "$CODEX_DIR/skills"/*.md; do
+for link in "$CODEX_DIR/skills"/*; do
     if [[ -L "$link" ]]; then
         CODEX_LINK_COUNT=$((CODEX_LINK_COUNT + 1))
     fi
@@ -208,14 +208,20 @@ echo "  Installation Complete!"
 echo "========================================"
 echo ""
 COMMAND_COUNT=$(ls "$BUILD_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
-SKILL_COUNT=$(find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$({
+    find "$REPO_DIR/skills" -maxdepth 2 -name "SKILL.md" 2>/dev/null
+    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" 2>/dev/null
+} | wc -l | tr -d ' ')
 info "Available slash commands ($COMMAND_COUNT):"
 ls "$BUILD_DIR/commands"/*.md 2>/dev/null | xargs -I {} basename {} .md | sort | while read cmd; do
     echo "  /$cmd"
 done
 echo ""
 info "Available skills ($SKILL_COUNT):"
-find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" -exec basename {} .md \; 2>/dev/null | sort | while read skill; do
+{
+    find "$REPO_DIR/skills" -maxdepth 2 -name "SKILL.md" -exec dirname {} \; 2>/dev/null | xargs -I {} basename {}
+    find "$REPO_DIR/skills" -maxdepth 1 -name "*.md" -exec basename {} .md \; 2>/dev/null
+} | sort | while read skill; do
     echo "  $skill"
 done
 echo ""

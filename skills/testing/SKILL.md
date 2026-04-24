@@ -1,11 +1,15 @@
 ---
 name: testing
-description: Test-harness work — create first suite, update existing suite, review test quality, review test plan adequacy. Internal helper for /create-tests, /update-tests, /review-code, planning/iterate-review. Covers HOW to test (harness + suite craft), not WHAT to test (that's the qa skill).
+description: Use for HOW to test: creating or updating automated test suites, reviewing test code quality, and reviewing test-plan adequacy. Do NOT use for QA scenario discovery, manual product validation, bug triage, or general code review.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Testing
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for test-harness craft — writing, updating, and critiquing automated tests at the pytest/jest/vitest layer.
 

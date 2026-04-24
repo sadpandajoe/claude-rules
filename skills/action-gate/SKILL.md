@@ -1,12 +1,16 @@
 ---
 name: action-gate
-description: Emit an Execution Gate block (Risk / Confidence / Decision Required / Verification Strength) after an investigation or classification phase. Provides the auto-proceed rule and rating guidance. Internal helper called by /fix-bug, /create-feature, and similar workflows.
+description: Use when a workflow needs an Execution Gate block after investigation, classification, or cold-read planning. Produces Risk, Confidence, Decision Required, Verification Strength, and proceed/ask/stop guidance. Do NOT use for code review gates, test verification reports, or PR approval verdicts.
 user-invocable: false
 disable-model-invocation: true
 model: sonnet
 ---
 
 # Action Gate
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Use this helper after an investigation or classification phase has produced a root-cause hypothesis, a proposed fix, and a validation plan.
 

@@ -163,7 +163,7 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - **All resolved, PR approved**: Merge the PR
 ```
 
-**Record metrics**: call the `metrics-emit` skill with:
+**Record metrics**: include `metrics-emit` context with:
 - `command`: `address-feedback`
 - `complexity`: classification from the complexity gate (`trivial` / `standard`)
 - `status`: outcome (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)

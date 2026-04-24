@@ -1,11 +1,15 @@
 ---
 name: reporting
-description: Shared structural rules and per-command templates for end-of-workflow summaries and continuation checkpoints. Internal helper used by end-to-end commands.
+description: Use when an end-to-end command needs a final summary or continuation checkpoint shape from shared templates. Do NOT use for progress logging, metrics emission, code review findings, or PROJECT.md archival.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Reporting
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Shared rules for the **shape** of two recurring outputs every end-to-end workflow produces:
 

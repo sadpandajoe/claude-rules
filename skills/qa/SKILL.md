@@ -1,11 +1,15 @@
 ---
 name: qa
-description: QA capabilities across the bug + feature lifecycle — bug triage, fix validation, impact assessment, use-case discovery, scenario expansion, scenario execution, and bug filing. Internal helper used by /fix-bug, /create-feature, /review-code, /review-pr, /test-pr.
+description: Use for WHAT to test and user-visible validation: bug triage, fix validation, impact assessment, use-case discovery, scenario expansion/execution, and bug filing. Do NOT use for automated test-harness implementation, test code review, technical plan review, or code-quality review.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # QA
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella skill for repo-standard QA phases. The orchestrator picks the relevant phase from the decision tree below and reads the corresponding reference for steps + output template.
 
@@ -37,7 +41,7 @@ Common combinations:
 - **Bug workflow** (`/fix-bug`): triage-bug → (implement) → validate-fix → optionally file-bug
 - **Code review** (`/review-code`, `/review-pr`): assess-impact (always) → expand-scenarios (when reviewing a fix)
 - **Test plan**: analyze-use-cases → expand-scenarios → execute-use-cases
-- **PR smoke test** (`/test-pr`): assess-impact → `pr-smoke-scenarios` (separate skill) → execute-use-cases
+- **PR smoke test** (`/test-pr`): assess-impact → [references/pr-smoke-scenarios.md](references/pr-smoke-scenarios.md) → execute-use-cases
 
 ## Notes
 

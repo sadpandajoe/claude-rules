@@ -14,7 +14,7 @@
 
 ## Test-First Modes
 
-Two modes. Plans pick which mode applies, and `skills/implement-change.md` executes accordingly. Both share "tests before implementation"; granularity and intent differ.
+Two modes. Plans pick which mode applies, and `skills/implement-change/` executes accordingly. Both share "tests before implementation"; granularity and intent differ.
 
 ### RED/GREEN per slice — for bug fixes
 

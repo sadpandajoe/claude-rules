@@ -1,11 +1,15 @@
 ---
 name: review
-description: Code review — dispatch classifier (which reviewers fire) + reviewer lenses (code-quality, adversarial). Internal helper for /review-code and /review-pr. Reviews actual code in a diff; plan-reviewers live in plan-review/.
+description: Use for reviewing actual code diffs: dispatching code-review lenses, code-quality checks, and adversarial review. Do NOT use for technical plan critique, product brief review, QA scenario design, or writing the fix.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Review
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for code-review work — review of *shipped code*, not plans. Two kinds of references:
 

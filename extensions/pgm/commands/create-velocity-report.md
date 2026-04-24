@@ -56,7 +56,7 @@ This takes ~5-10 min. Continue to 3b while it runs.
 **3b. Collect Shortcut data (while GitHub runs in background):**
 
 Use the Shortcut REST API (preferred) via `curl` with `$SHORTCUT_API_TOKEN`.
-Follow `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
+Follow `skills/shortcut/references/fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
 
 Run all team queries in **parallel bash calls** — each team's queries are independent:
 - **Completed stories** per team: `POST /stories/search` with `completed_at_start`/`completed_at_end` from config date range, `group_id`

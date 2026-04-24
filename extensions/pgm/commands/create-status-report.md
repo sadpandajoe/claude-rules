@@ -46,7 +46,7 @@ Use the **Agent tool** to spawn 2-3 agents **in a single message** (this is crit
 - Return structured JSON or markdown that the main context can synthesize
 
 **Agent 1 — Shortcut REST API** (via `curl` with `$SHORTCUT_API_TOKEN`):
-Follow `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
+Follow `skills/shortcut/references/fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas.
 
 Run all team queries in **parallel bash calls** (each team's queries are independent):
 - **WIP stories** per team: `POST /stories/search` with `workflow_state_types: ["started"]` and `group_id`

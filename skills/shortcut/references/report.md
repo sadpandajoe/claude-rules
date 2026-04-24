@@ -16,9 +16,9 @@ Post structured reports (QA results, fix summaries, test findings) to Shortcut s
 
 - `$SHORTCUT_API_TOKEN` must be set
 - Story ID must be known (numeric ID or `sc-NNNNN` format)
-- Use the `shortcut-fetch` skill patterns for API access and retry logic
+- Follow [fetch.md](fetch.md) patterns for API access and retry logic
 
-@{{TOOLKIT_DIR}}/rules/shortcut-api.md
+Read `rules/shortcut-api.md` for the global Shortcut routing constraints.
 
 ## Core Steps
 

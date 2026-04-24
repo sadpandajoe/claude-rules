@@ -23,7 +23,7 @@
 
 2. **Create Initial Tests**
 
-   Use the `testing` skill's [references/create-tests.md](../skills/testing/references/create-tests.md). This helper owns:
+   Follow [skills/testing/references/create-tests.md](../skills/testing/references/create-tests.md). This testing context owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
    - creating the first meaningful tests for the target area

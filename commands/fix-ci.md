@@ -237,7 +237,7 @@
    Next: [specific next action]
    ```
 
-   **Record metrics**: call the `metrics-emit` skill with:
+   **Record metrics**: include `metrics-emit` context with:
    - `command`: `fix-ci`
    - `complexity`: classification from the complexity gate (`trivial` / `moderate` / `standard`)
    - `status`: outcome from the Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)

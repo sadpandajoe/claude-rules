@@ -59,7 +59,7 @@
 
 6. **Report Findings**
 
-   Post a narrative report using the QA Verification template from `shortcut-report.md`.
+   Post a narrative report using the QA Verification template from [skills/shortcut/references/report.md](../skills/shortcut/references/report.md).
 
    **If a Shortcut story is known** (provided as input, or from PROJECT.md):
    - Upload video evidence to the story

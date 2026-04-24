@@ -1,11 +1,15 @@
 ---
 name: plan-review
-description: Reviewer lenses that critique a plan (not code) — architecture, backend, frontend, implementation feasibility. Internal helper dispatched by planning/iterate-review during plan iteration. Different from review/ (which reviews shipped code) and pm/review-feature-brief (which reviews a brief).
+description: Use when critiquing a technical plan before implementation: architecture, backend, frontend, or implementation feasibility lenses. Do NOT use for reviewing shipped code, product briefs, test files, or post-implementation diffs.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Plan Review
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for reviewer lenses that critique a *technical plan* before implementation starts. Each reference is a reviewer subagent prompt applying a specific angle to the plan.
 

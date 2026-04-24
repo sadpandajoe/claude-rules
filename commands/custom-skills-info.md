@@ -52,6 +52,7 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Maintenance
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
+| `/audit-agent-setup` | Audit commands, skills, rules, and agent docs against the primer model | After agent setup edits, before restructuring | — |
 | `/toolkit-doctor` | Validate symlinks, imports, paths, permissions, extensions | After install, after edits | — |
 
 ### Extension (PGM) — install with `--with-pgm`

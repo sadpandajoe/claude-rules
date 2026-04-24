@@ -88,7 +88,7 @@ Pick one based on branch state:
 
 Use the summary template at [skills/reporting/templates/complete-project-summary.md](../skills/reporting/templates/complete-project-summary.md) following the structural rules in [skills/reporting/SKILL.md](../skills/reporting/SKILL.md).
 
-After emitting the summary, call the `metrics-emit` skill with:
+After emitting the summary, include `metrics-emit` context with:
 - `command`: `complete-project`
 - `complexity`: `standard`
 - `status`: `clean` (or `blocked` if step 5 left services running, etc.)

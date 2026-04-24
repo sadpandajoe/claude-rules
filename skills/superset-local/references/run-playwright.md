@@ -14,7 +14,7 @@ Run Playwright E2E tests against a local Superset development stack. Handles the
 
 ## Prerequisites
 
-A healthy local Superset stack with its frontend dev server responding. If not running, call `run-superset-local.md` first (or prompt the user to start it).
+A healthy local Superset stack with its frontend dev server responding. If not running, follow [start-stack.md](start-stack.md) first (or prompt the user to start it).
 
 ## Steps
 
@@ -30,7 +30,7 @@ Look for:
 - A `superset-light` container showing `(healthy)`
 - A `superset-node-light` container with a port mapping
 
-If nothing is running, invoke `run-superset-local.md` to start the stack automatically. Only stop and ask the user if the stack start fails.
+If nothing is running, follow [start-stack.md](start-stack.md) to start the stack automatically. Only stop and ask the user if the stack start fails.
 
 ### 2. Detect Frontend Port
 
@@ -133,6 +133,6 @@ These are gotchas specific to running Playwright against a local Superset dev st
 
 ## What This Skill Does NOT Do
 
-- Start or manage the Docker stack (use `run-superset-local.md` for that)
+- Start or manage the Docker stack (use [start-stack.md](start-stack.md) for that)
 - Fix test code
 - Modify playwright.config.ts

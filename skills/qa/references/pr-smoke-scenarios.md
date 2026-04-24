@@ -16,7 +16,7 @@ Derive a focused, runnable smoke-test scenario list from a PR diff and descripti
 The caller provides:
 - PR title, description, and author notes
 - List of changed files and a diff summary
-- Impact assessment (CORE / STANDARD / PERIPHERAL) from the `qa` skill ([references/assess-impact.md](qa/references/assess-impact.md))
+- Impact assessment (CORE / STANDARD / PERIPHERAL) from [assess-impact.md](assess-impact.md)
 
 ## Steps
 

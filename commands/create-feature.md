@@ -59,7 +59,7 @@ Run the complexity gate as one sequence: classify → emit → route.
 **c. Route** per the classification. These are the feature-specific overrides to the rule's canonical paths:
 
 - **Trivial**: skip to step 5. Update PROJECT.md with action items only (no PLAN.md).
-- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then run the `planning` skill's [references/iterate-review.md](../skills/planning/references/iterate-review.md) with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
+- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then follow [skills/planning/references/iterate-review.md](../skills/planning/references/iterate-review.md) with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
 - **Standard**: continue to step 2 — produces a formal plan in PLAN.md.
 
 ### 2. Plan Mode → Exploration + Design
@@ -68,9 +68,9 @@ Enter plan mode. Inside plan mode, produce a draft plan:
 
 **a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
 
-**b. Create the feature brief**: If PM planning is needed, use the `pm` skill's [references/create-feature-brief.md](../skills/pm/references/create-feature-brief.md) with milestones via [references/plan-milestones.md](../skills/pm/references/plan-milestones.md). If skipped, synthesize a minimal brief from the request.
+**b. Create the feature brief**: If PM planning is needed, follow [skills/pm/references/create-feature-brief.md](../skills/pm/references/create-feature-brief.md) with milestones via [references/plan-milestones.md](../skills/pm/references/plan-milestones.md). If skipped, synthesize a minimal brief from the request.
 
-**c. Create the technical plan**: Use the `planning` skill's [references/plan-implementation.md](../skills/planning/references/plan-implementation.md) (follow the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
+**c. Create the technical plan**: Follow [skills/planning/references/plan-implementation.md](../skills/planning/references/plan-implementation.md) (use the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 
 The deliverable from this step is a **draft plan** — a feature brief (when applicable) and a technical plan. Step 3 writes that draft to PLAN.md. Polish happens in step 4 review iterations, not here.
 
@@ -100,7 +100,7 @@ This gate ensures the plan is durable before review iterations begin. PLAN.md is
 
 ### 4. Review Iterations + Action Gate
 
-Run the `planning` skill's [references/iterate-review.md](../skills/planning/references/iterate-review.md) with these inputs:
+Follow [skills/planning/references/iterate-review.md](../skills/planning/references/iterate-review.md) with these inputs:
 
 - **Plan location**: `PLAN.md` (written in step 3)
 - **PM brief review**: include when PM planning was used in step 2
@@ -108,7 +108,7 @@ Run the `planning` skill's [references/iterate-review.md](../skills/planning/ref
   - Always: `plan-review/references/architecture.md`, `plan-review/references/implementation.md`, `testing/references/review-testplan.md`
   - Conditional: `plan-review/references/frontend.md` when the plan touches UI; `plan-review/references/backend.md` when it touches API / DB / migrations
 - **Scope**: same classification produced in step 1 (trivial / moderate / substantial) so the helper picks the right reviewer model
-- **Action gate**: include (run the `action-gate` skill after cold read)
+- **Action gate**: include `action-gate` context after cold read
 
 The helper handles parallel launch, 8/10 iteration loop, shallow-analysis escalation (Sonnet → Opus), cold read via `planning/references/finalize.md`, and appends final scores to PLAN.md. See its file for the full procedure.
 
@@ -126,9 +126,9 @@ Update PROJECT.md: phase → "implementing".
 
 Implementation and review run as one tight loop.
 
-**Standard / moderate path**: for each slice in the plan, spawn `implement-change.md` — it handles test-first execution per the mode the plan specified (test set as specification for features) and runs the slice's acceptance check. After each slice, run `/review-code` as an internal loop until only nitpicks remain, then update PROJECT.md phase to "implementing slice N of M". Run QA validation when the work is user-visible. **Stop before the final commit** — the commit boundary is a user decision for non-trivial work.
+**Standard / moderate path**: for each slice in the plan, spawn `implement-change/` — it handles test-first execution per the mode the plan specified (test set as specification for features) and runs the slice's acceptance check. After each slice, run `/review-code` as an internal loop until only nitpicks remain, then update PROJECT.md phase to "implementing slice N of M". Run QA validation when the work is user-visible. **Stop before the final commit** — the commit boundary is a user decision for non-trivial work.
 
-**Trivial path**: spawn `implement-change.md` for the change → run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...` — pre-commit alone is not sufficient) → update PROJECT.md if present → commit (`feat:`) → push, but **only when verification is STRONG and review is clean**. **Stop before creating a PR** — PR creation remains a user decision even on the trivial path.
+**Trivial path**: spawn `implement-change/` for the change → run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...` — pre-commit alone is not sufficient) → update PROJECT.md if present → commit (`feat:`) → push, but **only when verification is STRONG and review is clean**. **Stop before creating a PR** — PR creation remains a user decision even on the trivial path.
 
 The reviewer emits a Review Gate block per `rules/review-gate.md`; branch on Status: `clean`, `blocked`, `user decision`, `skipped`. STRONG/PARTIAL/WEAK labels: per `rules/review-gate.md`. For truly minimal mechanical changes, the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
@@ -148,7 +148,7 @@ Lead with whether the feature ships and acceptance criteria are met — if the u
 
 **Do not delete PLAN.md.** It persists in place after completion. Cleanup happens when the user explicitly runs `/archive-project-file` — workflows do not auto-delete files. If the workflow stopped before completion (blocker, escalation), leaving PLAN.md in place lets the next session pick up.
 
-**Record metrics**: call the `metrics-emit` skill with:
+**Record metrics**: include `metrics-emit` context with:
 - `command`: `create-feature`
 - `complexity`: classification from step 1 (`trivial` / `moderate` / `standard`)
 - `status`: outcome from step 5 Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)

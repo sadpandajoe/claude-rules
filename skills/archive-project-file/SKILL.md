@@ -1,6 +1,6 @@
 ---
 name: archive-project-file
-description: Archive completed-phase content from PROJECT.md to PROJECT_ARCHIVE.md, and delete stale PLAN.md when no active workflow uses it. Use when PROJECT.md is cluttered with completed work or before starting a new major phase.
+description: Use when PROJECT.md has completed-phase content that should move to PROJECT_ARCHIVE.md, or when a stale PLAN.md remains after a workflow is done. Do NOT use for active work, unresolved blockers, current continuation checkpoints, or project summaries that should stay in PROJECT.md.
 argument-hint: [phase-name]
 ---
 
@@ -8,6 +8,10 @@ argument-hint: [phase-name]
 
 > **When**: A project/feature is done and needs to be preserved.
 > **Produces**: Archived PROJECT.md content in PROJECT_ARCHIVE.md, stale PLAN.md deleted.
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 This command should be owned by one main agent. Do not split the write across multiple agents — the archive boundary, breadcrumb, and preserved active context must stay consistent.
 

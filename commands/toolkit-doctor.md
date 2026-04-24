@@ -45,9 +45,9 @@ For each expected symlink, verify it exists, is a symlink, and points to the cor
 | `$CLAUDE_DIR/commands` | `$REPO_DIR/build/commands` |
 | `$CLAUDE_DIR/skills` | `$REPO_DIR/skills` |
 
-Then iterate each top-level `*.md` file under `$REPO_DIR/skills/` and verify a matching symlink exists in `$CODEX_DIR/skills/` pointing to the correct source. Do not hardcode skill names — discover them from the filesystem.
+Then iterate each installable skill under `$REPO_DIR/skills/` and verify a matching symlink exists in `$CODEX_DIR/skills/` pointing to the correct source. Installable skills are top-level directories with `SKILL.md` plus any remaining top-level `*.md` skills. Do not hardcode skill names — discover them from the filesystem.
 
-Verify no persona subdirectories remain under `$REPO_DIR/skills/` (all skills should be flat `.md` files at the top level).
+Verify no legacy persona subdirectories remain under `$REPO_DIR/skills/`. Directory skills are valid only when they contain `SKILL.md`.
 
 Finally, verify no symlink target is dangling (target file/dir must exist on disk).
 
@@ -74,7 +74,7 @@ Compare README.md content against the actual filesystem. Each mismatch is DRIFT,
 
 1. **Commands**: Every `*.md` in `commands/` should appear in the README Repository Structure block. Every command listed in the block should exist on disk. Bidirectional check.
 2. **Rules**: Same bidirectional check for `rules/*.md` against the README rules tree.
-3. **Skills**: Every `*.md` file under `skills/` should appear in the README skills tree. Bidirectional check.
+3. **Skills**: Every installable skill under `skills/` should appear in the README skills tree. Bidirectional check.
 4. **Workflow Rules table**: Every `rules/*.md` file referenced in the Workflow Rules table should exist on disk.
 
 #### F. Extension Boundaries

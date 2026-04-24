@@ -1,12 +1,16 @@
 ---
 name: implement-change
-description: Implement one slice from a plan — applies the test-first mode the plan specified, stays within slice scope, runs the slice's acceptance check, and hands changed files back for review. Internal helper called by /fix-bug, /create-feature, and similar workflows.
+description: Use when an approved plan, RCA, or slice is ready for code changes. Implements one scoped slice, follows the requested test-first mode, verifies acceptance, and hands changed files back for review. Do NOT use for root-cause investigation, plan creation, broad unsliced refactors, or final code review.
 user-invocable: false
 disable-model-invocation: true
 model: opus
 ---
 
 # Implement Change
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Use this phase when the workflow is ready to apply a code change after investigation and any needed planning are complete.
 

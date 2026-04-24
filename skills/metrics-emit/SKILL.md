@@ -1,12 +1,16 @@
 ---
 name: metrics-emit
-description: Append a structured workflow event to .claude/metrics.jsonl for observability. Called at the end of an end-to-end command's summary step so /metrics and /complete-project can aggregate later.
+description: Use at the end of an end-to-end workflow summary to append one structured event to .claude/metrics.jsonl for later /metrics or /complete-project aggregation. Do NOT use as a progress log, checkpoint mechanism, or blocker for workflow completion.
 user-invocable: false
 disable-model-invocation: true
 model: haiku
 ---
 
 # Metrics Emit
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Append a single structured event to `.claude/metrics.jsonl` at the end of any command's summary step. This is observability infrastructure — it records what happened so `/metrics` can analyze trends.
 
@@ -55,5 +59,5 @@ File: .claude/metrics.jsonl
 ## Notes
 - One line per event, strict JSON — no trailing commas, no multi-line formatting
 - The `.claude/` directory is user-local, not checked into git
-- Commands should call this skill at the very end of their summary step, after all gates have resolved
+- End-to-end command prompts should reference this skill context at the very end of their summary step, after all gates have resolved
 - `/metrics` command reads this file and produces aggregate summaries

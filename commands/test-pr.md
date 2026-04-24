@@ -76,11 +76,11 @@ Decision:
 
 ### 4. Assess Impact
 
-Run the `qa` skill's [references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff and changed files. This classifies the touched workflows as CORE, STANDARD, or PERIPHERAL and determines how many smoke scenarios to generate.
+Follow [skills/qa/references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff and changed files. This classifies the touched workflows as CORE, STANDARD, or PERIPHERAL and determines how many smoke scenarios to generate.
 
 ### 5. Derive Smoke Scenarios
 
-Run `pr-smoke-scenarios.md` with:
+Follow [skills/qa/references/pr-smoke-scenarios.md](../skills/qa/references/pr-smoke-scenarios.md) with:
 - PR title, description, and author notes
 - List of changed files and diff
 - Impact assessment from step 4
@@ -163,6 +163,6 @@ State:
 ## Notes
 - **This command tests what is currently running** — make sure the right branch is checked out and the app is up before running
 - For full QA validation with a curated test plan iterated to quality threshold, use `/run-test-plan` instead
-- For running the project's existing automated Playwright test suite (`.spec.ts` files), use the `run-playwright-local.md` skill instead
+- For running Superset's existing automated Playwright test suite (`.spec.ts` files), route to [skills/superset-local/references/run-playwright.md](../skills/superset-local/references/run-playwright.md) instead
 - Does not modify code or file bugs — test-only output
 - The `--smoke` flag is useful for a quick pre-merge sanity check; omit it for more thorough coverage on CORE-impact PRs

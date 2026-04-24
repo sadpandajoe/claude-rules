@@ -1,11 +1,15 @@
 ---
 name: pm
-description: Product-management phases — create feature brief (scope + AC), plan milestones, review a brief, decompose an epic into waves. Internal helper for /create-feature PM layer when scope/milestones/AC framing is non-trivial.
+description: Use for product scoping before technical planning: feature briefs, acceptance criteria, milestones, brief review, or epic decomposition. Do NOT use for technical implementation plans, code changes, code review, or test execution.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # PM
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for product-management planning phases — producing and reviewing scope-level artifacts before technical planning begins.
 

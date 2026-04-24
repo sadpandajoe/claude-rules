@@ -1,11 +1,15 @@
 ---
 name: preflight
-description: Pre-work environment checks — worktree setup (git-infra level) and app-runnable environment prep (service level). Internal helper called by workflows that need a ready local environment.
+description: Use before work that needs a ready worktree or runnable app: dependency/env checks, build artifacts, Docker/service readiness, seed data, and feature flags. Do NOT use for writing tests, implementing code, or validating product behavior after the environment is ready.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Preflight
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for pre-work environment-readiness checks. Two distinct layers, both called before real work begins.
 
@@ -27,5 +31,5 @@ Use worktree-preflight on first entry into any worktree. Use prepare-environment
 
 ## Notes
 
-- Worktree preflight is generic (applies to any project). Project-specific "spin up X stack" skills live separately at project level (e.g., `e2e-testing/` with `superset-stack.md`).
+- Worktree preflight is generic (applies to any project). Project-specific stack skills live separately (e.g., `superset-local/`).
 - Neither auto-starts Docker — both surface what's needed and let the user or a concrete stack skill do the actual startup.

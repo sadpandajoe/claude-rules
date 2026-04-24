@@ -6,7 +6,7 @@ model: haiku
 
 Use this helper whenever a workflow needs to make Shortcut REST API calls. It wraps the known operational gotchas so callers don't rediscover them each session.
 
-For endpoint reference, query patterns, and field names see `rules/shortcut-api.md`.
+Global rules only route Shortcut work here; this file owns the detailed REST protocol.
 
 ## Before Making Calls
 
@@ -59,6 +59,67 @@ Do not attempt `jq` on fields that contain user-authored text. Use `jq` only for
 | `workflow_state_id` | Integer. Map to name via `GET /workflows`. Cache the mapping per session. |
 | `custom_fields` | Array of `{"field_id": ..., "value_id": ..., "value": "..."}`. Shape varies by workspace config. |
 | `description` | Markdown string. May contain control chars, emoji, and embedded images. Always parse with `strict=False`. |
+
+## Endpoints
+
+| Endpoint | Method | Use |
+|----------|--------|-----|
+| `/stories/search` | POST | Find stories by team, state, dates. Supports pagination. |
+| `/stories/<id>` | GET | Single story details |
+| `/epics/<id>` | GET | Epic details — progress, state, stories |
+| `/groups` | GET | All teams (groups) — verify UUIDs |
+| `/groups/<id>/stories` | GET | Stories assigned to a team |
+| `/iterations` | GET | All iterations |
+| `/workflows` | GET | Workflow states — map state IDs to names |
+| `/members` | GET | All workspace members |
+
+## Common Query Patterns
+
+**Completed stories by team in a date range:**
+```bash
+curl -s -X POST "https://api.app.shortcut.com/api/v3/stories/search" \
+  -H "Content-Type: application/json" \
+  -H "Shortcut-Token: $SHORTCUT_API_TOKEN" \
+  -d '{"completed_at_start":"2026-03-01T00:00:00Z","completed_at_end":"2026-03-21T23:59:59Z","group_id":"<team-uuid>"}'
+```
+
+**WIP stories by team:**
+```bash
+curl -s -X POST "https://api.app.shortcut.com/api/v3/stories/search" \
+  -H "Content-Type: application/json" \
+  -H "Shortcut-Token: $SHORTCUT_API_TOKEN" \
+  -d '{"workflow_state_types":["started"],"group_id":"<team-uuid>"}'
+```
+
+**Blocked stories:** Query WIP, then filter client-side for `.blocked == true` or `.blocker == true`.
+
+## Pagination
+
+Search responses include a `next` token when more results exist. Pass it as `"next": "<token>"` in the next POST body. Loop until no `next` token is returned.
+
+## Workflow States
+
+Fetch from `/workflows` to map `workflow_state_id` to human-readable names. The "Engineering Kanban" workflow is primary. Typical flow: Unstarted -> Ready for Dev -> In Development -> Ready for Review -> In Review -> Ready for Deploy -> Deployed/Done.
+
+## Story ID Formats
+
+Stories can be referenced as:
+- `sc-12345` or `SC-12345` — extract the number, query `/stories/12345`
+- Shortcut URL — extract the story ID from the path
+- Numeric ID — query directly
+
+## MCP Fallback
+
+When REST API is unavailable after retry or for interactive one-off lookups, use the Shortcut MCP tools:
+
+| Tool | Use |
+|------|-----|
+| `stories-search` | Search with team, date, state filters |
+| `stories-get-by-id` | Single story details |
+| `epics-get-by-id` | Epic details |
+| `epics-search` | Find epics by query |
+| `iterations-search` | Find iterations by date range |
+| `iterations-get-stories` | Stories in an iteration |
 
 ## Minimal Fetch Pattern
 

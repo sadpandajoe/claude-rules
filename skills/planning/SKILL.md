@@ -1,11 +1,15 @@
 ---
 name: planning
-description: Technical planning phases — produce an implementation plan, iterate plan review, finalize with cold read, classify review findings as code-level vs plan-level. Internal helper for /create-feature, /review-plan, /fix-bug standard path.
+description: Use when producing or iterating a technical implementation plan, finalizing it with a cold read, or classifying review findings as plan-level vs code-level. Do NOT use for product scoping, code implementation, code review, or QA scenario execution.
 user-invocable: false
 disable-model-invocation: true
 ---
 
 # Planning
+
+## Before Starting
+
+Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Umbrella for technical planning phases — producing a plan, iterating it through review, finalizing it with a cold read, and routing review findings back if they indicate a plan-level issue.
 

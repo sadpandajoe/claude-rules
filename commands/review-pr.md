@@ -60,7 +60,7 @@ Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
 ### 3. Assess Impact + Understand the Problem
 
-Run the `qa` skill's [references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
+Follow [skills/qa/references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
 
 **Impact escalation**: If impact is CORE, escalate regardless of complexity tier:
 - TRIVIAL + CORE → run full review team (not just code quality)
@@ -81,7 +81,7 @@ If the premise is valid, proceed to team review with that understanding as conte
 
 ### 4. Detect Reviewer Team
 
-Use the `review` skill's [references/classify-diff.md](../skills/review/references/classify-diff.md) to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The reference returns triggered reviewers with reasons.
+Follow [skills/review/references/classify-diff.md](../skills/review/references/classify-diff.md) to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The reference returns triggered reviewers with reasons.
 
 Pass the impact assessment from step 3 to all reviewer subagents so they can calibrate severity — CORE workflow findings get stricter treatment per `rules/code-review.md` calibration.
 

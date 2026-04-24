@@ -58,7 +58,7 @@
 
 6. **Update the Tests**
 
-   Use the `testing` skill's [references/update-tests.md](../skills/testing/references/update-tests.md):
+   Follow [skills/testing/references/update-tests.md](../skills/testing/references/update-tests.md):
 
    This helper owns:
    - updating existing tests first
