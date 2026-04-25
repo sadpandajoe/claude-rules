@@ -102,7 +102,7 @@ type: {feedback|reference|project|user}
 - `feedback_summary_style.md` — still relevant, no conflicts
 
 ### Update
-- `reference_shortcut_api.md` — references `skills/shared/shortcut-fetch.md` (pre-Wave-3 path, now `shortcut-fetch.md`)
+- `reference_shortcut_api.md` — references an obsolete Shortcut fetch helper path (current path: `skills/shortcut/references/fetch.md`)
 
 ### Prune candidates
 - [none found, or list with reasons]
@@ -134,6 +134,7 @@ type: {feedback|reference|project|user}
 **b.** Decision criteria — rules vs. memories:
 - **Rule**: Pattern applies across all projects and sessions, is structural, constrains behavior
 - **Memory**: Pattern is project-specific, personal preference, or operational context
+- **Skill lesson/gotcha**: Pattern applies only when a specific skill is active; append it to that skill's `lessons.md` or `gotchas.md` instead of promoting it globally
 
 **c.** Check `rules/` for partial coverage (update existing rule vs. new rule).
 

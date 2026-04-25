@@ -30,7 +30,7 @@ Bot accounts to filter from metrics: listed in `config.json` under `bots`.
 
 ## API Reference
 
-Subagents read `rules/shortcut-api.md` when making Shortcut API calls. See `shortcut-fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
+Subagents read `rules/shortcut-api.md` when making Shortcut API calls. See `skills/shortcut/references/fetch.md` for the retry wrapper, JSON parsing, and field shape gotchas. For PGM commands, prefer Shortcut REST API over MCP — faster, no permission prompts, richer fields.
 
 ## Parallel Agent Pattern
 
@@ -57,7 +57,7 @@ Agent 3 (Notion MCP, optional):
 
 Each agent should:
 - Read `config.json` for team/member context
-- Read `shortcut-fetch.md` for Shortcut API operational patterns (Agent 1)
+- Read `skills/shortcut/references/fetch.md` for Shortcut API operational patterns (Agent 1)
 - Filter out bot accounts
 - Return structured data for synthesis
 

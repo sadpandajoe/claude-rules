@@ -1,6 +1,6 @@
 # /review-code-adversarial - Dual-Model Red-Team Review
 
-@{{TOOLKIT_DIR}}/skills/review-adversarial.md
+@{{TOOLKIT_DIR}}/skills/review/references/adversarial.md
 
 > **When**: You want to stress-test changes for security holes, edge cases, race conditions, and failure modes using both Claude and Codex in parallel.
 > **Produces**: Merged adversarial findings from two models, fixes, and a Review Gate block.
@@ -28,7 +28,7 @@ Read the full content of each changed file plus surrounding context.
 Run both models in parallel:
 
 **Claude adversarial** (foreground subagent):
-- Apply `review-adversarial.md` skill
+- Apply `review/references/adversarial.md`
 - Analyze through all lenses: security, edge cases, race conditions, error handling, data integrity, input validation
 - Produce findings with concrete failure scenarios
 

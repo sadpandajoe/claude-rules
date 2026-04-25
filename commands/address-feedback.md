@@ -163,7 +163,13 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - **All resolved, PR approved**: Merge the PR
 ```
 
-Record lifecycle: `command-complete`
+**Record metrics**: include `metrics-emit` context with:
+- `command`: `address-feedback`
+- `complexity`: classification from the complexity gate (`trivial` / `standard`)
+- `status`: outcome (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)
+- `rounds`: review rounds if any (0 if review was skipped)
+- `gate_decisions`: `{ complexity: <gate>, triage: <fix N / skip N / discuss N>, review: <gate> }`
+- `models_used`: subagent model invocation counts
 
 ## Non-Negotiable Gates
 

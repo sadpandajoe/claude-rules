@@ -81,5 +81,5 @@ Events: [total count]
 - This is a read-only command — it never modifies the metrics file
 - Metrics are best-effort: not every command emits metrics yet (initial adoption covers `/create-feature`, `/fix-bug`, `/fix-ci`)
 - The `.claude/metrics.jsonl` file is user-local and not committed to git
-- Events are appended by `metrics-emit.md` at each command's summary step
+- Events are appended by `metrics-emit/` at each command's summary step
 - Trend analysis requires at least 10 events to be meaningful

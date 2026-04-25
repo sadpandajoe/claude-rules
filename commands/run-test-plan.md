@@ -2,7 +2,7 @@
 
 @{{TOOLKIT_DIR}}/rules/input-detection.md
 @{{TOOLKIT_DIR}}/rules/preset-environments.md
-@{{TOOLKIT_DIR}}/skills/review-testplan.md
+@{{TOOLKIT_DIR}}/skills/testing/references/review-testplan.md
 
 > **When**: You want to validate a feature area, story, PR, or existing test-plan doc without fixing code in the same workflow.
 > **Produces**: A reviewed runnable test plan, execution results, evidence for material failures, and a local findings summary.
@@ -59,7 +59,7 @@
 
 6. **Report Findings**
 
-   Post a narrative report using the QA Verification template from `shortcut-report.md`.
+   Post a narrative report using the QA Verification template from [skills/shortcut/references/report.md](../skills/shortcut/references/report.md).
 
    **If a Shortcut story is known** (provided as input, or from PROJECT.md):
    - Upload video evidence to the story
@@ -106,8 +106,6 @@
    ### Follow-Up
    - [Manual next steps only]
    ```
-
-   Record lifecycle: `command-complete`
 
 ## Continuation Checkpoint
 

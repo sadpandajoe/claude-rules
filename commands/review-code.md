@@ -43,8 +43,6 @@ Examples — TRIVIAL: renamed a variable in one file (10 lines, no logic). STAND
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate`
-
 - **Trivial**: Code quality reviewer only.
 - **Standard**: Full review team.
 
@@ -52,9 +50,9 @@ Only formatting-only diffs and micro-fixes (per `rules/review-gate.md`) skip the
 
 ### 3. Classify and Assess Impact
 
-Run these two skills in parallel on the changeset:
-- **`classify-diff.md`** — determines which review domains apply (structure: which reviewers)
-- **`qa-assess-impact.md`** — determines functional impact: CORE, STANDARD, or PERIPHERAL (function: how critical)
+Follow these two reference paths in parallel on the changeset:
+- **`review/references/classify-diff.md`** — determines which review domains apply (structure: which reviewers)
+- **[skills/qa/references/assess-impact.md](../skills/qa/references/assess-impact.md)** — determines functional impact: CORE, STANDARD, or PERIPHERAL (function: how critical)
 
 **Impact escalation**: If the impact is CORE, escalate regardless of complexity tier:
 - TRIVIAL + CORE → run full review team (not just code quality)
@@ -106,8 +104,6 @@ Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
 
-Record lifecycle: `review-gate`
-
 ### 8. Adversarial Suggestion
 
 If the diff touches security-sensitive areas (auth, input handling, API endpoints, database queries, file operations, secrets), suggest:
@@ -123,7 +119,7 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 | Reviewer | Why |
 |----------|-----|
 | Code quality | Always |
-| Tests / Test plan | Tests exist → review-tests.md; no tests → review-testplan.md |
+| Tests / Test plan | Tests exist → testing/references/review-tests.md; no tests → testing/references/review-testplan.md |
 | Architecture | Logic changes in source files |
 | Codex (GPT-5.4) | Standard complexity (or: skipped — plugin not available) |
 
@@ -162,8 +158,6 @@ Rounds: [N] | Pre-flight: [pass/fail] | Status: [clean/blocked]
 - **Security-sensitive areas detected**: `/review-code-adversarial` for red-team review
 - **Test gaps identified**: `/create-tests` or `/update-tests` to fill coverage
 ```
-
-Record lifecycle: `command-complete`
 
 ## Notes
 - This command is used standalone and also called internally by `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, `/update-tests`

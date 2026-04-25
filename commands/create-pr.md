@@ -90,7 +90,13 @@ Base: [base branch] ← [head branch]
 Commits: [N]
 ```
 
-Record lifecycle: `command-complete`
+**Record metrics**: include `metrics-emit` context with:
+- `command`: `create-pr`
+- `complexity`: `standard`
+- `status`: `clean` if the PR was created, `blocked` otherwise
+- `rounds`: 0
+- `gate_decisions`: `{ pr_created: <yes | no>, draft: <yes | no> }`
+- `models_used`: subagent model invocation counts
 
 ## Notes
 - This command generates and creates the PR — it does not review the code

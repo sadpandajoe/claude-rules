@@ -39,8 +39,7 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Project State
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/checkpoint` | Save state to PROJECT.md (add `--commit --clear` for full protocol) | Context getting deep | — |
-| `/update-project-file` | Manual PROJECT.md refresh | Need to update status | — |
+| `/checkpoint` | Save state to PROJECT.md — works for both quick logs (`/checkpoint "msg"`) and full save-and-clear (`/checkpoint --clear`) | Anytime you want to update state, log progress, or save before `/clear` | — |
 | `/archive-project-file` | Move completed work to archive | PROJECT.md is cluttered | — |
 | `/complete-project` | Capstone: summarize, promote learnings, archive, hand off | Project or major work is done | — |
 
@@ -53,6 +52,7 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Maintenance
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
+| `/audit-agent-setup` | Audit commands, skills, rules, and agent docs against the primer model | After agent setup edits, before restructuring | — |
 | `/toolkit-doctor` | Validate symlinks, imports, paths, permissions, extensions | After install, after edits | — |
 
 ### Extension (PGM) — install with `--with-pgm`

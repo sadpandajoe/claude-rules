@@ -1,6 +1,5 @@
 # /create-feature - End-to-End Feature Workflow
 
-@{{TOOLKIT_DIR}}/rules/planning.md
 @{{TOOLKIT_DIR}}/rules/input-detection.md
 @{{TOOLKIT_DIR}}/rules/orchestration.md
 @{{TOOLKIT_DIR}}/rules/complexity-gate.md
@@ -8,22 +7,24 @@
 > **When**: You have a feature request or other planned non-bug work and want the repo-standard workflow to scope it, review it, implement it, and keep going until a real decision matters.
 > **Produces**: Feature brief, milestones, implementation plan, reviewed plan, implemented local changes, review and QA results, and a handoff before the final commit or PR action.
 
+## Contract
+
+Non-negotiable guarantees this workflow maintains. If the workflow would skip any of these, stop and ask.
+
+- [ ] Complexity Gate block emitted (step 1)
+- [ ] PLAN.md written with plan content (step 3) — standard path only
+- [ ] Review iterations meet threshold and cold read passes (step 4) — standard path only
+- [ ] `/review-code` Review Gate block emitted (step 5)
+- [ ] PROJECT.md updated with current state and (on completion) Completed entry
+- [ ] Summary emitted (step 6)
+
 ## Plan Mode Boundary
 
-Plan mode is for **exploration and design only** — step 2 below. Review iterations (step 4) happen in **normal mode** after plan mode exit, where agents can be launched freely and PROJECT.md can be written.
+Plan mode is for exploration and design only — step 2. Everything else (writing PLAN.md, launching reviewer agents, looping to 8/10) happens in normal mode, because plan mode is read-only except for the plan file and turns must end with `AskUserQuestion` or `ExitPlanMode`.
 
-**Why reviews live outside plan mode**: Plan mode constrains turn-ending behavior ("end turns with AskUserQuestion or ExitPlanMode") and is read-only except for the plan file. Review iterations need to launch multiple reviewer agents, auto-loop to 8/10, and write to PROJECT.md — all of which conflict with plan mode constraints. Separating them eliminates the ambiguity.
+Standard path flow: complexity gate → plan mode (brief + tech plan draft) → exit plan mode → write PLAN.md (hard gate) → review iterations → implement + review → summarize.
 
-**Standard path**:
-1. Complexity gate in normal mode (must be visible in conversation).
-2. Enter plan mode for exploration + design (PM brief, tech plan draft).
-3. Exit plan mode → write draft plan to PROJECT.md (hard gate).
-4. Review iterations in normal mode (agents, auto-loop, cold read).
-5. Implement, review, summarize.
-
-**Moderate path**: Skip plan mode. Orchestrator designs inline, spawns one reviewer subagent. See step 1 for details.
-
-**Trivial path**: Skip plan mode entirely. Implement → `/review-code` → summary.
+Moderate and trivial paths skip plan mode. See `rules/complexity-gate.md` for canonical path behavior; step 1 below lists only the feature-specific overrides.
 
 ## Usage
 ```
@@ -38,14 +39,13 @@ Plan mode is for **exploration and design only** — step 2 below. Review iterat
 
 ### 1. Normalize Input + Complexity Gate
 
-Accept:
-- plain-language feature request
-- Shortcut story ID or URL
-- GitHub issue or PR reference / URL
+Accept plain-language feature requests, Shortcut story IDs/URLs, or GitHub issue/PR references.
 
-When a ticket URL or issue reference is provided, **fetch and parse it FIRST** before any planning or code investigation. Extract scope, acceptance criteria, and constraints from the source. These are authoritative — don't re-derive scope from scratch.
+When a ticket URL or reference is provided, **fetch and parse it FIRST** before any planning or code investigation. The ticket's scope, acceptance criteria, and constraints are authoritative — don't re-derive from scratch.
 
-Then assess complexity:
+Run the complexity gate as one sequence: classify → emit → route.
+
+**a. Classify** using these feature-specific signals:
 
 | Signal | Trivial | Moderate | Standard |
 |--------|---------|----------|----------|
@@ -54,182 +54,104 @@ Then assess complexity:
 | New APIs / migrations | No | Minor (add endpoint, extend model) | Yes, cross-system |
 | Behavioral risk | Mechanical / cosmetic | Contained functional change | Cross-cutting functional change |
 
-Emit the Complexity Gate block per `rules/complexity-gate.md`.
+**b. Emit** the Complexity Gate block using the format in `rules/complexity-gate.md`. That rule also defines auto-proceed and general routing behavior — do not re-state it here.
 
-**Trivial + confidence 8/10+**: Auto-proceed — do not ask the user for confirmation; skip to the trivial path — step 5.
+**c. Route** per the classification. These are the feature-specific overrides to the rule's canonical paths:
 
-**Moderate + confidence 8/10+**: Skip plan mode and full reviewer army. Orchestrator designs inline:
-1. Explore and design in the main thread (no plan mode, no investigation subagents)
-2. Write plan to PROJECT.md (same hard gate as step 3)
-3. Spawn **one** reviewer subagent (`review-implementation`, `model: "sonnet"`) + cold read (`finalize-plan`) — 2 spawns instead of 5–6
-4. Implement, `/review-code`, summary (same as standard steps 5–7)
-
-If design reveals the feature is more complex than expected, escalate to STANDARD and enter plan mode.
-
-**Standard**: Continue to step 2. Make this decision yourself and continue automatically — do not ask the user whether to run review iterations, which reviewers to use, or whether the plan is "good enough." End-to-end commands own their internal loops.
+- **Trivial**: skip to step 5. Update PROJECT.md with action items only (no PLAN.md).
+- **Moderate**: skip plan mode. Design inline, write action items to PROJECT.md (no PLAN.md), then follow [skills/planning/references/iterate-review.md](../skills/planning/references/iterate-review.md) with `reviewer set: [plan-review/references/implementation.md]` and scope `moderate`. Continue from step 5. Escalate to STANDARD if complexity emerges.
+- **Standard**: continue to step 2 — produces a formal plan in PLAN.md.
 
 ### 2. Plan Mode → Exploration + Design
 
-Enter plan mode. Inside plan mode, do all of the following:
+Enter plan mode. Inside plan mode, produce a draft plan:
 
 **a. Decide PM scope**: Use the PM layer when scope, milestones, acceptance criteria, or rollout framing are non-trivial. Skip when the work is already tightly scoped. State the decision explicitly.
 
-**b. Create the feature brief**: If PM planning is needed, use `pm-create-feature-brief.md` with milestones via `pm-plan-milestones.md`. If skipped, synthesize a minimal brief from the request.
+**b. Create the feature brief**: If PM planning is needed, follow [skills/pm/references/create-feature-brief.md](../skills/pm/references/create-feature-brief.md) with milestones via [references/plan-milestones.md](../skills/pm/references/plan-milestones.md). If skipped, synthesize a minimal brief from the request.
 
-**c. Create the technical plan**: Use `plan-feature.md` to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
+**c. Create the technical plan**: Follow [skills/planning/references/plan-implementation.md](../skills/planning/references/plan-implementation.md) (use the "For Features" guidance) to define technical approach, PR slices, migrations/API implications, test strategy, and implementation sequencing.
 
-Exit plan mode when you have a draft feature brief and technical plan. These do not need to be polished — review iterations in step 4 will refine them.
+The deliverable from this step is a **draft plan** — a feature brief (when applicable) and a technical plan. Step 3 writes that draft to PLAN.md. Polish happens in step 4 review iterations, not here.
 
-### 3. Write PROJECT.md (hard gate)
+Exit plan mode when the draft is complete.
 
-After exiting plan mode, read the plan file. Write its content into PROJECT.md sections:
+### 3. Write PLAN.md (hard gate)
+
+After exiting plan mode, read the draft plan file and write its content into a new `PLAN.md` at the repo root with these sections:
 - `Feature Brief`
 - `Milestones` (if PM planning was used)
 - `Implementation Plan`
 - `Test Strategy`
 
+Then update PROJECT.md with a pointer:
+- Set current workflow + phase ("Working on: <feature>; phase: review")
+- Add "Active plan: PLAN.md" pointer
+
 **Do not proceed to step 4 until this confirmation block is emitted:**
 
 ```markdown
-## PROJECT.md Updated
-Sections written: [list of sections written]
+## PLAN.md Written
+Sections: [list of sections written]
+PROJECT.md updated: pointer to PLAN.md added
 ```
 
-This gate ensures the plan is durable before review iterations begin. If the plan is only in conversation or a plan file, it can be lost on context refresh.
+This gate ensures the plan is durable before review iterations begin. PLAN.md is loaded by the review iteration phase and again during implementation; PROJECT.md is the lightweight state pointer that subsequent sessions read first.
 
 ### 4. Review Iterations + Action Gate
 
-Now in normal mode, iterate the plan using reviewer agents. This is the main quality gate.
+Follow [skills/planning/references/iterate-review.md](../skills/planning/references/iterate-review.md) with these inputs:
 
-**a. PM brief review** (if PM planning was used): Spawn a `review-feature-brief` reviewer subagent with `model: "sonnet"` per `rules/orchestration.md` — PM briefs are scoped reviews. Use `model: "opus"` only if the brief covers multi-system rollout or material business risk. Revise until 8/10.
+- **Plan location**: `PLAN.md` (written in step 3)
+- **PM brief review**: include when PM planning was used in step 2
+- **Reviewer set**:
+  - Always: `plan-review/references/architecture.md`, `plan-review/references/implementation.md`, `testing/references/review-testplan.md`
+  - Conditional: `plan-review/references/frontend.md` when the plan touches UI; `plan-review/references/backend.md` when it touches API / DB / migrations
+- **Scope**: same classification produced in step 1 (trivial / moderate / substantial) so the helper picks the right reviewer model
+- **Action gate**: include `action-gate` context after cold read
 
-**b. Technical plan review**: Always run these reviewers in parallel:
-- `review-architecture`
-- `review-implementation`
-- `review-testplan`
+The helper handles parallel launch, 8/10 iteration loop, shallow-analysis escalation (Sonnet → Opus), cold read via `planning/references/finalize.md`, and appends final scores to PLAN.md. See its file for the full procedure.
 
-Add when the plan needs them:
-- `review-frontend`
-- `review-backend`
+After the helper returns, **print a brief summary in conversation** for approval / next step:
+- What scored where (final scores per reviewer)
+- Cold read verdict
+- Action gate verdict
+- Whether iterations introduced material plan changes (1–2 lines, not a full change log)
 
-**Choose the reviewer model based on actual plan complexity**, per `rules/orchestration.md`:
-- **Trivial plan** (single subsystem, mechanical change, no architectural decisions): `model: "sonnet"`
-- **Substantial plan** (multi-system, real trade-offs, novel design, ambiguous constraints): `model: "opus"`
+Auto-iterate the helper. Only stop for a user-blocking decision.
 
-Revise the plan until all applicable reviewers are at 8/10 or better. Run iterations automatically — do not ask the user whether to continue or which reviewers to use. Only stop for a blocking decision that requires user input.
+Update PROJECT.md: phase → "implementing".
 
-If a Sonnet reviewer scored low for *shallow analysis* (lack of depth) rather than legitimate plan issues, re-run that specific reviewer on `model: "opus"`.
+### 5. Implement + Review
 
-**c. Cold read**: Spawn `finalize-plan` as a fresh-eyes final check. Match the model to the plan's reasoning load (same rule as 4b — `model: "sonnet"` for trivial-to-moderate plans, `model: "opus"` for substantial cross-system plans). If it finds a blocking issue, revise and re-run.
+Implementation and review run as one tight loop.
 
-**d. Action gate**: Run `action-gate.md`. Auto-proceed when Risk is LOW, Confidence ≥ 8/10, and no decision is required.
+**Standard / moderate path**: for each slice in the plan, spawn `implement-change/` — it handles test-first execution per the mode the plan specified (test set as specification for features) and runs the slice's acceptance check. After each slice, run `/review-code` as an internal loop until only nitpicks remain, then update PROJECT.md phase to "implementing slice N of M". Run QA validation when the work is user-visible. **Stop before the final commit** — the commit boundary is a user decision for non-trivial work.
 
-Update PROJECT.md with final review scores after this step.
+**Trivial path**: spawn `implement-change/` for the change → run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...` — pre-commit alone is not sufficient) → update PROJECT.md if present → commit (`feat:`) → push, but **only when verification is STRONG and review is clean**. **Stop before creating a PR** — PR creation remains a user decision even on the trivial path.
 
-### 5. Implementation
+The reviewer emits a Review Gate block per `rules/review-gate.md`; branch on Status: `clean`, `blocked`, `user decision`, `skipped`. STRONG/PARTIAL/WEAK labels: per `rules/review-gate.md`. For truly minimal mechanical changes, the review loop may be skipped per the skip rule in `rules/review-gate.md`.
 
-**Standard path** (from step 4):
-- For each implementation slice, define the acceptance or regression test first
-- Write the failing test before the code change when feasible
-- If test-first is blocked by env, repro, or harness constraints, write the test anyway and record the verification gap — writing is separate from running
-- For mechanical changes (renames, config swaps, endpoint changes with no new logic), writing tests alongside the implementation is acceptable — record why test-first was skipped
-- Implement the feature through `developer`
-- Run QA validation when the work is user-visible
+**Resuming from a pre-built plan**: enter at this step (skip steps 1–4), but still run the review loop and pre-flight checks before declaring done — do not skip the Review Gate because the plan was drafted in a prior session.
 
-**Trivial path** (from step 1):
-1. Implement the change
-2. Run the actual test suite covering the changed files (`pytest -k ...`, `jest --testPathPattern ...`) — pre-commit alone is not sufficient
-3. Update PROJECT.md (single update) — skip if no PROJECT.md exists and work completes without blockers
-4. If STRONG verification + review clean: commit (`feat:`) + push automatically. If PARTIAL or WEAK: commit — stop before push, note verification gap.
+If a meaningful decision surfaces during implementation or review, stop and present it clearly.
 
-If a meaningful decision surfaces during implementation, stop and present it clearly.
+### 6. Summary
 
-### 6. Review Changed Files (gate)
+Use the template at [skills/reporting/templates/create-feature-summary.md](../skills/reporting/templates/create-feature-summary.md) following the structural rules in [skills/reporting/SKILL.md](../skills/reporting/SKILL.md).
 
-Run `/review-code` on changed repo-tracked files as an internal loop. Keep iterating until only nitpicks remain or a real blocker/user decision appears.
+Lead with whether the feature ships and acceptance criteria are met — if the user gave you a ticket, answer whether it's done.
 
-The developer emits a Review Gate block per `rules/review-gate.md`. Callers branch on Status: `clean`, `blocked`, `user decision`, `skipped`.
+**Update PROJECT.md** (standard path only): on successful completion:
+- Remove the "Active plan" pointer (PLAN.md is no longer driving active work)
+- Append a "Completed" entry: `<date> — <feature>`
 
-For truly minimal mechanical changes (renames, config swaps), the review loop may be skipped per the skip rule in `rules/review-gate.md`.
+**Do not delete PLAN.md.** It persists in place after completion. Cleanup happens when the user explicitly runs `/archive-project-file` — workflows do not auto-delete files. If the workflow stopped before completion (blocker, escalation), leaving PLAN.md in place lets the next session pick up.
 
-Do not skip this step when resuming from a pre-built plan.
-
-### 7. Summary
-
-Lead with the outcome, not the process. If the user gave you a ticket, answer whether it's done.
-
-```markdown
-## Create-Feature Complete
-[1-2 lines: what was built, whether acceptance criteria are met]
-
-### What was built
-- [Specific behavior/UX flow — what the user or system does differently now]
-
-### Verify manually
-- [Things automated tests can't cover — live integration, UI rendering, permissions]
-- [Omit section if everything is covered by automated tests]
-
-### Key decisions
-- [Decisions made during planning that shaped the implementation]
-
-### What to do next
-- [Specific next action — PR, deploy step, remaining slices]
-
-### Open risks
-- [Anything uncertain or untested — omit section if none]
-
-<details><summary>Technical details</summary>
-
-- Files changed: [list]
-- Review: Rounds [N] | Status [clean/blocked]
-
-</details>
-```
-
-## Non-Negotiable Gates
-
-Use this checklist to verify you haven't skipped a gate:
-
-- [ ] Complexity Gate block emitted (step 1)
-- [ ] PROJECT.md written with plan content (step 3) — standard path only
-- [ ] All applicable reviewers at 8/10 (step 4b) — standard path only
-- [ ] Cold read passed (step 4c) — standard path only
-- [ ] `/review-code` Review Gate block emitted (step 6)
-- [ ] PROJECT.md updated with final status
-- [ ] Summary emitted (step 7)
-
-## PROJECT.md Update Discipline
-
-**Standard path:**
-- **step 3** — after exiting plan mode, flush the draft plan into PROJECT.md. This is the first write and a hard gate.
-- **step 4** — after review iterations complete, update with final review scores.
-- after implementation and validation complete.
-
-## Continuation Checkpoint
-
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /create-feature <arguments>
-- Phase: input / complexity-gate / plan-mode / project-md-write / review-iterations / action-gate / implement / review-code / summarize
-- Resume target: <story, issue, milestone, PR slice, file set, or current blocker>
-- Completed items: <finished phases or accepted decisions>
-### State
-- Complexity: <trivial / moderate / standard>
-- PM required: <yes / no / skipped — trivial>
-- PM brief score: <score or skipped>
-- Technical plan scores: <reviewer: score, ... or pending>
-- Cold read: <go / no-go / pending>
-- Review status: <clean / blocked / pending>
-- Files changed so far: <files or none>
-- Pending blockers or decisions: <if any>
-```
-
-## Notes
-- `/create-feature` is the public entrypoint for planned non-bug work, including refactors where the PM layer can be skipped
-- Only pause when a real decision matters
-- Use test-first implementation by default for each slice; document why when it is blocked
-- `/review-code` is an internal phase here, not the expected next top-level user step
-- Trivial path with STRONG verification: commit and push automatically — stop before creating a PR, that remains a user decision
-- Standard/moderate path: stop before the final commit or PR action
-- When resuming from a pre-built plan, enter at the implementation phase but still run review, QA, and pre-flight checks before declaring done
+**Record metrics**: include `metrics-emit` context with:
+- `command`: `create-feature`
+- `complexity`: classification from step 1 (`trivial` / `moderate` / `standard`)
+- `status`: outcome from step 5 Review Gate (`clean` / `blocked` / `user-decision` / `skipped` / `micro-fix`)
+- `rounds`: total review iteration rounds from step 4 (0 for trivial path)
+- `gate_decisions`: `{ complexity: <step 1>, action_gate: <step 4>, review: <step 5> }`
+- `models_used`: subagent model invocation counts

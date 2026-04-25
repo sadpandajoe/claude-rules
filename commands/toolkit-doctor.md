@@ -45,9 +45,9 @@ For each expected symlink, verify it exists, is a symlink, and points to the cor
 | `$CLAUDE_DIR/commands` | `$REPO_DIR/build/commands` |
 | `$CLAUDE_DIR/skills` | `$REPO_DIR/skills` |
 
-Then iterate each top-level `*.md` file under `$REPO_DIR/skills/` and verify a matching symlink exists in `$CODEX_DIR/skills/` pointing to the correct source. Do not hardcode skill names — discover them from the filesystem.
+Then iterate each installable skill under `$REPO_DIR/skills/` and verify a matching symlink exists in `$CODEX_DIR/skills/` pointing to the correct source. Installable skills are top-level directories with `SKILL.md` plus any remaining top-level `*.md` skills. Do not hardcode skill names — discover them from the filesystem.
 
-Verify no persona subdirectories remain under `$REPO_DIR/skills/` (all skills should be flat `.md` files at the top level).
+Verify no legacy persona subdirectories remain under `$REPO_DIR/skills/`. Directory skills are valid only when they contain `SKILL.md`.
 
 Finally, verify no symlink target is dangling (target file/dir must exist on disk).
 
@@ -74,7 +74,7 @@ Compare README.md content against the actual filesystem. Each mismatch is DRIFT,
 
 1. **Commands**: Every `*.md` in `commands/` should appear in the README Repository Structure block. Every command listed in the block should exist on disk. Bidirectional check.
 2. **Rules**: Same bidirectional check for `rules/*.md` against the README rules tree.
-3. **Skills**: Every `*.md` file under `skills/` should appear in the README skills tree. Bidirectional check.
+3. **Skills**: Every installable skill under `skills/` should appear in the README skills tree. Bidirectional check.
 4. **Workflow Rules table**: Every `rules/*.md` file referenced in the Workflow Rules table should exist on disk.
 
 #### F. Extension Boundaries
@@ -83,7 +83,16 @@ Compare README.md content against the actual filesystem. Each mismatch is DRIFT,
 2. **Extension self-containment**: If `extensions/pgm/` exists, verify its files only reference their own tree or core paths (not other extensions).
 3. **PGM install state**: If PGM is installed (commands exist in `build/commands/`), verify the extension commands resolve. If not installed, verify no PGM commands appear in `build/commands/`.
 
-#### G. Permission Health
+#### G. Skill Cross-References
+
+For each `skills/*/SKILL.md` (and any flat `skills/*.md`), verify the skill's internal structure resolves. All checks here are FAIL when broken — a missing reference means the skill is silently broken at invocation time.
+
+1. **Reference link resolution.** Extract every markdown link in `SKILL.md` matching `references/*.md`, `templates/*.md`, `examples/*.md`, `assets/*`, or `scripts/*`. For each, verify the target file exists relative to the skill folder.
+2. **Reference orphans.** For each `references/*.md` file in the skill folder, verify it is linked from `SKILL.md` (or another reference within the same skill). Unlinked references are DRIFT — they bloat the skill folder without participating in the routing table.
+3. **Description boundaries.** Each `SKILL.md` description must contain both a "Use when" / "Use for" trigger phrase **and** a "Do NOT use" boundary clause. Missing either is DRIFT — the description is then a poor classifier.
+4. **Capitalization consistency.** Files named `GOTCHAS.md`, `LESSONS.md`, or `RULES.md` (uppercase) are DRIFT — the convention is lowercase `gotchas.md`, `lessons.md`, `rules.md` to match the "Before Starting" line in every SKILL.md.
+
+#### H. Permission Health
 
 Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP] Permission health — no settings.json found` and move on.
 
@@ -97,7 +106,7 @@ Read `$CLAUDE_DIR/settings.json` if it exists. If it does not exist, emit `[SKIP
 
 All checks in this section are DRIFT (recommendations), never FAIL.
 
-#### H. Runtime Capabilities
+#### I. Runtime Capabilities
 
 Check for optional external tools that specific commands depend on. All checks are **DRIFT** (never FAIL) since these are optional capabilities.
 

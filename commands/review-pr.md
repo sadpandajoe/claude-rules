@@ -56,13 +56,11 @@ Examples — TRIVIAL: docs-only PR (3 files, 30 lines, no behavior change). STAN
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Record lifecycle: `gate`
-
 **Trivial + confidence 8/10+**: Code quality review only — unless impact assessment (step 3) escalates.
 
 ### 3. Assess Impact + Understand the Problem
 
-Run `qa-assess-impact.md` on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
+Follow [skills/qa/references/assess-impact.md](../skills/qa/references/assess-impact.md) on the PR diff to determine functional impact: CORE, STANDARD, or PERIPHERAL. This runs in parallel with the problem understanding below.
 
 **Impact escalation**: If impact is CORE, escalate regardless of complexity tier:
 - TRIVIAL + CORE → run full review team (not just code quality)
@@ -83,7 +81,7 @@ If the premise is valid, proceed to team review with that understanding as conte
 
 ### 4. Detect Reviewer Team
 
-Use `classify-diff.md` to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The skill returns triggered reviewers with reasons.
+Follow [skills/review/references/classify-diff.md](../skills/review/references/classify-diff.md) to determine which review domains apply to the PR diff. Pass the diff and complexity tier from step 2 (or escalated tier if CORE impact upgraded it). The reference returns triggered reviewers with reasons.
 
 Pass the impact assessment from step 3 to all reviewer subagents so they can calibrate severity — CORE workflow findings get stricter treatment per `rules/code-review.md` calibration.
 
@@ -97,7 +95,7 @@ Additionally, for Standard PRs (or CORE-escalated), always include:
 **Standard**: Launch all review lanes in parallel:
 
 **Lane 1 — Regular team** (foreground subagents, `model: "opus"`):
-Each reviewer subagent runs with context isolation per `rules/orchestration.md`. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `classify-diff.md` plus pattern analysis (step 6).
+Each reviewer subagent runs with context isolation per `rules/orchestration.md`. Each applies its lens independently and returns severity-tagged findings. The team includes all reviewers triggered by `review/references/classify-diff.md` plus pattern analysis (step 6).
 
 **Lane 2 — Codex second opinion** (if available):
 Check if the Codex plugin is available. If unavailable, skip silently and note "Codex: skipped (plugin not available)" in the summary.
@@ -217,8 +215,6 @@ PR #[number]: [title] — [Approve / Request Changes / Comment]
 - **Author asked you to address feedback**: `/address-feedback <number>`
 ```
 
-Record lifecycle: `command-complete`
-
 ## Batch Path
 
 When step 1 detects multiple PRs, use this path instead of steps 2–11. Reviews are read-only — no worktrees needed, just parallel subagents.
@@ -258,8 +254,6 @@ After all subagents complete, aggregate:
 - PR #[N]: [why it needs manual follow-up]
 - {Or "All PRs reviewed cleanly"}
 ```
-
-Record lifecycle: `command-complete`
 
 ## Non-Negotiable Gates
 

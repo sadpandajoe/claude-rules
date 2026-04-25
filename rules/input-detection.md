@@ -10,4 +10,4 @@ When a command receives a ticket or issue reference as an argument, detect the s
 | `owner/repo#12345` | GitHub issue/PR | `gh issue view 12345 -R owner/repo` |
 | `https://github.com/...` | GitHub URL | `gh issue view <url>` or `gh pr view <url>` |
 
-For Shortcut REST calls, follow `rules/shortcut-api.md` (retry wrapper, JSON parsing, field shapes) and use `skills/shortcut-fetch.md` for implementation.
+For Shortcut REST calls, follow `rules/shortcut-api.md` for routing and `skills/shortcut/references/fetch.md` for retry wrapper, JSON parsing, field shapes, and implementation details.

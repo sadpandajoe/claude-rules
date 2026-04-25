@@ -13,7 +13,7 @@
 /review-plan --pm
 ```
 
-`--pm`: Include PM brief review (`review-feature-brief`) in addition to technical reviewers.
+`--pm`: Include PM brief review (`pm/references/review-feature-brief.md`) in addition to technical reviewers.
 
 ## Steps
 
@@ -32,13 +32,13 @@ Assess the plan's complexity to determine reviewer depth:
 
 | Plan scope | Reviewers | Cold read |
 |------------|-----------|-----------|
-| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `review-implementation` | `finalize-plan` |
-| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `review-architecture` + `review-implementation` + `review-testplan` | `finalize-plan` |
+| **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `plan-review/references/implementation.md` | `planning/references/finalize.md` |
+| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `planning/references/finalize.md` |
 
 **Conditional reviewers** (add to substantial plans when applicable):
-- `review-frontend` — if plan touches frontend (React, CSS, UI components)
-- `review-backend` — if plan touches backend (API, database, migrations)
-- `review-feature-brief` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
+- `plan-review/references/frontend.md` — if plan touches frontend (React, CSS, UI components)
+- `plan-review/references/backend.md` — if plan touches backend (API, database, migrations)
+- `pm/references/review-feature-brief.md` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
 
 State the scope assessment, which reviewers are selected, and why before launching.
 
@@ -61,7 +61,7 @@ After collecting scores:
 
 ### 4. Cold Read
 
-Run `finalize-plan` as a fresh-eyes final check:
+Run `planning/references/finalize.md` as a fresh-eyes final check:
 - If **Go** → proceed to step 5
 - If **No-Go** with blocking issues → revise the plan and re-run finalize-plan
 - If **No-Go** after two revisions → stop and surface the blocking issues to the user

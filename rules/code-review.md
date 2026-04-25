@@ -44,7 +44,7 @@ Missing tests are not always the same severity. Calibrate based on what the chan
 | Rename, move, reformatting | No test | Not a finding | Mechanical change — compiler/linter covers this |
 | One-liner typo fix in non-logic code | No test | Not a finding | Test would be testing a string literal |
 
-**Impact escalation**: When the impact assessment (from `qa-assess-impact.md`) is CORE, shift all "missing test" findings up one severity level. A config change with no test is normally `[minor]` — but if it touches a CORE workflow (login, auth, payment), it becomes `[major]`.
+**Impact escalation**: When the impact assessment (from the `qa` skill's `references/assess-impact.md`) is CORE, shift all "missing test" findings up one severity level. A config change with no test is normally `[minor]` — but if it touches a CORE workflow (login, auth, payment), it becomes `[major]`.
 
 When reviewing, **assess what the PR does before scoring test coverage**. A blanket "no tests = major" penalizes trivial PRs unfairly and lets risky PRs hide behind a few token tests.
 

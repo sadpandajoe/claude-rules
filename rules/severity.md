@@ -4,7 +4,7 @@ Two tag systems coexist in the toolkit. Both are valid — use the one native to
 
 ## Code Review Severity
 
-Action tags for iterative review/fix loops (`/review-code`, `/review-pr`, `review-code-quality.md`):
+Action tags for iterative review/fix loops (`/review-code`, `/review-pr`, `review/references/code-quality.md`):
 
 | Tag | Meaning | When to use |
 |-----|---------|-------------|
@@ -14,7 +14,7 @@ Action tags for iterative review/fix loops (`/review-code`, `/review-pr`, `revie
 
 ## Plan Review Severity
 
-Impact labels for plan and design review findings (`review-architecture.md`, `review-implementation.md`, etc.):
+Impact labels for plan and design review findings (`plan-review/references/architecture.md`, `plan-review/references/implementation.md`, etc.):
 
 | Tag | Meaning | When to use |
 |-----|---------|-------------|
@@ -24,7 +24,7 @@ Impact labels for plan and design review findings (`review-architecture.md`, `re
 
 ## QA Bug Severity
 
-For bug reports filed by QA skills (`qa-file-bug.md`):
+For bug reports filed by the `qa` skill (`references/file-bug.md`):
 
 | Severity | Indicators |
 |----------|-----------|

@@ -2,6 +2,12 @@
 
 One-stop setup repo for AI-assisted coding with Claude Code and Codex CLI.
 
+## Mental Model
+
+- **Rules** are always-on constraints and routing hints. Keep them short and use them as an index.
+- **Skills** are selected from their descriptions. Descriptions should say when to use the skill and when not to.
+- **Commands** expand prompts. They can reference skill paths to bias selection, but they do not directly call skills.
+
 ## Quick Start
 
 ```bash
@@ -35,6 +41,8 @@ claude
 |------|---------|
 | `~/.claude/CLAUDE.md` | Global instructions (auto-generated from config/CLAUDE.md) |
 | `~/.claude/commands/` | Custom slash commands |
+| `~/.claude/skills/` | Repo-managed Claude skills |
+| `~/.codex/skills/<skill>` | Repo-managed Codex skill links |
 
 ### Claude Code 2.1.x Features Used
 | Feature | Purpose |
@@ -59,7 +67,6 @@ ai-toolkit/
 ├── rules/
 │   ├── universal.md        # Core principles (loaded first)
 │   ├── orchestration.md    # Multi-agent workflow rules
-│   ├── planning.md         # Project planning + PROJECT.md defaults
 │   ├── context-management.md   # Context depth thresholds and checkpoint protocol
 │   ├── rule-maintenance.md     # How to strengthen, update, or extract rules
 │   ├── investigation.md    # Debugging & root cause
@@ -67,32 +74,35 @@ ai-toolkit/
 │   ├── testing.md          # Test strategy
 │   ├── troubleshooting.md  # Emergency recovery
 │   ├── resource-management.md  # Worktrees, Docker, heavy tasks
-│   ├── cherry-picking.md   # Cross-branch work
 │   ├── code-review.md      # Review guidelines
 │   ├── complexity-gate.md  # Complexity classification and fast-path
 │   ├── review-gate.md      # Review gate output contract
 │   ├── stop-rules.md       # Universal stop conditions for iterative loops
-│   ├── shortcut-api.md     # Shortcut REST API: auth, retry, endpoints, patterns
+│   ├── shortcut-api.md     # Shortcut REST API routing hint
 │   └── input-detection.md  # Route ticket/issue inputs to Shortcut or GitHub
-├── skills/                  # Flat directory — all skills at top level
-│   ├── review-*.md          # Shared reviewers (adversarial, architecture, backend, code-quality, feature-brief, frontend, implementation, rca, testplan, tests)
-│   ├── finalize-plan.md     # Fresh-eyes final plan review
-│   ├── check-existing-fix.md   # Upstream fix check
-│   ├── action-gate.md       # Shared proceed/stop decision helper
-│   ├── shortcut-fetch.md    # Shortcut API retry wrapper
-│   ├── cherry-pick-*.md     # Cherry-pick phases (investigate, gate, plan, apply, adapt, validate, batch-sequence)
-│   ├── ci-*.md              # CI/build tasks (classify-failure, verify-fix)
-│   ├── pm-*.md              # Product management (create-feature-brief, plan-milestones)
-│   ├── qa-*.md              # QA tasks (analyze-use-cases, capture-evidence, execute/expand, file-bug, report-shortcut-results, triage-bug, validate-fix)
-│   ├── implement-change.md  # Focused implementation
-│   ├── investigate-*.md     # Investigation phases (bug, change)
-│   ├── plan-*.md            # Planning phases (change, feature)
-│   ├── prepare-environment.md   # Local environment setup
-│   ├── create-tests.md      # First-suite test creation
-│   └── update-tests.md      # Existing suite maintenance
+├── skills/                  # Directory skills with SKILL.md; references load lazily (see skills/README.md for anatomy)
+│   ├── planning/            # Technical planning — plan-implementation, iterate-review, finalize, feedback-classify
+│   ├── pm/                  # Product management — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
+│   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation
+│   ├── review/              # Code-reviewer lenses + dispatch — classify-diff, code-quality, adversarial
+│   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, ci-classify-failure, ci-verify-fix
+│   ├── qa/                  # QA — triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
+│   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
+│   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
+│   ├── cherry-pick/         # Cherry-pick workflow — investigate, gate, plan, apply, adapt, validate, batch-sequence
+│   ├── agent-setup-maintainer/ # Maintains commands, skills, rules, and agent workflow docs
+│   ├── action-gate/         # Shared proceed/stop decision helper
+│   ├── implement-change/    # Focused implementation
+│   ├── reporting/           # Structural rules + per-command summary/checkpoint templates
+│   ├── metrics-emit/        # Telemetry skill — final command-complete event
+│   ├── archive-project-file/ # Archive lifecycle command
+│   ├── shortcut/            # Shortcut REST fetch/report helpers
+│   ├── superset-local/      # Superset-specific local stack + Playwright helpers
+│   └── workstreams/         # Post-parallel-implementation fan-in and merge sequencing
 ├── hooks/
 │   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
-│   └── check-resources.sh         # Warn on constrained resources before tests
+│   ├── check-resources.sh         # Warn on constrained resources before tests
+│   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
 ├── extensions/
 │   └── pgm/                 # Program management (optional, install with --with-pgm)
 │       ├── commands/         # /create-status-report, /create-velocity-report
@@ -116,10 +126,10 @@ ai-toolkit/
     ├── create-pr.md             # Generate PR title + description from diff/commits
     ├── review-code-adversarial.md # Red-team review for security and edge cases
     ├── custom-skills-info.md    # Print toolkit reference card
-    ├── checkpoint.md            # Save workflow state before /clear
+    ├── checkpoint.md            # Save workflow state, log progress, or full save-and-clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
-    ├── update-project-file.md   # Manual PROJECT.md status refresh
+    ├── audit-agent-setup.md     # Audit commands, skills, rules, and agent docs
     ├── archive-project-file.md  # Archive completed work
     └── toolkit-doctor.md        # Structural health check
 ```
@@ -156,8 +166,7 @@ ai-toolkit/
 ### Project State
 | Command | Purpose |
 |---------|---------|
-| `/checkpoint` | Save workflow state to PROJECT.md and clear context |
-| `/update-project-file` | Manual PROJECT.md status refresh |
+| `/checkpoint` | Save workflow state to PROJECT.md (also for quick progress logs and full save-and-clear) |
 | `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
 
 ### Learning & Memory
@@ -178,6 +187,7 @@ ai-toolkit/
 ### Toolkit Maintenance
 | Command | Purpose |
 |---------|---------|
+| `/audit-agent-setup` | Audit command/skill/rule/docs layout against the agentic primer model |
 | `/toolkit-doctor` | Validate symlinks, build output, imports, path portability, and README accuracy |
 | `/custom-skills-info` | Print reference card of all commands with gates |
 
@@ -250,13 +260,11 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 |------|--------------|
 | `rules/universal.md` | Always (core principles) |
 | `rules/orchestration.md` | When coordinating helpers, reviewers, or parallel agents |
-| `rules/planning.md` | `/create-feature`, `/update-project-file` |
 | `rules/context-management.md` | Always (checkpoint protocol, loaded via CLAUDE.md) |
 | `rules/investigation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` when RCA matters |
 | `rules/implementation.md` | `/fix-bug`, `/create-feature`, `/fix-ci` |
 | `rules/testing.md` | `/create-tests`, `/update-tests`, `/run-test-plan` |
 | `rules/troubleshooting.md` | Emergency recovery |
-| `rules/cherry-picking.md` | `/cherry-pick`, `/fix-bug` when it routes into cherry-pick |
 | `rules/code-review.md` | `/review-code`, `/review-pr`, `/address-feedback` |
 | `rules/complexity-gate.md` | `/create-feature`, `/fix-bug` (trivial vs standard routing) |
 | `rules/review-gate.md` | `/review-code`, `/create-feature`, `/fix-bug` (review output contract) |
