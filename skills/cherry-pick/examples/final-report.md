@@ -4,11 +4,12 @@ Use this format at the end of every cherry-pick (single or batch). Lead with the
 
 ## Rules
 
-- The compact 5-column table replaces the full 12-column execution table only in the final report. See [execution-table.md](execution-table.md) for the full table.
+- The compact 6-column table replaces the full 13-column execution table only in the final report. See [execution-table.md](execution-table.md) for the full table.
 - Add **Detailed Notes** for any row that is not `Applied` with `None` adaptation, plus any `Applied` row with notable adaptation.
 - Keep the dependency graph from the batch-sequence phase if inter-change dependencies were detected.
 - "What to do next" is actionable only — no recap of what just happened.
 - Lead with the ticket outcome. The user cares about "is the fix on the branch" more than about the process.
+- **Scope Audit field is mandatory** for any row not in `Rejected` or `Skipped` — its absence means the leak-detection subagent did not run, which blocks `Applied`/`Partial`/`Blocked` status.
 
 ## Template
 
@@ -20,11 +21,11 @@ Use this format at the end of every cherry-pick (single or batch). Lead with the
 [X of N applied, Y rejected, Z partial] -> <target branch>
 
 ### Results
-| SHA | PR | Status | Validation | Notes |
-|-----|----|--------|------------|-------|
-| `<sha>` | #123 | Applied | Tested | Clean apply |
-| `<sha>` | #124 | Partial | Checked | 5 of 7 sub-fixes applied; encoding fix dropped — see below |
-| `<sha>` | #125 | Rejected | — | Feature change, no --force |
+| SHA | PR | Status | Scope Audit | Validation | Notes |
+|-----|----|--------|-------------|------------|-------|
+| `<sha>` | #123 | Applied | CLEAN | Tested | Clean apply |
+| `<sha>` | #124 | Partial | CLEAN (1 hunk reverted) | Checked | 5 of 7 sub-fixes applied; encoding fix dropped — see below |
+| `<sha>` | #125 | Rejected | — | — | Feature change, no --force |
 
 ### Detailed Notes
 #### `<sha>` — <summary>

@@ -2,9 +2,12 @@
 
 Use after a cherry-pick applies cleanly or after conflict resolution completes.
 
-**Always runs as a subagent** — the thread that applied must not validate its own work.
+Validate is two distinct jobs:
 
-**Model selection**: set by the gate (Sonnet for trivial, Opus for non-trivial). The caller spawns this subagent with the correct model.
+- **Scope-leak audit (7a)** — runs as a subagent, mandatory for every cherry, no exceptions. Catches the silent failure mode that build/test cannot catch.
+- **Correctness validation (7b)** — runs on the main thread. Build/type-check/tests fail loudly when the cherry is broken; no fresh context required.
+
+**Model selection** for the scope-leak subagent: set by the gate (Sonnet for trivial, Opus for non-trivial). The caller spawns the subagent with the correct model.
 
 ## Goal
 
@@ -12,21 +15,25 @@ Prove that the moved change is integrated cleanly, contains only the intended ch
 
 Consume risk signals from investigate and adaptation signals from adapt. Do not re-litigate whether the cherry-pick should have happened.
 
-## Parallel Work
+## Subagent Contract — Scope-Leak Audit (7a)
 
-When project tooling allows it safely, run these in parallel:
+**One job, one rule: every cherry-pick gets a fresh subagent for leak detection. No tiers, no carve-outs, no "trivial" skip.** Clean applies are the highest-risk vector — they look fine and ship leaked code from adjacent commits (see [../gotchas.md](../gotchas.md) #1).
 
-1. Conflict-marker scan
-2. Fast build or type-check
-3. Targeted tests for the touched area
+**Subagent inputs:** source commit SHA, target branch HEAD SHA after apply, summary of any adapt-phase changes.
 
-Avoid parallel validation when the project's test/build tooling fights for the same generated outputs or shared local environment.
+**Subagent must produce** (orchestrator refuses `Applied` status without all three):
 
-## Diff Audit (Scope Leak Check) — MANDATORY
+1. Literal stdout of `${CLAUDE_SKILL_DIR}/scripts/scope-audit.sh <source-commit>` — pasted verbatim, not summarized.
+2. Per-hunk audit verdict from Step 2 below — explicit list of extra hunks (or "none") with origin classification for each.
+3. Final recommendation: `CLEAN` / `LEAK — revert <hunks>` / `ESCALATE — <reason>`.
 
-Run this **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
+If the subagent returns `LEAK`, the main thread reverts the named hunks, amends, and re-spawns the subagent on the amended commit. Loop until `CLEAN` or `ESCALATE`.
 
-**Mandatory for every cherry-pick, including clean applies with zero conflicts.** This intentionally re-checks scope even when adapt already ran its own leak detection — defense in depth. Do not skip because adapt "already checked." See [../gotchas.md](../gotchas.md) for the scope-leak failure mode.
+The subagent does **not** run build/test. Correctness is the main thread's job (7b).
+
+## Diff Audit Procedure (executed by the subagent)
+
+Run **before** build/test validation. A clean build doesn't catch unrelated changes that happen to compile.
 
 ### Step 1: Mechanical Pre-Check
 
@@ -44,7 +51,7 @@ This produces a mechanical comparison (file list, line counts) — no LLM judgme
 **Interpretation:**
 - **Extra files found** → scope leak until proven otherwise. Investigate each in Step 2.
 - **Line count differs by >20% for a shared file** → flag for hunk-level investigation.
-- **Both checks clean** → still run Step 2, but with higher confidence.
+- **Both checks clean** → Step 2 is still mandatory. Mechanical CLEAN does NOT permit skipping the hunk audit — small leaks inside heavily-touched shared files pass under the 20% threshold. The mechanical pre-check only adjusts confidence; it never removes the hunk audit requirement.
 
 ### Step 2: LLM Hunk-Level Audit
 
@@ -79,7 +86,9 @@ Verdict: [clean / leaked — reverted / leaked — kept with justification]
 
 If the audit finds leaks, revert them before proceeding to build/test validation. If a leaked change appears to be a required prerequisite, escalate to the user rather than silently keeping it.
 
-## Validation Order
+## Correctness Validation — Main Thread (7b)
+
+Runs only after the scope-leak subagent returns `CLEAN`. Build/test failures are loud and self-describing; no fresh context required.
 
 At minimum:
 1. Confirm no conflict markers.

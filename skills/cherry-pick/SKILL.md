@@ -85,21 +85,26 @@ If a trivial change unexpectedly hits conflicts, escalate to adapt — the gate 
 
 → Conflict classification, scope leak detection during resolution, escalation triggers: [references/adapt.md](references/adapt.md)
 
-### 7. Validate (model from gate)
+### 7. Validate
 
-**Invariant: the agent that applied must not validate its own work.** Self-validation misses scope leak — the failure in gotchas.md (#38809) was caught exactly because validation happened in a fresh context. Use a subagent, a new session, or any mechanism that gives validation a clean view — the *how* is flexible, the *fresh context* is not.
+Two distinct jobs, run on different threads:
 
-The diff audit is **mandatory for every cherry-pick, including clean applies**. Clean applies are the highest-risk vector for scope leak.
+**7a. Scope-leak audit — subagent, mandatory, every cherry, no exceptions.**
 
-```bash
-${CLAUDE_SKILL_DIR}/scripts/scope-audit.sh <source-commit>
-```
+Post-apply, spawn a subagent (model from gate: Sonnet for trivial, Opus for non-trivial). Its only job is leak detection. Single rule: every cherry, every time, including clean applies — clean applies are the highest-risk vector for scope leak.
 
-This runs the mechanical pre-check (file list comparison, line count divergence). Then do the LLM hunk-level audit on anything flagged.
+The subagent must:
+1. Run `${CLAUDE_SKILL_DIR}/scripts/scope-audit.sh <source-commit>` and capture the literal output.
+2. Run the LLM hunk-level audit comparing source diff vs cherry-pick result diff.
+3. Return a structured report containing the literal `scope-audit.sh` output, per-hunk verdict, and a clear `LEAK / CLEAN / ESCALATE` recommendation.
 
-→ Full procedure (LLM audit, validation order, status labels, dependency manifest rule): [references/validate.md](references/validate.md)
+The orchestrator may not mark a cherry `Applied` without this report. If the subagent finds leaks, revert leaked hunks and amend on the main thread, then re-spawn the subagent on the amended commit.
 
-If audit finds leaks, revert leaked hunks and amend before pushing.
+**7b. Correctness validation — main thread.**
+
+Conflict-marker scan, build, type-check, targeted tests. Build failures are loud and don't need a fresh context — the main thread handles them.
+
+→ Full procedure (subagent contract, LLM audit, validation order, status labels, dependency manifest rule): [references/validate.md](references/validate.md)
 
 **Push after each successful cherry-pick** so CI runs against the change:
 ```bash
@@ -126,7 +131,7 @@ When multiple PRs/SHAs are provided, the main agent acts as a **thin orchestrato
 
 Use the format in [examples/final-report.md](examples/final-report.md). Lead with the ticket outcome (what the user cares about), then the execution table, then actionable residuals.
 
-The full 12-column execution table format is in [examples/execution-table.md](examples/execution-table.md). The compact table replaces it only in the final report.
+The full 13-column execution table format is in [examples/execution-table.md](examples/execution-table.md). The compact table replaces it only in the final report.
 
 **Record metrics**: include `metrics-emit` context with:
 - `command`: `cherry-pick`

@@ -1,12 +1,12 @@
 # Execution Table Format (Full)
 
-The 12-column table tracks each cherry through every phase. Produced by the plan phase, updated by apply/adapt/validate, preserved through the final report as detailed notes.
+The 13-column table tracks each cherry through every phase. Produced by the plan phase, updated by apply/adapt/validate, preserved through the final report as detailed notes.
 
 ```markdown
-| # | SHA | PR | Description | Depends On | Risk | Confidence | Decision | Status | Adaptation | Validation | Notes |
-|---|-----|----|-------------|------------|------|------------|----------|--------|------------|------------|-------|
-| 1 | `<sha>` | #123 | <summary> | — | LOW | 9/10 | Auto | Applied | None | Tested | Clean apply |
-| 2 | `<sha>` | #124 | <summary> | #123 | MED | 7/10 | Approval | Partial | Medium | Checked | 2 of 3 sub-fixes applied |
+| # | SHA | PR | Description | Depends On | Risk | Confidence | Decision | Status | Adaptation | Scope Audit | Validation | Notes |
+|---|-----|----|-------------|------------|------|------------|----------|--------|------------|-------------|------------|-------|
+| 1 | `<sha>` | #123 | <summary> | — | LOW | 9/10 | Auto | Applied | None | CLEAN | Tested | Clean apply |
+| 2 | `<sha>` | #124 | <summary> | #123 | MED | 7/10 | Approval | Partial | Medium | CLEAN (1 hunk reverted) | Checked | 2 of 3 sub-fixes applied |
 ```
 
 ## Field Meanings
@@ -23,8 +23,13 @@ The 12-column table tracks each cherry through every phase. Produced by the plan
 | `Decision` | `Auto`, `Approval`, `Escalate` | gate |
 | `Status` | `Planned`, `Applied`, `Partial`, `Blocked`, `Rejected`, `Skipped` | apply/adapt |
 | `Adaptation` | `None`, `Minor`, `Medium`, `High` | adapt (see plan.md for definitions) |
-| `Validation` | `Not run`, `Tested`, `Checked`, `Build-only`, `Structural` | validate |
+| `Scope Audit` | `CLEAN`, `CLEAN (N hunks reverted)`, `ESCALATE` | scope-leak subagent (7a) |
+| `Validation` | `Not run`, `Tested`, `Checked`, `Build-only`, `Structural` | validate (7b, main thread) |
 | `Notes` | Short freeform | any phase |
+
+## Scope Audit Field
+
+**Mandatory.** A cherry cannot be marked `Applied` (or `Partial`) without a `Scope Audit` value populated by the scope-leak subagent (see [../references/validate.md](../references/validate.md)). The literal `scope-audit.sh` output and per-hunk verdict belong in the detailed notes for any row whose audit was not pristine `CLEAN`.
 
 ## Status Semantics
 
