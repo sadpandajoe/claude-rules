@@ -63,16 +63,6 @@
    - [Ready for manual commit / needs more work]
    ```
 
-## Continuation Checkpoint
-
-Phases: scope / review-tests / write-tests / verify / review / summarize
-
-State:
-- Current scope: <what is being tested>
-- Review status: <clean / blocked / pending>
-- Tests added so far: <files or none>
-- Verification status: <passed / partial / blocked>
-
 ## Notes
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
 - Favor the smallest set of high-signal tests over broad test quantity

@@ -107,16 +107,6 @@
    - [Manual next steps only]
    ```
 
-## Continuation Checkpoint
-
-Phases: resolve-plan / review-plan / execute / capture-evidence / summarize
-
-State:
-- Plan score: <score or blocked>
-- Execution status: <not started / partial / complete>
-- Evidence status: <captured / none / pending>
-- Blockers or unclear items: <if any>
-
 ## Notes
 - `/run-test-plan` is validation-only in v1
 - Prefer a small runnable matrix over a broad exploratory sweep

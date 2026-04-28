@@ -112,6 +112,14 @@ Do not run scenarios in parallel — sequential execution keeps evidence clean.
 
 ### 7. Report
 
+The template below is for **in-terminal output only**.
+
+If the user asks to post results to a Shortcut story, GitHub PR/issue comment, or any other shared external destination, do not adapt this template. Instead:
+- Read [skills/qa/references/write-report.md](../skills/qa/references/write-report.md) for canonical body shape (single-flow vs multi-scenario), tone (narrative not technical), and evidence rules. Load the matching template / example from `qa/references/write-report/` only when actually drafting.
+- Read the destination-specific reference for upload + post mechanics: [skills/shortcut/references/report.md](../skills/shortcut/references/report.md) for Shortcut, or the equivalent for other destinations.
+
+The terminal template below specifies a tabular grid that's appropriate for in-conversation summaries only — never paste it into an external comment.
+
 ```markdown
 ## Test-PR Complete
 
@@ -148,17 +156,6 @@ Impact: CORE / STANDARD / PERIPHERAL
 [Failures:] Feed findings back to the PR author — specific failures listed above.
 [Blocked:] Resolve blockers above and re-run `/test-pr <number>`.
 ```
-
-## Continuation Checkpoint
-
-Phases: resolve-pr / detect-url / assess-impact / derive-scenarios / confirm-scenarios / execute / report
-
-State:
-- PR: <number> — <title>
-- App URL: <url or pending>
-- Impact: <CORE / STANDARD / PERIPHERAL>
-- Scenarios: <N total, N complete, N remaining>
-- Results so far: <N pass, N fail, N blocked>
 
 ## Notes
 - **This command tests what is currently running** — make sure the right branch is checked out and the app is up before running

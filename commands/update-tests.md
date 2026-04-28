@@ -118,17 +118,6 @@
    - [Created `test:` commit / no commit and why]
    ```
 
-## Continuation Checkpoint
-
-Phases: scope / gap-analysis / update-tests / verify / review / commit / summarize
-
-State:
-- Existing suite status: <found / insufficient / none>
-- Review status: <clean / blocked / pending>
-- Files changed so far: <files or none>
-- Verification status: <passed / partial / blocked>
-- Pending blockers or follow-up gaps: <if any>
-
 ## Notes
 - `/update-tests` is the public workflow for existing-suite maintenance
 - Favor replacing low-signal tests over adding redundant ones

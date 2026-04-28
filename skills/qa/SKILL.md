@@ -23,6 +23,7 @@ Umbrella skill for repo-standard QA phases. The orchestrator picks the relevant 
 | Expand scenarios | After fix is known: identify smallest extra checks for regression protection | [references/expand-scenarios.md](references/expand-scenarios.md) |
 | Execute use cases | Run scenarios against a real environment with evidence capture | [references/execute-use-cases.md](references/execute-use-cases.md) |
 | File bug | Strong failure signal needs a clean handoff (Shortcut posting included) | [references/file-bug.md](references/file-bug.md) |
+| Write report | QA results need to land on a Shortcut/PR/Slack/email destination — canonical body shape and tone | [references/write-report.md](references/write-report.md) |
 
 ## Invocation Patterns
 

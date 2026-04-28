@@ -1,15 +1,13 @@
-# /fix-bug Continuation Checkpoint Template
+# /fix-bug Continuation Checkpoint Extension
 
-Follow the structural rules in [../SKILL.md](../SKILL.md). Resume specifics live in the Progress Update entry — the Continuation Checkpoint header carries only workflow metadata.
+`/checkpoint` writes the generic `## Continuation Checkpoint` block (see [../SKILL.md](../SKILL.md) and [../../../commands/checkpoint.md](../../../commands/checkpoint.md)). When the detected top-level command is `/fix-bug`, append these additional fields to the `### Workflow` block:
 
 ```markdown
-## Continuation Checkpoint — [ISO timestamp]
-### Workflow
-- Top-level command: /fix-bug <arguments>
 - Phase: input / complexity-gate / existing-fix-check / plan-mode / plan-md-write / implement-and-review / qa-validate / summarize
-- Active plan: PLAN.md (standard path) | none (trivial / moderate)
 - Existing-fix status: FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED | pending
 ```
+
+The `Phase` line replaces the generic `Phase:` field with the `/fix-bug`-specific enum. The `Existing-fix status:` line is added below the generic fields.
 
 When `Active plan: PLAN.md` is set, resuming sessions can read PROJECT.md alone for orientation — only load PLAN.md if the next phase requires it (implementation or QA validation).
 

@@ -48,6 +48,8 @@ The three templates below are the canonical format — other commands and report
 
 The checkpoint header is intentionally light — workflow metadata only. State details live in Current Status; resume specifics live in the Progress Update message. Do not duplicate across sections.
 
+Start from the generic shape:
+
 ```markdown
 ## Continuation Checkpoint — [ISO timestamp]
 ### Workflow
@@ -55,6 +57,8 @@ The checkpoint header is intentionally light — workflow metadata only. State d
 - Phase: [phase]
 - Active plan: PLAN.md | none
 ```
+
+If the detected top-level command has a per-command extension at `skills/reporting/templates/<command>-checkpoint.md` (e.g. `fix-bug-checkpoint.md`, `create-feature-checkpoint.md`), append the additional Workflow fields that template specifies. The per-command templates own only the extra fields — they do not redefine the generic header. For ad-hoc work or commands without an extension, write the generic shape alone.
 
 **b. `## Current Status` — refresh in place:**
 
