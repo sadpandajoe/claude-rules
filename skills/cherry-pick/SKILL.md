@@ -138,7 +138,8 @@ The full 13-column execution table format is in [examples/execution-table.md](ex
 - `complexity`: from gate (`trivial` / `non-trivial`); use `standard` for batch
 - `status`: aggregate result (`clean` if all Applied, `blocked` if any Blocked/Rejected requiring intervention, etc.)
 - `rounds`: total plan-review iterations across all cherries (0 if all clean)
-- `gate_decisions`: `{ verdict: PROCEED | REJECT | FORCE-PROCEED, scope_audit: <CLEAN | LEAKED>, batch_size: <N> }`
+- `gate_decisions`: `{ verdict: PROCEED | REJECT | FORCE-PROCEED, batch_size: <N> }`
+- `scope_audit`: per-cherry verdicts from the 7a subagent — `{ clean: <N>, leaked_reverted: <N>, escalated: <N> }`. Single cherry: one of `CLEAN | LEAKED-REVERTED | ESCALATED`.
 - `models_used`: subagent model invocation counts
 
 ## Continuation Checkpoint
