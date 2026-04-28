@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Use for HOW to test: creating or updating automated test suites, reviewing test code quality, and reviewing test-plan adequacy. Do NOT use for QA scenario discovery, manual product validation, bug triage, or general code review.
+description: "Use for HOW to test: creating or updating automated test suites, reviewing test code quality, and reviewing test-plan adequacy. Do NOT use for QA scenario discovery, manual product validation, bug triage, or general code review."
 user-invocable: false
 disable-model-invocation: true
 ---

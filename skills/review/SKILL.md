@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use for reviewing actual code diffs: dispatching code-review lenses, code-quality checks, and adversarial review. Do NOT use for technical plan critique, product brief review, QA scenario design, or writing the fix.
+description: "Use for reviewing actual code diffs: dispatching code-review lenses, code-quality checks, and adversarial review. Do NOT use for technical plan critique, product brief review, QA scenario design, or writing the fix."
 user-invocable: false
 disable-model-invocation: true
 ---
