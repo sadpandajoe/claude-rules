@@ -178,18 +178,6 @@ PR #[number] — [N] fixed, [N] skipped, [N] discussed
 - [ ] Review Gate block emitted (after fixes, unless skipped per skip rule)
 - [ ] Summary emitted
 
-## Continuation Checkpoint
-
-Phases: gather / complexity-gate / investigate / triage / fix / review / draft / post / summarize
-
-State:
-- PR: [number] — [title]
-- Complexity: [trivial / standard]
-- Triage: [N] fix, [N] skip, [N] discuss
-- Fixes committed: [yes / no / partial]
-- Review: [clean / blocked / pending]
-- Posted: [yes / no / pending]
-
 ## Notes
 - Always investigate before triaging — read the actual code
 - TDD for behavioral changes, direct fix for cosmetic/pattern-following

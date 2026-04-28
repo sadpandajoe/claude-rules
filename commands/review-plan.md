@@ -111,22 +111,6 @@ Write final review scores to PROJECT.md:
 - After review iterations complete: write final scores
 - If revisions were made: the plan sections in PROJECT.md are updated as part of each revision
 
-## Continuation Checkpoint
-
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /review-plan [flags]
-- Phase: read-plan / detect-reviewers / review-iterations / cold-read / update / summarize
-- Resume target: [current reviewer or iteration round]
-- Completed items: [reviewers already at 8/10]
-### State
-- Reviewers selected: [list]
-- Current scores: [reviewer: score, ...]
-- Cold read: [go / no-go / pending]
-- Revisions made: [count]
-```
-
 ## Notes
 - Standalone command — `/create-feature` step 4 does the same work inline, but this is for one-off use
 - Does not create or implement the plan — only reviews an existing one

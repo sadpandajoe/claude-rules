@@ -61,13 +61,13 @@ The command-specific sections in the middle vary; the lead, the "What to do next
 
 ## Continuation Checkpoint structure
 
-When a workflow pauses (cost/context threshold, user interrupt, blocker), it must emit a checkpoint that lets a future session resume from the exact state.
+`/checkpoint` is the single writer of `## Continuation Checkpoint` blocks in PROJECT.md. End-to-end commands do **not** define their own checkpoint sections — they rely on the user (or an internal context-management trigger) invoking `/checkpoint`, which autodetects the active top-level command and extends its generic header with per-command fields.
 
 ### Rules
 
 1. **Workflow identification first.** The top-level command, its arguments, and the current phase. Without this, resumption guesses.
-2. **Resume target second.** What artifact, file, ticket, or decision the next session should pick up at.
-3. **State fields are command-specific.** Each command lists only the state that matters for its workflow — scores, classifications, completed items.
+2. **Header stays light.** Workflow metadata only. Resume specifics belong in the `### [timestamp] — Progress Update` entry; state details belong in `## Current Status`. Do not duplicate across sections.
+3. **Per-command fields extend the Workflow block.** Each command's template adds extra Workflow lines (e.g., `Existing-fix status:` for `/fix-bug`); it does not introduce a separate `### State` section.
 4. **No procedural recap.** The checkpoint records *state*, not *steps taken*.
 5. **Timestamps in ISO format** so future sessions can compute staleness.
 
@@ -78,26 +78,22 @@ When a workflow pauses (cost/context threshold, user interrupt, blocker), it mus
 ### Workflow
 - Top-level command: /<command> <arguments>
 - Phase: <phase identifier>
-- Resume target: <what to pick up next>
-- Completed items: <finished phases or accepted decisions>
-
-### State
-- <command-specific state field>: <value>
-- <command-specific state field>: <value>
+- Active plan: PLAN.md | none
+- <per-command field>: <value>     # appended from skills/reporting/templates/<command>-checkpoint.md, if present
 ```
 
-The Workflow block is identical across commands. The State block is per-command.
+The first three Workflow lines are owned by `/checkpoint`. Per-command templates contribute only the additional lines.
 
 ## How to use
 
-End-to-end commands reference both this skill (for structural rules) and their specific template:
+End-to-end commands reference this skill for **summaries only**. Continuation Checkpoints are owned by `/checkpoint`, not by the commands.
 
 ```markdown
 ### N. Summary
 Use the template at [skills/reporting/templates/<command>-summary.md] following the structural rules in [skills/reporting/SKILL.md].
-
-## Continuation Checkpoint
-Use the template at [skills/reporting/templates/<command>-checkpoint.md].
 ```
 
-When a new command is added, drop a new template file into [templates/](templates/) following the outer shapes documented above. The structural rules apply automatically.
+When a new end-to-end command is added:
+
+1. Drop a `<command>-summary.md` template into [templates/](templates/) following the Summary outer shape.
+2. If the command has command-specific Workflow fields worth capturing on pause, drop a `<command>-checkpoint.md` template too — `/checkpoint` will pick it up automatically by command name. Skip this file for commands that need no extra fields beyond the generic header.

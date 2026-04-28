@@ -161,10 +161,6 @@ Lead with whether the user's reported symptom is fixed — if the user gave you 
 - `gate_decisions`: `{ complexity: <step 1>, existing_fix: <FIXED_UPSTREAM | FIX_PENDING_PR | UNFIXED | SKIPPED>, review: <step 5> }`
 - `models_used`: subagent model invocation counts
 
-## Continuation Checkpoint
-
-Use the template at [skills/reporting/templates/fix-bug-checkpoint.md](../skills/reporting/templates/fix-bug-checkpoint.md).
-
 ## Cross-Repo Bugs
 
 When the symptom is in repo A (e.g., CI failure in a downstream fork) but the fix goes in repo B (e.g., upstream):

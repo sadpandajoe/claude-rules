@@ -1,14 +1,12 @@
-# /create-feature Continuation Checkpoint Template
+# /create-feature Continuation Checkpoint Extension
 
-Follow the structural rules in [../SKILL.md](../SKILL.md). Resume specifics live in the Progress Update entry — the Continuation Checkpoint header carries only workflow metadata.
+`/checkpoint` writes the generic `## Continuation Checkpoint` block (see [../SKILL.md](../SKILL.md) and [../../../commands/checkpoint.md](../../../commands/checkpoint.md)). When the detected top-level command is `/create-feature`, replace the generic `Phase:` field with the `/create-feature`-specific enum:
 
 ```markdown
-## Continuation Checkpoint — [ISO timestamp]
-### Workflow
-- Top-level command: /create-feature <arguments>
 - Phase: input / complexity-gate / plan-mode / plan-md-write / review-iterations / action-gate / implement-and-review / summarize
-- Active plan: PLAN.md (standard path) | none (trivial / moderate)
 ```
+
+No additional Workflow fields beyond the phase enum — `/create-feature` doesn't carry extra command-specific state on the checkpoint header.
 
 When `Active plan: PLAN.md` is set, resuming sessions can read PROJECT.md alone for orientation — only load PLAN.md if the next phase requires it (review iterations or implementation slice).
 

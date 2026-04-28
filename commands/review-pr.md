@@ -266,25 +266,6 @@ After all subagents complete, aggregate:
 - [ ] Team selection shown in summary
 - [ ] Summary emitted
 
-## Continuation Checkpoint
-
-**Single-PR phases**: gather / complexity-gate / understand-problem / detect-team / launch-review / pattern-analysis / scoring / gate / post / summarize
-
-**Batch phases**: gather-list / dispatch-reviews / collect-results / batch-summary
-
-State (single PR):
-- PR: [number] — [title]
-- Complexity: [trivial / standard]
-- Team: [list of selected reviewers]
-- Scores: [component: score, ...]
-- Recommendation: [approve / request-changes / comment / pending]
-- Posted: [yes / no / pending]
-
-State (batch):
-- Mode: batch
-- PRs: [N total, N complete, N failed]
-- Recommendations: [N approve, N request-changes, N comment]
-
 ## Notes
 - Accepts single PRs or batches — batch detection is automatic. Use `--all-open` to review every open PR in the repo.
 - Batch mode defaults to `--auto` (posts reviews without confirmation). No worktrees needed — reviews are read-only.

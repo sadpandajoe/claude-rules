@@ -256,24 +256,6 @@
 
 Keep the updates compact, but do not defer all state changes to the end of the workflow.
 
-## Continuation Checkpoint
-
-```markdown
-## Continuation Checkpoint — [timestamp]
-### Workflow
-- Top-level command: /fix-ci <arguments>
-- Phase: gather-logs / classify / ownership-check / complexity-gate / rca / gate / apply / verify / review / summarize
-- Resume target: <run id, artifact, failing job, or changed file set>
-- Completed items: <finished phases or already-fixed failures>
-### State
-- Complexity: <trivial / moderate / standard>
-- Failure summary: <current best classification>
-- Gate result: <proceed / approval / stop>
-- Review status: <clean / blocked / pending>
-- Files changed so far: <files or none>
-- Pending blockers or decisions: <if any>
-```
-
 ## Notes
 - Always read the actual failing log output — don't guess from job names alone
 - Auto-fixing is a phase, not the contract; trivial fixes with STRONG verification commit and push automatically — standard-path and weak-verification fixes still stop before commit
