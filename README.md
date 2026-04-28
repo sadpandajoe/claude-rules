@@ -117,11 +117,11 @@ ai-toolkit/
     ├── create-tests.md     # Create the first meaningful tests
     ├── update-tests.md     # Improve an existing test suite
     ├── run-test-plan.md    # Execute a reviewed validation plan
+    ├── test-pr.md          # Manual PR testing via Playwright browser
     ├── fix-ci.md           # Diagnose and safely fix CI failures
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
     ├── address-feedback.md # Address PR feedback
-    ├── cherry-pick.md      # Cross-branch work
     ├── learn.md                 # Memory management — add, list, review, prune, propose rules
     ├── create-pr.md             # Generate PR title + description from diff/commits
     ├── review-code-adversarial.md # Red-team review for security and edge cases
@@ -130,7 +130,10 @@ ai-toolkit/
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
     ├── audit-agent-setup.md     # Audit commands, skills, rules, and agent docs
-    ├── archive-project-file.md  # Archive completed work
+    ├── complete-project.md      # Project capstone summary
+    ├── metrics.md               # Workflow metrics summary
+    ├── show-cost.md             # Token usage and cost summary
+    ├── optimize-cost.md         # Usage pattern analysis and recommendations
     └── toolkit-doctor.md        # Structural health check
 ```
 
@@ -149,6 +152,7 @@ ai-toolkit/
 | `/create-tests` | Standalone test-only workflow for creating the first meaningful tests in an area |
 | `/update-tests` | End-to-end workflow for improving an existing suite, reviewing it, and auto-committing when ready |
 | `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
+| `/test-pr` | Manual PR testing via Playwright browser against a running local app |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
 | `/review-code` | Adaptive team review: code quality + architecture + test check + Codex second opinion |
 | `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) |
@@ -160,14 +164,22 @@ ai-toolkit/
 |---------|---------|
 | `/review-pr` | Adaptive team PR review: patterns, tests, architecture, RCA, auto-approve |
 | `/address-feedback` | Investigate PR comments, fix valid items, post replies |
-| `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks |
+| `/cherry-pick` | Plan, order, and safely apply one or more cross-branch cherry-picks (skill — also auto-triggers on natural-language requests) |
 | `/create-pr` | Generate PR title + description from diff, commits, and PROJECT.md |
 
 ### Project State
 | Command | Purpose |
 |---------|---------|
 | `/checkpoint` | Save workflow state to PROJECT.md (also for quick progress logs and full save-and-clear) |
-| `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md |
+| `/complete-project` | Generate a project capstone summary when work wraps up |
+| `/archive-project-file` | Move completed phases to PROJECT_ARCHIVE.md (skill — also auto-triggers when archive intent is detected) |
+
+### Cost & Metrics
+| Command | Purpose |
+|---------|---------|
+| `/show-cost` | Token usage and cost summary for the current session |
+| `/optimize-cost` | Usage pattern analysis and cost-reduction recommendations |
+| `/metrics` | Aggregate workflow metrics from `.claude/metrics.jsonl` |
 
 ### Learning & Memory
 | Command | Purpose |

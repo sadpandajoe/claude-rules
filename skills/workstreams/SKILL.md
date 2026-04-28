@@ -1,6 +1,6 @@
 ---
 name: workstreams
-description: Use after parallel implementation subagents finish and their worktree results need fan-in: collect handoffs, update slice status, merge branches in dependency order, and surface failed or conflicting slices. Do NOT use for planning slices, implementing code, reviewing code, or running tests before handoff.
+description: "Use after parallel implementation subagents finish and their worktree results need fan-in: collect handoffs, update slice status, merge branches in dependency order, and surface failed or conflicting slices. Do NOT use for planning slices, implementing code, reviewing code, or running tests before handoff."
 user-invocable: false
 disable-model-invocation: true
 ---
