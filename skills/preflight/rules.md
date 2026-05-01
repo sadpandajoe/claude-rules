@@ -5,11 +5,19 @@ Read this when a workflow is preparing a local app, Docker stack, or git worktre
 ## Docker Container Management
 
 Before starting any Docker containers:
-1. Run `docker ps` to check running containers.
-2. If two or fewer containers are running, proceed.
-3. If more than two containers are running, show the running containers to the user and ask whether to stop any before starting new ones, or start anyway.
+1. Run `docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"` to inspect running containers.
+2. **Stale check** — flag any container whose `STATUS` shows `Up` for more than 24 hours, or whose name contains a feature/branch prefix that doesn't match the current working branch (e.g., `fix-foo-*`, `feat-bar-*`). List the stale ones with their age and ask the user whether to stop them before starting new work. Do not stop containers without confirmation.
+3. **Count check** — if two or fewer non-stale containers are running, proceed. If more than two, show the running containers to the user and ask whether to stop any before starting another stack.
 
-Each Superset stack can use 4-6 GB RAM. Multiple stacks can saturate the Docker VM and crash the host.
+### Capacity math
+
+Run `docker info | grep -E "CPUs|Total Memory"` once per session to know the daemon's ceiling. The Total Memory value caps the *aggregate* across all containers, regardless of host RAM.
+
+- Each Superset stack uses 4–6 GB.
+- Lightweight services (redis, postgres, single web service) typically use < 200 MB each.
+- If aggregate `MemUsage` (from `docker stats --no-stream`) is approaching 70 % of the daemon Total Memory, warn the user before starting another stack — running out of Docker memory triggers OOM kills, not gradual slowdown.
+
+If the daemon cap looks too low for the user's workflow (e.g., < 12 GB on a host with 32 GB+ of RAM), mention raising it in Docker Desktop → Settings → Resources → Memory. Do not modify Docker Desktop settings programmatically.
 
 ## Worktree Management
 

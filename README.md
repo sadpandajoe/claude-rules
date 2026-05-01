@@ -134,6 +134,7 @@ ai-toolkit/
     ├── metrics.md               # Workflow metrics summary
     ├── show-cost.md             # Token usage and cost summary
     ├── optimize-cost.md         # Usage pattern analysis and recommendations
+    ├── check-resources.md       # Local environment capacity check
     └── toolkit-doctor.md        # Structural health check
 ```
 
@@ -180,6 +181,11 @@ ai-toolkit/
 | `/show-cost` | Token usage and cost summary for the current session |
 | `/optimize-cost` | Usage pattern analysis and cost-reduction recommendations |
 | `/metrics` | Aggregate workflow metrics from `.claude/metrics.jsonl` |
+
+### Environment
+| Command | Purpose |
+|---------|---------|
+| `/check-resources` | Local environment capacity check — running containers, stale ones, headroom verdict |
 
 ### Learning & Memory
 | Command | Purpose |
