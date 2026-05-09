@@ -36,7 +36,7 @@ If the workflow would cross a contract boundary, stop and ask — do not cross f
 
 ## Single Cherry-Pick Flow
 
-Each cherry-pick runs all 7 phases. No phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see gotchas.md).
+Each cherry-pick runs all 8 phases. No phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see gotchas.md), and the push in step 8 is what attributes CI signal to the right cherry.
 
 ### 1. Investigate (Opus)
 
@@ -106,10 +106,17 @@ Conflict-marker scan, **pre-commit on changed files**, build, type-check, target
 
 → Full procedure (subagent contract, LLM audit, validation order, status labels, dependency manifest rule): [references/validate.md](references/validate.md)
 
-**Push after each successful cherry-pick** so CI runs against the change:
+### 8. Push (main thread — mandatory, per cherry)
+
 ```bash
 git push
 ```
+
+Push **immediately after** step 7 passes for *this* cherry, before starting the next one. Do not batch pushes at the end of a multi-cherry run.
+
+**Why:** CI must run against each cherry independently so a failure points at the offending change, not the bundle. Batching defeats per-cherry attribution and forces bisection later.
+
+The only exception is when the user explicitly asks for batched push (e.g., to reduce CI cost). In that case, confirm before deferring.
 
 ## Batch Cherry-Pick Flow
 
@@ -118,10 +125,10 @@ When multiple PRs/SHAs are provided, the main agent acts as a **thin orchestrato
 **Invariant: each cherry must start with clean context.** Subagents are the usual mechanism, but any isolation that prevents cherry #10 from inheriting cherry #1's diffs and decisions works. What matters is that the agent working on cherry N does not carry state from cherries 1..N-1.
 
 1. **Sequence planning** — run [references/batch-sequence.md](references/batch-sequence.md) to determine execution order based on dependencies. Sonnet is sufficient.
-2. **Per-cherry execution** — for each cherry in sequence, run the full single flow (steps 1–7) in an isolated context.
+2. **Per-cherry execution** — for each cherry in sequence, run the full single flow (steps 1–8) in an isolated context. **Step 8 (push) runs per cherry, not after the batch.** If you find yourself thinking "I'll push them all at the end," stop — re-read step 8.
 3. **Status tracking** — record results in the execution table. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
 4. **Escalation** — surface escalations to the user, relay answers back.
-5. **Final report** — collect results and produce the document phase output.
+5. **Final report** — collect results and produce the document phase output. By this point all successful cherries are already pushed; the report summarizes, it does not push.
 
 **Why isolation matters:** with 15 cherry-picks, inline processing pollutes context with prior diffs by cherry #10. Quality degrades silently — conflicts start looking alike, decisions bleed across cherries.
 
@@ -144,7 +151,7 @@ The full 13-column execution table format is in [examples/execution-table.md](ex
 
 ## Continuation Checkpoint
 
-Phases: investigate / gate / plan / plan-review / apply / adapt / validate / document
+Phases: investigate / gate / plan / plan-review / apply / adapt / validate / push / document
 
 State to checkpoint:
 - Target branch
