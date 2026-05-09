@@ -68,20 +68,44 @@ The template script bundles this; don't reinvent.
 
 Per `rules/preset-environments.md`:
 - Stage: read `$PRESET_STG_BOT_LOGIN` / `$PRESET_STG_BOT_PASSWORD`. Abort with a clear message if either is unset.
+- For multi-role / RBAC runs, source role-specific credentials from your team's secrets vault (e.g. `Agor-Test-Vault`) — never hard-code per-role passwords here.
 - Local: try `admin`/`admin` then `admin`/`general`.
 - Production: refuse.
+
+#### Asserting login completion — the `next=` trap
+
+After clicking *Log in*, do **not** assert with `page.waitForURL(new RegExp(workspaceHost))`. The Preset manager IdP redirects to `https://manage.app-stg.preset.io/login/?next=https%3A%2F%2F<workspaceHost>%2Fsuperset%2Fwelcome%2F` — a URL that *contains the workspace host inside the `next=` query parameter*. A naive host-substring regex matches that intermediate URL and the assertion fires while we're still on the login page, so subsequent steps (find chatbot trigger, etc.) fail with confusing timeouts.
+
+Correct pattern:
+
+```js
+await page.getByRole('button', { name: /log in/i }).click();
+for (let i = 0; i < 30; i++) {
+  await page.waitForTimeout(1000);
+  const url = page.url();
+  if (url.includes(WORKSPACE_HOST) && !url.includes('/login')) break;
+}
+if (page.url().includes('/login')) throw new Error('login did not complete');
+await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+```
+
+The two-clause condition (host present **and** `/login` absent) is what disambiguates the IdP redirect from the post-auth landing.
+
+#### Persisting `storageState`
 
 For repeated runs, persist `storageState` between runs to skip the login leg:
 
 ```js
 // First run, after successful login:
-await context.storageState({ path: '~/.qa-runner/storage/<env>.json' });
+await context.storageState({ path: '~/.qa-runner/storage/<host>-<role>.json' });
 // Subsequent runs:
 const context = await browser.newContext({
-  storageState: '~/.qa-runner/storage/<env>.json',
+  storageState: '~/.qa-runner/storage/<host>-<role>.json',
   recordVideo: { dir, size: VIEWPORT },
 });
 ```
+
+**Key the storage path by host AND role**, not by host alone. When the same workspace is exercised under multiple roles in one session (e.g. Dashboard Viewer + Primary Contributor for an RBAC verification), a host-only storage file gets overwritten by the second role's session and then silently reused for the first role's *next* run with the wrong cookies — so login is skipped, requests fire as the wrong user, and the verdict is invalid. Always include the role in the filename.
 
 ### 6. Run the script
 
