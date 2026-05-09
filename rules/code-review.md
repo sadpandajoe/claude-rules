@@ -1,8 +1,12 @@
 # Code Review Principles
 
 ## Core Principles
-- **DRY** — similar logic? Extract if maintained together, parameterize if independent
+- **DRY** — Check three forms of duplication before accepting new code:
+  1. **Within the repo** — similar logic already exists? Extract if maintained together, parameterize if independent.
+  2. **Against installed packages** — does a dependency in `package.json` / `requirements.txt` / `go.mod` / equivalent already provide this? Reimplementing utilities from a shipped library or internal shared package is `[minor]` — or `[major]` if the reimplementation drifts from documented behavior the library has already gotten right.
+  3. **Against language built-ins** — modern stdlib often covers what looks custom (`Object.groupBy`, `Array.prototype.flatMap`, `itertools.groupby`, etc.). Flag custom helpers that duplicate built-ins.
 - **Consistency** — follow existing patterns and conventions (grep for similar files to find them)
+- **Modeling** — logic lives in the right module/package/class; signatures match neighbors; new code is placed where a future reader would look for it
 - **Test quality** — tests should not silently pass (always-green tests are noise); data should match types
 
 ## Scoring
