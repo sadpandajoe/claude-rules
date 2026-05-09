@@ -90,3 +90,4 @@ Stop and ask for user input when:
 - the target branch lacks required architectural groundwork
 - dropping a bug fix leaves the underlying bug unaddressed on the target branch (surface the residual risk even if proceeding)
 - scope leak detection finds changes from adjacent commits that may be intentional prerequisites
+- a bundled PR contains sub-fixes that look unrelated to the main fix and would otherwise be dropped as scope creep — surface to the orchestrator with the list of sub-fixes proposed for exclusion and a one-line rationale per drop, rather than deciding alone. The user explicitly listed the PR in the batch, which generally implies they want everything in it; the orchestrator (or user) should confirm the drop, not the adapter.

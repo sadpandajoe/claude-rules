@@ -90,6 +90,18 @@ Format per entry: **Symptom** → **Why** → **Do instead** → **First seen**.
 
 ---
 
+## Batched push at end of batch instead of per-cherry
+
+**Symptom:** All cherry-picks in a multi-PR batch get committed locally, then pushed in a single `git push` at the end. CI runs once against the bundle. If a later cherry breaks something, the failure can't be attributed without bisecting the bundled push.
+
+**Why:** `git push` happening once per batch is the natural rhythm when you're orchestrating a tight loop ("apply, validate, next, …, done, push"). The skill's per-cherry push directive is easy to skim past because it sits as a trailing note after the validate references rather than as a numbered phase, and the Batch Flow section doesn't restate it.
+
+**Do instead:** Step 8 (push) is a numbered phase that runs **per cherry, before starting the next one**. Treat the per-cherry loop body as steps 1–8, not 1–7. If you're tempted to defer push, re-read step 8. Only batch pushes when the user explicitly requests it (e.g., to reduce CI cost) — confirm first.
+
+**First seen:** 4-PR batch into 6.0-release, 2026-05-06. Pushed once at the end; user flagged it.
+
+---
+
 ## Validation status overstated as "Tested" when only build ran
 
 **Symptom:** Execution table says `Tested` for a cherry-pick where only the build passed; targeted tests existed but weren't executed.
@@ -106,3 +118,17 @@ Format per entry: **Symptom** → **Why** → **Do instead** → **First seen**.
 If tests existed and weren't run, flag the gap explicitly with what was available, why skipped, and recommended follow-up.
 
 **First seen:** Standing rule encoded in validate phase.
+
+---
+
+## Orchestrator prescribes `git apply` for partial cherry-picks
+
+**Symptom:** A partial cherry-pick lands with the wrong author (the local user instead of the source PR author) and a hand-written commit message that doesn't match `cherry-pick -x` convention. Detected post-push when reviewing `git log` author/subject.
+
+**Why:** When the orchestrator builds a subagent prompt for a partial cherry-pick (some files inapplicable on target), it's tempting to prescribe `git format-patch -1 <sha> -- <subset> | git apply --3way` because it cleanly limits the file set without modify/delete conflicts. But `git apply` discards source author and forces a manual `git commit`, which defaults the author to the local user and requires writing the message by hand — both of which break `cherry-pick -x` convention. The subagent dutifully follows the prompt, the apply.md escalation ladder is bypassed, and the bug only surfaces when a human reads the commit log.
+
+**Do instead:** Even for partials, prescribe `git cherry-pick -x <sha>` in the subagent prompt. Modify/delete conflicts on inapplicable files resolve cleanly with `git rm <inapplicable-files>`. The resulting `git cherry-pick --continue` preserves source author and produces the standard subject + `(cherry picked from commit ...)` trailer automatically. The fact that some files were excluded shows up only in the diff — never in the message, never in the author.
+
+**Remediation if already pushed:** Reset to before the bad commit, re-run `git cherry-pick -x` properly, then re-cherry-pick (or `rebase --onto`) any subsequent commits onto the corrected base, then `git push --force-with-lease`. Do not just amend the message — that leaves the wrong author.
+
+**First seen:** 2026-05-08 batch into 6.0-release. Partial cherry-pick of PR #39636 used `git format-patch | git apply` per the subagent prompt I wrote; landed with author=Joe Li (should have been Amin Ghadersohi) and a modified subject `(partial)`. User flagged; remediation required reset + redo + force-push of 5 commits.
