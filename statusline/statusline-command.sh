@@ -182,25 +182,85 @@ if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
     total_changes=$(( staged + unstaged + untracked ))
 fi
 
-# Context used percentage
+# Context used percentage and absolute token count
 ctx_pct=""
+ctx_tokens_display=""
 remaining=$(echo "$input" | jq -r '.context_window.remaining_percentage // empty')
+ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // empty')
 if [ -n "$remaining" ]; then
     remaining_int=$(printf "%.0f" "$remaining")
     ctx_pct=$((100 - remaining_int))
+    if [ -n "$ctx_size" ] && [ "$ctx_size" -gt 0 ]; then
+        ctx_tokens=$(awk "BEGIN{printf \"%.0f\", $ctx_pct * $ctx_size / 100}")
+        if [ "$ctx_tokens" -ge 1000 ]; then
+            ctx_tokens_display=$(awk "BEGIN{printf \"%.0fk\", $ctx_tokens/1000}")
+        else
+            ctx_tokens_display="${ctx_tokens}"
+        fi
+    fi
 fi
 
-# Rate limits
+# Rate limits + reset times
 five_hr_pct=""
+five_hr_reset_str=""
 five_hr=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+five_hr_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 if [ -n "$five_hr" ]; then
     five_hr_pct=$(printf "%.0f" "$five_hr")
 fi
+if [ -n "$five_hr_reset" ]; then
+    five_hr_reset_str=$(date -r "$five_hr_reset" +"%-I%p" 2>/dev/null | tr '[:upper:]' '[:lower:]')
+fi
 
 seven_day_pct=""
+seven_day_reset_str=""
 seven_day=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+seven_day_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 if [ -n "$seven_day" ]; then
     seven_day_pct=$(printf "%.0f" "$seven_day")
+fi
+if [ -n "$seven_day_reset" ]; then
+    now_ts=$(date +%s)
+    delta=$(( seven_day_reset - now_ts ))
+    if [ "$delta" -lt 0 ]; then delta=0; fi
+    if [ "$delta" -ge 86400 ]; then
+        d=$(( delta / 86400 ))
+        h=$(( (delta % 86400) / 3600 ))
+        seven_day_reset_str=$(printf "in %dd %dh" "$d" "$h")
+    elif [ "$delta" -ge 3600 ]; then
+        h=$(( delta / 3600 ))
+        m=$(( (delta % 3600) / 60 ))
+        seven_day_reset_str=$(printf "in %dh %dm" "$h" "$m")
+    else
+        m=$(( delta / 60 ))
+        seven_day_reset_str=$(printf "in %dm" "$m")
+    fi
+fi
+
+# Agent invocations grouped by model (parse current transcript)
+agents_total=0
+agents_opus=0
+agents_sonnet=0
+agents_haiku=0
+if [ -n "$transcript" ] && [ -f "$transcript" ]; then
+    while IFS=$'\t' read -r stype emodel; do
+        [ -z "$stype$emodel" ] && continue
+        agents_total=$((agents_total + 1))
+        model="$emodel"
+        if [ -z "$model" ] && [ -n "$stype" ]; then
+            def=$(find "$HOME/.claude/plugins/marketplaces" -name "${stype}.md" -path "*/agents/*" -print -quit 2>/dev/null)
+            if [ -n "$def" ]; then
+                model=$(awk '/^model:/ { sub(/^[ \t]*model:[ \t]*/, ""); sub(/[ \t]+$/, ""); print; exit }' "$def" 2>/dev/null)
+            fi
+        fi
+        [ -z "$model" ] && model="opus"
+        case "$model" in
+            opus*)   agents_opus=$((agents_opus + 1)) ;;
+            sonnet*) agents_sonnet=$((agents_sonnet + 1)) ;;
+            haiku*)  agents_haiku=$((agents_haiku + 1)) ;;
+            *)       agents_opus=$((agents_opus + 1)) ;;
+        esac
+    done < <(jq -r 'select(.message.content) | .message.content[]? | select(.type == "tool_use" and .name == "Agent") | "\(.input.subagent_type // "")\t\(.input.model // "")"' "$transcript" 2>/dev/null)
 fi
 
 # --- Line 1: model effort | session dur | msgs | cost | time | diff ---
@@ -236,23 +296,35 @@ for part in "${line1_parts[@]}"; do
     fi
 done
 
-# --- Line 2: resource bars — ctx, session (5hr), 7d ---
+# --- Line 2: resource bars — context, 5h, weekly ---
 BAR_WIDTH=10
 line2_parts=()
 
 if [ -n "$ctx_pct" ]; then
-    bar=$(make_gradient_bar "$ctx_pct" 50 70 "$BAR_WIDTH")
-    line2_parts+=("session $bar")
+    bar=$(make_gradient_bar "$ctx_pct" 15 25 "$BAR_WIDTH")
+    if [ -n "$ctx_tokens_display" ]; then
+        line2_parts+=("context $bar $ctx_tokens_display")
+    else
+        line2_parts+=("context $bar")
+    fi
 fi
 
 if [ -n "$five_hr_pct" ]; then
-    bar=$(make_gradient_bar "$five_hr_pct" 50 80 "$BAR_WIDTH")
-    line2_parts+=("5h $bar")
+    bar=$(make_gradient_bar "$five_hr_pct" 70 90 "$BAR_WIDTH")
+    if [ -n "$five_hr_reset_str" ]; then
+        line2_parts+=("5h $bar · resets $five_hr_reset_str")
+    else
+        line2_parts+=("5h $bar")
+    fi
 fi
 
 if [ -n "$seven_day_pct" ]; then
-    bar=$(make_gradient_bar "$seven_day_pct" 50 80 "$BAR_WIDTH")
-    line2_parts+=("7d $bar")
+    bar=$(make_gradient_bar "$seven_day_pct" 70 90 "$BAR_WIDTH")
+    if [ -n "$seven_day_reset_str" ]; then
+        line2_parts+=("weekly $bar · resets $seven_day_reset_str")
+    else
+        line2_parts+=("weekly $bar")
+    fi
 fi
 
 line2=""
@@ -264,7 +336,14 @@ for part in "${line2_parts[@]}"; do
     fi
 done
 
-# --- Line 3: directory | branch | repo ---
+# --- Line 3: agents N | opus N | sonnet N | haiku N ---
+agents_line=""
+if [ "$agents_total" -gt 0 ]; then
+    agents_line=$(printf "agents %d | opus %d | sonnet %d | haiku %d" \
+        "$agents_total" "$agents_opus" "$agents_sonnet" "$agents_haiku")
+fi
+
+# --- Line 4: directory | branch | repo ---
 line3_parts=()
 
 # Directory
@@ -302,5 +381,6 @@ done
 # --- Output ---
 output="$line1"
 [ -n "$line2" ] && output="${output}"$'\n'"${line2}"
+[ -n "$agents_line" ] && output="${output}"$'\n'"${agents_line}"
 [ -n "$line3" ] && output="${output}"$'\n'"${line3}"
 printf "%s" "$output"
