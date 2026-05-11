@@ -37,6 +37,7 @@ Read the conversation context and PROJECT.md (if it exists) to determine:
 - **Active plan**: `PLAN.md` if one exists at repo root, otherwise `none`
 - **Where we left off**: the next concrete action — file + line context, ticket, or specific item to pick up
 - **Done / In Progress / Next / Blocked** for the Current Status block
+- If the active phase is `review-code`, read the `## Current Code Review` section in PROJECT.md if present and preserve its next finding/fix action in Current Status.
 
 If positional/named arguments were provided, use them instead of autodetecting.
 
@@ -76,6 +77,8 @@ If the detected top-level command has a per-command extension at `skills/reporti
 ```
 
 When a previously-In-Progress item completes, move it to Done. When Next becomes the new focus, move it to In Progress.
+
+If PROJECT.md contains `## Current Code Review`, keep it intact unless the Review Gate is clean and the caller workflow has moved past review. Do not collapse review findings into chat-only summary text before `/clear`.
 
 **c. `### [timestamp] — Progress Update` — append to Development Log:**
 

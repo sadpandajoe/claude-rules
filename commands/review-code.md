@@ -3,7 +3,7 @@
 @{{TOOLKIT_DIR}}/rules/complexity-gate.md
 
 > **When**: You have local changes and want a quality pass with the right reviewers for the change type.
-> **Produces**: Team-reviewed findings, fixes, test coverage assessment, verification, and a Review Gate block.
+> **Produces**: Team-reviewed findings, fixes, test coverage assessment, verification, a durable PROJECT.md review record, and a Review Gate block.
 
 ## Usage
 
@@ -28,13 +28,13 @@ That reference dispatches:
 
 ## Orchestration Model
 
-The main thread is the orchestrator. It gathers changed files, runs the Complexity Gate, runs repo-appropriate pre-flight verification, dispatches reviewer subagents, deduplicates findings, applies approved fixes, re-verifies, and emits the Review Gate.
+The main thread is the orchestrator. It gathers changed files, runs the Complexity Gate, runs repo-appropriate pre-flight verification, dispatches reviewer subagents, deduplicates findings, writes actionable review state to PROJECT.md, applies approved fixes, re-verifies, and emits the Review Gate.
 
 All review judgment comes from fresh-context reviewer lanes. The main thread synthesizes and fixes; it does not replace the reviewers.
 
 Use fresh reviewer subagents for each review pass after material code changes. Reuse a reviewer only to clarify that reviewer's own finding in the same pass.
 
-For STANDARD or expensive reviews, checkpoint/clear before reviewer dispatch once pre-flight verification and diff scope are recorded, and again after review fixes when QA/PR/final reporting remains. Resume from changed-file list, pre-flight result, and Review Gate state rather than from implementation chatter.
+For STANDARD or expensive reviews, checkpoint/clear before reviewer dispatch once pre-flight verification and diff scope are recorded, and again after review findings or fixes when QA/PR/final reporting remains. Resume from changed-file list, pre-flight result, PROJECT.md review record, and Review Gate state rather than from implementation chatter.
 
 ## Gates
 
@@ -46,7 +46,7 @@ For STANDARD or expensive reviews, checkpoint/clear before reviewer dispatch onc
 
 ## Summary Contract
 
-End with the Review Gate and the compact summary defined in `review/references/local-review.md`.
+Before fixing or clearing context, write/update PROJECT.md with the compact review record defined in `review/references/local-review.md`. End with the Review Gate and the compact summary defined there.
 
 Internal callers such as `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-tests`, and `/update-tests` own the next-step section after the Review Gate.
 

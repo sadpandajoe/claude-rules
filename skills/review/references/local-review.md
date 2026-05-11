@@ -71,7 +71,7 @@ Use triggered references from `classify-diff.md`, including:
 - [../../plan-review/references/frontend.md](../../plan-review/references/frontend.md)
 - [../../plan-review/references/backend.md](../../plan-review/references/backend.md)
 
-Collect findings, dedupe, sort by severity, and fix `[major]` and `[minor]` issues.
+Collect findings, dedupe, sort by severity, and write the Review Record to PROJECT.md before fixing `[major]` and `[minor]` issues or checkpointing.
 
 ## Re-Verify + Iterate
 
@@ -105,6 +105,31 @@ Rounds: [N]
 Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision/skipped/micro-fix]
 ```
+
+## PROJECT.md Review Record
+
+Write or update this compact record before fixing findings or clearing context. Keep only actionable state; do not paste full reviewer transcripts.
+
+```markdown
+## Current Code Review
+
+**Scope:** <changed files or path filter>
+**Pre-flight:** <pass/fail/skipped — command or reason>
+**Review Gate:** <pending/clean/blocked/user decision/skipped/micro-fix>
+
+### Findings
+| ID | Severity | File | Finding | Status |
+|----|----------|------|---------|--------|
+| R1 | major/minor/nitpick | path:line | concise issue | open/fixed/deferred/user-decision |
+
+### Fix Queue
+- [ ] R1 — <specific next action>
+
+### Resume Notes
+- Next: <fix R1 / re-run verification / emit Review Gate / continue caller workflow>
+```
+
+If there are no actionable findings, write `Findings: none` and the clean Review Gate status so `/checkpoint --clear` can resume without reconstructing review context from chat.
 
 ## Summary
 

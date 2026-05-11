@@ -17,7 +17,8 @@ STANDARD phase boundaries:
 1. **Investigation/planning artifact written**: `PLAN.md`, `BUG_FIX.md`, `CI_FIX.md`, `CHERRY_PICK.md`, or equivalent manifest is current.
 2. **Plan/RCA review accepted**: review scores, gate decision, and next implementation slice are written.
 3. **Implementation slice or wave complete**: changed files, verification run, and next review target are written.
-4. **Code review fixes complete**: Review Gate status, remaining risks, and next validation/PR action are written.
+4. **Code review findings recorded**: `## Current Code Review` contains actionable findings, fix queue, pre-flight result, and next action.
+5. **Code review fixes complete**: Review Gate status, remaining risks, and next validation/PR action are written.
 
 For batch work, checkpoint/clear between waves by default. For non-trivial cherry-picks, checkpoint/clear after investigate/gate/plan and after apply/adapt/validate when a later push/report phase remains.
 
