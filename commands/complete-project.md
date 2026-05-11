@@ -94,4 +94,4 @@ After emitting the summary, include `metrics-emit` context with:
 - `status`: `clean` (or `blocked` if step 5 left services running, etc.)
 - `rounds`: 0 (no review loop)
 - `gate_decisions`: include any user decisions made during memory promotion
-- `models_used`: track subagent invocations from this command
+- `worker_usage`: subagent/worker invocation counts when applicable

@@ -51,10 +51,10 @@ Add conditional reviewers when the plan touches their area:
 - `plan-review/references/frontend.md` — React, CSS, UI components
 - `plan-review/references/backend.md` — API, database, migrations
 
-**Model selection** per the scope input (see `rules/orchestration.md`):
+**Reasoning effort selection** per the scope input (see `rules/orchestration.md`):
 
-- `trivial` / `moderate` — `model: "sonnet"`
-- `substantial` — `model: "opus"` (multi-system, real trade-offs, novel design, ambiguous constraints)
+- `trivial` / `moderate` — standard reasoning effort
+- `standard` — heavy reasoning effort when the plan has multi-system scope, real trade-offs, novel design, or ambiguous constraints
 
 Each reviewer:
 - Reads the plan from the location provided by the caller
@@ -66,15 +66,15 @@ Each reviewer:
 After collecting scores:
 
 - **All reviewers ≥ 8/10** → proceed to cold read
-- **Any reviewer below 8/10** → revise the plan based on feedback, then re-run **only the failing reviewers** (not all of them)
+- **Any reviewer below 8/10** → revise the plan based on feedback, then re-run fresh reviewers for material revisions. Reuse the same reviewer only to clarify that reviewer's own finding in the same pass.
 - Auto-iterate — do not ask the user whether to continue or which reviewers to re-run
 - Only stop for a blocking decision that requires user input, or if stop rules in `rules/stop-rules.md` trigger
 
-**Shallow-analysis escalation**: If a Sonnet reviewer scored low because their analysis was shallow (not because the plan has real issues), re-run that specific reviewer on `model: "opus"` rather than revising a plan that doesn't need revising.
+**Shallow-analysis escalation**: If a reviewer scored low because their analysis was shallow (not because the plan has real issues), re-run that specific reviewer with heavier reasoning rather than revising a plan that doesn't need revising.
 
 ### 4. Cold Read
 
-Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match the model to the plan's reasoning load (same rule as step 2).
+Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match reasoning effort to the plan's reasoning load (same rule as step 2).
 
 - **Go** → proceed to step 5
 - **No-Go** with blocking issues → revise and re-run sibling [finalize.md](finalize.md)

@@ -1,10 +1,9 @@
 # /review-plan - One-Off Plan Review
 
-@{{TOOLKIT_DIR}}/rules/orchestration.md
 @{{TOOLKIT_DIR}}/rules/stop-rules.md
 
-> **When**: You have a plan in PROJECT.md and want a quality review without the full `/create-feature` workflow.
-> **Produces**: Reviewed plan with all applicable reviewers at 8/10, cold read passed, and final scores in PROJECT.md.
+> **When**: You have a `PLAN.md` or PROJECT.md-referenced plan and want a quality review without the full `/create-feature` workflow.
+> **Produces**: Reviewed `PLAN.md`, all applicable reviewers at 8/10, cold read passed, and final scores in PROJECT.md.
 
 ## Usage
 
@@ -15,11 +14,21 @@
 
 `--pm`: Include PM brief review (`pm/references/review-feature-brief.md`) in addition to technical reviewers.
 
+## Command Contract
+
+The command owns one-off plan review only. It does not create the plan, implement it, or turn review comments into code changes.
+
+- Read PROJECT.md to find the active plan pointer, then review `PLAN.md` as the formal plan body; do not preload unrelated workflow references.
+- Use fresh reviewer subagents for each review pass after material plan revisions.
+- Reuse a reviewer only to clarify that reviewer's own finding in the same pass.
+- The main thread revises `PLAN.md`; PROJECT.md stores state/pointers and final scores. Subagents return scored findings only.
+- Continue after material findings are resolved and the cold read says Go; otherwise stop on blocker, stop rule, or user decision.
+
 ## Steps
 
 ### 1. Read the Plan
 
-Read PROJECT.md. Verify it contains a plan with at least one of:
+Read PROJECT.md to find the active plan pointer, then read `PLAN.md` when present. If no `PLAN.md` exists, fall back to plan content embedded in PROJECT.md. Verify the plan contains at least one of:
 - `Implementation Plan` or `Accepted Solution` section
 - `Test Strategy` section
 - `Feature Brief` section
@@ -28,14 +37,14 @@ If no plan content found, stop: `"No plan found in PROJECT.md. Write a plan firs
 
 ### 2. Assess Plan Scope and Select Reviewers
 
-Assess the plan's complexity to determine reviewer depth:
+Assess the plan's complexity to determine reviewer depth. Use the substance of the plan, not role labels, to choose reasoning effort per `rules/orchestration.md`.
 
 | Plan scope | Reviewers | Cold read |
 |------------|-----------|-----------|
 | **Moderate** — single subsystem, well-understood pattern, no architectural decisions | 1 reviewer: `plan-review/references/implementation.md` | `planning/references/finalize.md` |
-| **Substantial** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `planning/references/finalize.md` |
+| **Standard** — multi-system, real trade-offs, novel design, or ambiguous constraints | 3+ reviewers: `plan-review/references/architecture.md` + `plan-review/references/implementation.md` + `testing/references/review-testplan.md` | `planning/references/finalize.md` |
 
-**Conditional reviewers** (add to substantial plans when applicable):
+**Conditional reviewers** (add to Standard plans when applicable):
 - `plan-review/references/frontend.md` — if plan touches frontend (React, CSS, UI components)
 - `plan-review/references/backend.md` — if plan touches backend (API, database, migrations)
 - `pm/references/review-feature-brief.md` — if `--pm` flag or plan has a `Feature Brief` section with scope/milestones
@@ -44,18 +53,14 @@ State the scope assessment, which reviewers are selected, and why before launchi
 
 ### 3. Review Iterations
 
-Launch selected reviewer subagents in parallel. **Choose the reviewer model based on the actual plan complexity**, per `rules/orchestration.md`:
-- **Moderate plan**: use `model: "sonnet"`.
-- **Substantial plan** (multi-system, real trade-offs, novel design, ambiguous constraints): use `model: "opus"`.
-
-When mixed, default to Sonnet and escalate the specific failing reviewer to Opus on re-run if the Sonnet pass scored low for shallow analysis (not for legitimate plan issues). Each reviewer:
-- Reads PROJECT.md for the plan content
+Launch selected fresh reviewer subagents in parallel. Match reviewer reasoning effort to the actual plan complexity. Each reviewer:
+- Reads only PROJECT.md plus the active plan content needed for its lens
 - Loads its own skill file (subagents load their own domain rules)
 - Produces a scored review block (X/10 with strengths, issues, suggestions)
 
 After collecting scores:
 - If all reviewers are at 8/10 or better → proceed to step 4
-- If any reviewer is below 8/10 → revise the plan in PROJECT.md based on their feedback, then re-run **only the failing reviewers**
+- If any reviewer is below 8/10 → revise `PLAN.md` based on their feedback, or PROJECT.md only when the plan is embedded there, then re-run fresh reviewers for material revisions. Reuse the same reviewer only to clarify their own finding in the same pass.
 - Auto-iterate — do not ask the user whether to continue or which reviewers to re-run
 - Only stop for a blocking decision that requires user input, or if stop rules trigger
 
@@ -109,7 +114,7 @@ Write final review scores to PROJECT.md:
 ## PROJECT.md Update Discipline
 
 - After review iterations complete: write final scores
-- If revisions were made: the plan sections in PROJECT.md are updated as part of each revision
+- If revisions were made: update `PLAN.md`, or PROJECT.md only when the plan is embedded there
 
 ## Notes
 - Standalone command — `/create-feature` step 4 does the same work inline, but this is for one-off use

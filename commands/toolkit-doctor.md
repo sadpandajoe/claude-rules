@@ -67,6 +67,7 @@ Exclude `build/` (those are resolved copies, not source).
 
 1. **Source imports**: Extract all `@{{TOOLKIT_DIR}}/path` references from files in `commands/` and `config/`. For each, verify `$REPO_DIR/path` exists on disk.
 2. **Build imports**: Extract all `@/absolute/path` references from files in `build/commands/` and `build/config/`. For each, verify the absolute path exists on disk.
+3. **Skill imports from commands**: In `commands/`, any source import that resolves under `skills/` is DRIFT. Commands should import only short rules needed immediately, then name or link skill phases for lazy loading.
 
 #### E. Structural Inventory
 

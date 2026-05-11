@@ -19,7 +19,7 @@ Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present. Ch
 
 **Out of scope:** broad refactors, behavior-changing adaptations without approval, dependency reinstall or environment rebuild, forcing incompatible APIs onto the target.
 
-**Success criteria:** each change is classified `Applied | Partial | Blocked | Rejected | Skipped`; applied changes preserve source intent; validation status recorded; PROJECT.md updated by the parent workflow (this command does not own it).
+**Success criteria:** each change is classified `Applied | Partial | Blocked | Rejected | Skipped`; applied changes preserve source intent; validation status recorded; batch state lives in the execution table or `CHERRY_PICK.md`; PROJECT.md is updated by the parent workflow (this command does not own it).
 
 If the workflow would cross a contract boundary, stop and ask — do not cross first and report after.
 
@@ -120,13 +120,58 @@ The only exception is when the user explicitly asks for batched push (e.g., to r
 
 ## Batch Cherry-Pick Flow
 
-When multiple PRs/SHAs are provided, the main agent acts as a **thin orchestrator**. It must not accumulate per-cherry context.
+When multiple PRs/SHAs are provided, the main agent acts as a **thin orchestrator**. It owns ordering, dependency tracking, user decisions, checkpoint boundaries, and final synthesis. It must not accumulate raw per-cherry context.
 
 **Invariant: each cherry must start with clean context.** Subagents are the usual mechanism, but any isolation that prevents cherry #10 from inheriting cherry #1's diffs and decisions works. What matters is that the agent working on cherry N does not carry state from cherries 1..N-1.
 
+### Durable Batch Manifest
+
+For 10+ changes, or any run with meaningful dependencies, expected conflicts, or multiple blocked/intervention points, create or update local `CHERRY_PICK.md` from [templates/cherry-pick-manifest.md](templates/cherry-pick-manifest.md).
+
+`PROJECT.md` should only point to the active run:
+- target branch
+- current phase
+- next batch/wave
+- manifest path: `CHERRY_PICK.md`
+
+`CHERRY_PICK.md` owns the detailed execution table, execution waves, dependency notes, per-cherry validation, conflict notes, user decisions, and compact subagent handoffs.
+
+Never commit `CHERRY_PICK.md`. Prefer `.git/info/exclude` for this workspace-local file unless the repo should ignore it globally.
+
+### Wave Size Policy
+
+Batch size means an orchestration wave, not permission to weaken per-cherry validation or per-cherry push.
+
+| Case | Wave size |
+|------|----------:|
+| Tiny independent fixes | 5 |
+| Normal bug fixes | 3 |
+| Cross-cutting changes | 1 |
+| Expected conflicts | 1 |
+| Dependency chain | 1 sequentially |
+| Clean mechanical backports | 5-8 only if validation is cheap |
+
+Investigate, gate, or plan independent changes in parallel when useful. Actual application on the target branch remains dependency-safe and sequential unless the workflow explicitly creates isolated worktrees/branches and has a fan-in plan.
+
+### Subagent Handoff Contract
+
+Each per-cherry or per-wave subagent returns only:
+- PR/SHA
+- source commit(s)
+- target commit SHA after apply
+- result: `Applied` / `Partial` / `Blocked` / `Rejected` / `Skipped`
+- conflicts: `none` or compact summary
+- scope audit: `CLEAN` / `LEAKED-REVERTED` / `ESCALATED`
+- validation label: `Tested` / `Checked` / `Build-only` / `Structural` / `Not run`
+- commands run
+- residual risk
+- dependency implications for later rows
+
+No full diffs or long logs unless blocked. If a blocked handoff needs raw evidence, put file paths or the shortest decisive excerpt in the manifest.
+
 1. **Sequence planning** — run [references/batch-sequence.md](references/batch-sequence.md) to determine execution order based on dependencies. Sonnet is sufficient.
 2. **Per-cherry execution** — for each cherry in sequence, run the full single flow (steps 1–8) in an isolated context. **Step 8 (push) runs per cherry, not after the batch.** If you find yourself thinking "I'll push them all at the end," stop — re-read step 8.
-3. **Status tracking** — record results in the execution table. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
+3. **Status tracking** — record results in the execution table or `CHERRY_PICK.md`. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
 4. **Escalation** — surface escalations to the user, relay answers back.
 5. **Final report** — collect results and produce the document phase output. By this point all successful cherries are already pushed; the report summarizes, it does not push.
 
@@ -147,7 +192,7 @@ The full 13-column execution table format is in [examples/execution-table.md](ex
 - `rounds`: total plan-review iterations across all cherries (0 if all clean)
 - `gate_decisions`: `{ verdict: PROCEED | REJECT | FORCE-PROCEED, batch_size: <N> }`
 - `scope_audit`: per-cherry verdicts from the 7a subagent — `{ clean: <N>, leaked_reverted: <N>, escalated: <N> }`. Single cherry: one of `CLEAN | LEAKED-REVERTED | ESCALATED`.
-- `models_used`: subagent model invocation counts
+- `worker_usage`: subagent/worker invocation counts when applicable
 
 ## Continuation Checkpoint
 

@@ -2,7 +2,6 @@
 
 @{{TOOLKIT_DIR}}/rules/input-detection.md
 @{{TOOLKIT_DIR}}/rules/preset-environments.md
-@{{TOOLKIT_DIR}}/skills/testing/references/review-testplan.md
 
 > **When**: You want to validate a feature area, story, PR, or existing test-plan doc without fixing code in the same workflow.
 > **Produces**: A reviewed runnable test plan, execution results, evidence for material failures, and a local findings summary.
@@ -38,7 +37,7 @@
 
 3. **Iterate the Plan to 8/10**
 
-   Review the matrix with the shared test-plan reviewer.
+   Load [skills/testing/references/review-testplan.md](../skills/testing/references/review-testplan.md) and review the matrix with a fresh test-plan reviewer after material revisions.
    Revise the plan until it reaches `8/10`, or stop early only if blockers or unresolved ambiguities make execution unsafe or misleading.
 
 4. **Execute the Plan**
@@ -46,13 +45,13 @@
    Run only the scenarios that are actually testable in the current environment.
 
    Execution defaults:
-   - Playwright MCP for UI and workflow checks
+   - Available browser automation for UI and workflow checks
    - API or CLI calls for non-UI validation
    - clear `BLOCKED` or `SKIP` outcomes when prerequisites are missing
 
 5. **Capture Evidence**
 
-   For UI scenarios, drive the browser via Playwright MCP and record the run as a single video artifact via macOS `screencapture` — follow the canonical recipe in [skills/qa/references/browser-recording.md](../skills/qa/references/browser-recording.md). One recording per logical flow, saved under `~/qa-recordings/<source-id>-<short-name>-<UTC-timestamp>.mov`. Real Chrome with the real OS cursor — no `recordVideo`, no synthetic-cursor scaffolding.
+   For UI scenarios, drive the available browser automation and capture evidence using [skills/qa/references/browser-recording.md](../skills/qa/references/browser-recording.md). Choose the platform-specific recorder from that reference. Capture one recording per logical flow when recording is available, plus screenshots for high-value states or failures.
 
    Supplement with console logs or API output only when video alone doesn't explain a failure.
 
@@ -111,3 +110,4 @@
 - Prefer a small runnable matrix over a broad exploratory sweep
 - Keep findings factual and local-first
 - The command should keep tightening and executing the plan automatically until the matrix reaches threshold or a real blocker stops it
+- The main thread owns scenario state, evidence paths, and reporting destinations; any subagent returns compact scenario/review handoffs only

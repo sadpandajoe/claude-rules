@@ -35,7 +35,7 @@ When the diff contains zero logic changes (formatting-only, lint-disable, import
 When ALL of these are true:
 - Diff is 3 lines or fewer
 - Pre-commit passes
-- Test suite passes
+- Relevant checks/tests pass
 - Confidence is 10/10
 
 Then:

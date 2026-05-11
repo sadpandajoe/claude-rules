@@ -17,16 +17,17 @@ Reason: [one line]
 
 When classification is `TRIVIAL` and confidence is `8/10` or higher:
 - **Auto-proceed** — do not ask the user for confirmation before implementing; the high-confidence classification is the approval
-- Skip plan mode, investigation lanes, RCA validation, and reviewer subagents
-- Go directly to implementation, verify, review, summary
+- Skip the formal planning phase, investigation lanes, RCA validation, and reviewer subagents
+- Go directly to implementation, verification, Review Gate emission, and summary
+- Emit Review Gate `skipped` or `micro-fix` only when `rules/review-gate.md` allows it; otherwise reclassify as MODERATE before logic review
 - Zero subagent spawns — orchestrator does all work inline
 
 ## Moderate Path
 
 When classification is `MODERATE` and confidence is `8/10` or higher:
-- Skip plan mode and parallel investigation-lane subagents
-- Orchestrator investigates and plans inline (no investigation subagent spawns)
-- Still spawn **one** reviewer subagent for code/plan review — never review your own work
+- Skip the formal planning phase and parallel investigation-lane subagents
+- Orchestrator scopes, investigates, or plans inline as the command requires
+- Still spawn **one** reviewer subagent for the command-required review — never review your own work. For feature work, this is usually code review after implementation; run plan review only when inline design uncovered real design uncertainty.
 - Still run tests and emit a Review Gate block
 - Spawn additional subagents only when parallelism provides a clear wall-clock win
 
@@ -41,8 +42,8 @@ MODERATE is the **default classification** — most real work lands here. Use TR
 ## Standard Path
 
 When classification is `STANDARD` (or confidence is below `8/10` for any classification):
-- Full workflow: plan mode, investigation lanes, reviewer subagents, RCA validation
-- Spawn subagents per command-specific steps and `rules/orchestration.md` model tiers
+- Full workflow: durable plan or investigation artifact as the command requires, reviewer subagents, and validation gates
+- Spawn subagents per command-specific steps and `rules/orchestration.md` reasoning-load boundaries
 
 ## Never Silently Decide
 
@@ -56,11 +57,18 @@ Always emit the gate block above. Do not silently choose a path — the block mu
 - **Config value change**: 1-2 files, mechanical substitution, testable in isolation. Confidence 9/10.
 - **Missing import after rename**: 1 file, fix is deterministic from the error, no design decision. Confidence 9/10.
 
+### MODERATE
+
+- **Add a small setting to an existing panel**: 2-4 files in one UI subsystem, known pattern, contained user-visible behavior. Confidence 8/10.
+- **Extend an existing API response with tests**: handler/model/test change in one subsystem, no new contract shape beyond one field. Confidence 8/10.
+- **Add one known-pattern validation path**: existing validator and targeted tests, clear error behavior, no adjacent workflow redesign. Confidence 8/10.
+
 ### STANDARD
 
-- **API endpoint returns wrong status code for edge case**: 3+ files (handler, test, maybe middleware), requires understanding request flow, behavioral change with regression potential. Confidence 6/10 until investigated.
-- **Feature flag logic inverted**: Cross-cutting impact across multiple components, needs investigation to confirm scope. Confidence 5/10.
-- **New validation rule on existing form**: Multiple files (frontend component, backend validator, test suite), design decision about error UX, potential for regression in adjacent flows. Confidence 7/10.
+- **New export flow across UI and API**: 3+ files, acceptance criteria need a durable plan, and tests/validation span layers. Confidence 7/10 until planned.
+- **Permission-sensitive bulk action**: Cross-cutting impact across UI, backend, authz, and audit paths. Confidence 6/10 until scoped.
+- **Feature flag behavior changes an existing workflow**: Multiple adjacent flows may regress; needs plan-review iteration or multiple review/fix waves and validation. Confidence 7/10.
+- **Bug fix with unclear root cause**: request flow or data path is not yet understood; needs investigation and RCA validation. Confidence 6/10 until investigated.
 
 ## Scope
 

@@ -1,6 +1,5 @@
 # /create-tests - Create the First Meaningful Tests
 
-@{{TOOLKIT_DIR}}/skills/testing/references/review-tests.md
 
 > **When**: You want standalone test-only work for an area that does not yet have a meaningful suite, or `/update-tests` has handed off because there is nothing real to update.
 > **Produces**: A first meaningful test suite or net-new high-signal coverage, validation results, and a summary of remaining gaps.
@@ -23,7 +22,7 @@
 
 2. **Create Initial Tests**
 
-   Follow [skills/testing/references/create-tests.md](../skills/testing/references/create-tests.md). This testing context owns:
+   Load [skills/testing/references/create-tests.md](../skills/testing/references/create-tests.md) for this step. This testing context owns:
    - running `review-tests` before writing tests
    - choosing the right test layer
    - creating the first meaningful tests for the target area
@@ -31,7 +30,7 @@
 
 3. **Review Changed Test Files**
 
-   Run `/review-code` on the changed repo-tracked files as an internal loop.
+   Run `/verify` or equivalent targeted checks first, then run `/review-code` on the changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
 4. **Summary**
@@ -67,3 +66,4 @@
 - `/create-tests` is a test-only command, not the normal entrypoint for feature or bug workflows
 - Favor the smallest set of high-signal tests over broad test quantity
 - `/review-code` is an internal phase here, not the expected next top-level user step
+- Stop before committing unless the user explicitly requested commit/push behavior.

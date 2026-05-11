@@ -11,16 +11,28 @@ disable-model-invocation: true
 
 Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
-Umbrella for code-review work — review of *shipped code*, not plans. Two kinds of references:
+Umbrella for code-review work — review of *shipped code*, not plans. References are grouped by role so commands can load only the phase they are entering.
 
-- **Dispatch** — classify the diff to determine which reviewers fire
-- **Lenses** — reviewer subagent prompts, each applying a specific lens
+## Orchestration
 
-## Dispatch
+| Reference | Role |
+|-----------|------|
+| [references/local-review.md](references/local-review.md) | Local `/review-code` orchestration |
+| [references/pr-review.md](references/pr-review.md) | Single GitHub PR review procedure |
+| [references/pr-batch.md](references/pr-batch.md) | Batch PR review orchestration |
+| [references/adversarial-orchestration.md](references/adversarial-orchestration.md) | `/review-code-adversarial` orchestration |
+
+## Classifiers
 
 | Reference | Role |
 |-----------|------|
 | [references/classify-diff.md](references/classify-diff.md) | Read diff + complexity tier, return which reviewer domains should activate |
+
+## Posting Helpers
+
+| Reference | Role |
+|-----------|------|
+| [references/pr-posting.md](references/pr-posting.md) | GitHub review posting and summary rules |
 
 ## Reviewer Lenses
 
@@ -38,15 +50,17 @@ Umbrella for code-review work — review of *shipped code*, not plans. Two kinds
 
 The `/review-code` command dispatches through `classify-diff`, which chooses lenses from this umbrella **and** the `testing/` umbrella when tests are in scope.
 
+The `/review-pr` command uses `pr-review`, `pr-batch`, and `pr-posting` for PR-specific context gathering and GitHub interaction, then dispatches the same reviewer lenses as `/review-code`.
+
 ## Invocation
 
-Each reviewer reference is a subagent prompt. Orchestrator dispatches via `/review-code` or standalone:
+Reviewer lens references are subagent prompts. Orchestration and posting references are read by the main thread.
 
 ```
-Agent(subagent_type: "general-purpose", model: "opus", prompt: <reference contents>)
+Agent(subagent_type: "general-purpose", reasoning_effort: "high", prompt: <reference contents>)
 ```
 
 ## Notes
 
 - `classify-diff` has a different shape from the reviewer references (it's a classifier, not a reviewer). Grouped here because reviewer dispatch is the head of the review workflow.
-- Reviewer descriptions declare their own `model:` in frontmatter for subagent spawning.
+- Reviewer lens descriptions declare their own reasoning-load hints in frontmatter for subagent spawning.

@@ -23,7 +23,7 @@ The calling command provides these values in its prompt:
 - `status` — the final outcome: `clean`, `blocked`, `user-decision`, `skipped`, `micro-fix`, or command-specific
 - `rounds` — number of review iterations (0 if no review loop)
 - `gate_decisions` — object with gate outcomes (e.g., `{complexity: "standard", action: "proceed", review: "clean"}`)
-- `models_used` — object counting subagent model usage (e.g., `{opus: 3, sonnet: 1, haiku: 0}`)
+- `worker_usage` — object counting subagent/worker usage by runtime-specific effort or model when available
 
 All fields are best-effort. If a value is unknown or not applicable, omit it rather than guessing.
 
@@ -39,7 +39,7 @@ All fields are best-effort. If a value is unknown or not applicable, omit it rat
   "status": "<outcome>",
   "rounds": <number>,
   "gate_decisions": {},
-  "models_used": {}
+  "worker_usage": {}
 }
 ```
 

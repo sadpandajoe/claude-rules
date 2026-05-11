@@ -1,31 +1,33 @@
 # Orchestration Principles
 
-## Claude Code-First Model
+## Primary Orchestrator Model
 
-Claude Code is the primary orchestrator: planning, investigation, complex reasoning, verification, and commits. Codex CLI is an optional delegatee for bounded, well-specified tasks when available.
+The active coding agent is the primary orchestrator: planning, investigation, complex reasoning, verification, durable state, and final synthesis. Secondary tools, CLIs, models, or subagents are optional delegatees for bounded, well-specified tasks when available.
 
 | Role | Owner | Examples |
 |------|-------|---------|
-| **Orchestrator** | Claude Code | Planning, architecture, RCA, multi-file refactors, security-sensitive code |
-| **Delegatee** (optional) | Codex CLI | Single-file implementations, boilerplate, mechanical transforms, test generation from spec |
-| **Internal workers** | Subagents | Exploration, planning, research (via Agent tool) |
+| **Orchestrator** | Active coding agent | Planning, architecture, RCA, multi-file refactors, security-sensitive code |
+| **Delegatee** (optional) | Secondary tool/model/CLI | Single-file implementations, boilerplate, mechanical transforms, test generation from spec |
+| **Internal workers** | Subagents/workers | Exploration, planning, research |
 | **Domain reviewers** | Skill subagents | Architecture, implementation, testing, frontend, backend perspectives |
 
-## Model Selection
+## Reasoning Load And Effort
 
-Match subagent model to the **actual reasoning load of this specific task**, not the category label. A "trivial architecture review" runs on Sonnet; a gnarly multi-constraint planning task runs on Opus regardless of label. The Agent tool accepts a `model` parameter — pass it explicitly on every invocation.
+Match subagent resources to the **actual reasoning load of this specific task**, not the category label. A trivial architecture review uses a standard reviewer; a gnarly multi-constraint planning task uses heavy reasoning regardless of role label.
 
-| Reasoning load | Model | Examples |
-|----------------|-------|----------|
-| Mechanical — no judgment, just retrieval or pattern-match | `haiku` | File search, symbol grep, listing definitions, fetching a known artifact |
-| Standard — apply known patterns, classify, review bounded change, single-file work | `sonnet` | Triage, RCA validation, single-file implementation, log classification, **reviews where the diff or plan is small/well-scoped — including architecture/adversarial reviews of trivial changes** |
-| Heavy — multi-constraint trade-offs, novel design, deep adversarial probing across many files | `opus` | Plan reviews when the plan spans systems, architectural decisions with real trade-offs, adversarial review of substantial diffs, hard fix planning where the failure surface is unclear |
+| Reasoning load | Effort boundary | Examples |
+|----------------|-----------------|----------|
+| Mechanical — no judgment, just retrieval or pattern-match | low | File search, symbol grep, listing definitions, fetching a known artifact |
+| Standard — apply known patterns, classify, review bounded change, single-file work | medium / high | Triage, RCA validation, single-file implementation, log classification, reviews where the diff or plan is small/well-scoped |
+| Heavy — multi-constraint trade-offs, novel design, deep adversarial probing across many files | high / xhigh | Cross-system plans, real architectural trade-offs, security-sensitive adversarial review, hard fix planning where the failure surface is unclear |
 
-**The decision rule**: assess the *substance* of this specific task before choosing. Default to `sonnet`. Drop to `haiku` only for purely mechanical work. Escalate to `opus` only when this specific instance genuinely requires deep reasoning. Role labels (e.g., "architecture reviewer") do not auto-promote to Opus — the actual scope does.
+**The decision rule**: assess the *substance* of this specific task before choosing. Default to standard reasoning. Drop to mechanical only for purely mechanical work. Escalate to heavy only when this specific instance genuinely requires deep reasoning. Role labels do not auto-promote the task — the actual scope does.
 
-**Cherry-pick model tiering**: Cherry-pick phases use gate-driven model selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines models for plan, validate, and adapt phases. See `skills/cherry-pick/references/gate.md` for the tier table.
+Provider mapping is runtime-specific. For Claude-style aliases, mechanical/standard/heavy often map to Haiku/Sonnet/Opus. For Codex-style reasoning controls, they map to low/medium-or-high/high-or-xhigh effort on the configured model. Prefer the neutral load/effort boundary in reusable rules and translate only at invocation time.
 
-The orchestrator (main thread) may run on any model the user has selected — these tiers apply to **subagents** spawned from it. A Sonnet orchestrator escalating to an Opus subagent for genuinely hard work is the canonical cost-efficient pattern.
+**Cherry-pick reasoning tiering**: Cherry-pick phases use gate-driven reasoning selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines worker effort for plan, validate, and adapt phases. See `skills/cherry-pick/references/gate.md` for the tier table.
+
+The orchestrator may run on any model the user has selected. These tiers apply to **subagents/workers** spawned from it. A standard orchestrator escalating one genuinely hard subtask to a heavier worker is the canonical cost-efficient pattern.
 
 ## Inline-First Principle
 
@@ -41,7 +43,31 @@ Do it inline when:
 - The orchestrator already has the relevant context loaded
 - The task is bounded and the result is short (triage, RCA for a single failure mode)
 
-When the complexity gate classifies work as MODERATE, default to inline for investigation and planning, but still spawn a reviewer subagent. When STANDARD, use subagents per command-specific steps.
+When the complexity gate classifies work as MODERATE, default to inline for scoping, investigation, and planning, but still spawn a reviewer subagent. When STANDARD, use subagents per command-specific steps.
+
+## Long-Running Workflow Pattern
+
+When a workflow may process many units, inspect large logs, or run across multiple phases, the main thread should stay as a thin orchestrator rather than becoming the durable memory for every raw detail.
+
+- **Main thread owns** ordering, dependency tracking, user decisions, checkpoint boundaries, and final synthesis.
+- **Durable state lives in files**: use `PROJECT.md`, `PLAN.md`, or a command-specific local manifest when chat history would otherwise become the state store.
+- **Subagents own bounded expensive context**: each receives only the unit, wave, or lane it needs plus the output contract.
+- **Subagents return compact handoffs**: status, evidence summary, blockers, verification, residual risk, and next-action implications. Do not return full logs or diffs unless blocked.
+- **The main thread updates durable state after every unit or wave** before starting the next one.
+- **Checkpoint between waves/phases** when context or cost thresholds are near the limits in `rules/context-management.md`. Do not keep extending one long session just because context remains available.
+
+Use command-specific manifests when the work has a natural table of units, for example large cherry-pick trains, multi-failure CI fixes, or batch PR reviews. Keep those files local-only unless the command explicitly says otherwise.
+
+## Subagent Batch Rules
+
+Use these rules whenever a command delegates implementation, investigation lanes, review batches, cherry-pick waves, or CI failure groups.
+
+- Start with one unit unless the plan already proves independence.
+- Batch 2-3 units only when ownership is disjoint and dependencies are clear.
+- Use a single unit when work touches shared APIs, migrations, auth, routing, state models, generated artifacts, or cross-cutting contracts.
+- Each subagent gets only the unit scope, relevant context excerpt, entrance criteria, exit criteria, expected validation, and handoff format.
+- After each wave, collect compact handoffs, update durable state, run any required fan-in or review gate, then decide the next wave.
+- Do not start the next wave while the current wave has failed acceptance, merge conflicts, unresolved review findings, or an open user decision.
 
 ## Subagent Context Loading
 
@@ -52,4 +78,4 @@ Subagents load their own domain rules — commands should not `@import` rules th
 - **Skill files reference rules by path**: e.g., "Read and apply `rules/review-gate.md`"
 - **Commands tell subagents which files to read**: include the rule file path in the Agent tool prompt
 
-Never load the same rule in both contexts.
+Avoid redundantly loading the same rule in both contexts unless the main thread must evaluate a returned gate or handoff against that rule.

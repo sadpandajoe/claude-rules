@@ -35,6 +35,7 @@ For each candidate change, run these analyses in parallel when possible:
 - Independent SHAs (the script's "Independence Check" section) may be investigated in parallel — the orchestrator should spawn one subagent per island concurrently.
 - Actual cherry-pick application on the target branch remains sequential.
 - Flag circular dependencies or ambiguous prerequisite chains as requiring user decision.
+- Do not optimize only for throughput. Prefer smaller waves when conflicts, shared files, dependency manifests, migrations, generated files, or API-shape changes appear.
 
 **Why a real graph beats merge order:** if A modifies file F and B later removes F, applying A then B on the target requires A's adapter to integrate against the target's pre-removal F, then B's adapter to remove what's left. Applying B first (when safe by hunk inspection) lets A apply against a clean post-removal state. Merge order on master doesn't reveal this — only file-overlap analysis does.
 
@@ -63,6 +64,12 @@ For `--plan-only`, the orchestrator also runs investigate + gate for each cherry
 |---|-----|----|-------------|------------|-------|
 | 1 | `<sha>` | #123 | <summary> | — | Independent |
 | 2 | `<sha>` | #124 | <summary> | #123 | Must follow #123 |
+
+### Execution Waves
+| Wave | Changes | Why grouped | Execution mode |
+|------|---------|-------------|----------------|
+| 1 | PR #123, PR #125 | independent, low conflict | parallel investigate; sequential apply |
+| 2 | PR #124 | depends on #123 | solo |
 
 ### Parallelizable Groups
 [List which changes can be investigated in parallel because they're independent — copy from `batch-deps.sh` "Independence Check" section]

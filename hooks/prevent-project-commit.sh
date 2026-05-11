@@ -2,12 +2,12 @@
 #
 # prevent-project-commit.sh — Claude Code PreToolUse hook
 #
-# Blocks git commit when PROJECT.md is staged.
+# Blocks git commit when local workflow state files are staged.
 # Fail-open: exits 0 on any unexpected state (never blocks on errors).
 #
 # Exit codes:
-#   0 — allow (not a commit, or PROJECT.md not staged)
-#   2 — block (PROJECT.md is staged for commit)
+#   0 — allow (not a commit, or no protected state file staged)
+#   2 — block (protected state file staged for commit)
 #
 
 set -euo pipefail
@@ -41,13 +41,17 @@ if ! git rev-parse --git-dir &>/dev/null; then
     exit 0
 fi
 
-# Check if PROJECT.md is staged
-if git diff --cached --name-only 2>/dev/null | grep -q 'PROJECT\.md$'; then
-    cat >&2 <<'EOF'
-PROJECT.md is staged for commit. This file contains session state and should not be checked in.
+# Check if local workflow state files are staged
+STAGED_STATE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '(^|/)(PROJECT|CHERRY_PICK|CI_FIX)\.md$' || true)
 
-Unstage with: git reset HEAD PROJECT.md
+if [[ -n "$STAGED_STATE_FILES" ]]; then
+    cat >&2 <<'EOF'
+Local workflow state file(s) are staged for commit. These files contain session or batch state and should not be checked in.
+
 EOF
+    echo "$STAGED_STATE_FILES" | sed 's/^/  - /' >&2
+    echo "" >&2
+    echo "Unstage with: git reset HEAD <file>" >&2
     exit 2
 fi
 
