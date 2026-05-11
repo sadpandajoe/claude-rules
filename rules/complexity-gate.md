@@ -27,7 +27,7 @@ When classification is `TRIVIAL` and confidence is `8/10` or higher:
 When classification is `MODERATE` and confidence is `8/10` or higher:
 - Skip the formal planning phase and parallel investigation-lane subagents
 - Orchestrator scopes, investigates, or plans inline as the command requires
-- Still spawn **one** reviewer subagent for the command-required review — never review your own work. For feature work, this is usually code review after implementation; run plan review only when inline design uncovered real design uncertainty.
+- Still run one command-required review phase with at least one fresh reviewer — never review your own work. Review commands may launch all triggered lanes for the diff; feature work usually runs code review after implementation. Run plan review only when inline design uncovered real design uncertainty.
 - Still run tests and emit a Review Gate block
 - Spawn additional subagents only when parallelism provides a clear wall-clock win
 

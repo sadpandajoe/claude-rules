@@ -4,7 +4,7 @@ model: sonnet
 
 # CI Fix Orchestration
 
-Use after logs have been gathered and failures have been classified. The command owns the final decision, but this reference defines grouping, routing, safe-fix scope, and commit strategy.
+Use after logs have been gathered and failures have been classified. The command owns the final decision, but this reference defines grouping, routing, safe-fix scope, and commit recommendation strategy.
 
 ## Classify and Group
 
@@ -72,19 +72,21 @@ Proceed automatically only when the Action Gate says the fix is low-risk, high-c
 
 Keep scope limited to the failing surface. If verification is weak or root cause is ambiguous, stop instead of widening scope.
 
-## Commit Strategy
+## Commit Recommendation Strategy
+
+This section recommends the shape of the git action; it does not grant permission to mutate history or publish changes. Commit, amend, rebase, push, force-push, GitHub posting, and thread resolution require explicit user authorization or a command flag that clearly grants that exact boundary.
 
 | Scenario | Action |
 |----------|--------|
-| Lint/style only, cherry-pick flow | Amend into the breaking cherry-pick commit + force-push |
-| Lint/style only, single parent commit clear | Amend + force-push feature branch |
-| Lint/style only, multiple parent commits | `style:` commit + push |
-| Trivial code fix + STRONG verification | New commit + push |
+| Lint/style only, cherry-pick flow | Recommend amending into the breaking cherry-pick commit; ask before rebase/force-push |
+| Lint/style only, single parent commit clear | Recommend amend; ask before force-push |
+| Lint/style only, multiple parent commits | Recommend `style:` commit; ask before commit/push |
+| Trivial code fix + STRONG verification | Recommend a new commit; ask before commit/push |
 | Standard path or PARTIAL/WEAK verification | Stop before commit — present diagnosis and recommended next step |
 
 Detecting cherry-pick flow: check `git log --grep="cherry picked from commit"` on recent branch commits. If cherry-picked commits are present, trace which one last touched the lint-failing files (`git log -- <file>` filtered to cherry-picked SHAs). That is the commit to amend into, not necessarily the latest.
 
-Force-push is only permitted on the current feature branch, never on main/master or shared branches.
+Force-push is only permitted after explicit user authorization, only on the current feature branch, and never on main/master or shared branches.
 
 Use fixup+autosquash when amending a non-tip commit:
 

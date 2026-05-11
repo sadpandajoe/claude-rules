@@ -15,11 +15,11 @@ This skill iterates **reviews of a plan**, not iterations of code review. It is 
 
 The caller provides:
 
-- **Plan location**: where the plan lives (usually PROJECT.md sections, sometimes a plan file)
+- **Plan location**: where the plan lives (usually `PLAN.md`; PROJECT.md should point to it rather than duplicate it)
 - **Reviewer set**: which reviewers to run. Always + conditional:
   - Always: whichever reviewers the caller designates as mandatory
   - Conditional: add based on what the plan actually touches
-- **Scope**: `trivial` / `moderate` / `substantial` — determines model tier
+- **Scope**: `trivial` / `moderate` / `standard` — determines reasoning effort
 - **Optional PM brief review**: when the plan has a feature brief that needs `pm/references/review-feature-brief.md`
 - **Optional action gate**: when the caller wants an action gate block after cold read
 
@@ -34,7 +34,7 @@ Default: **8/10 or better** on every applicable reviewer, plus a **Go** from col
 When the caller provides PM context:
 
 - Spawn `pm/references/review-feature-brief.md` as a subagent
-- Model: `sonnet` by default; escalate to `opus` only when the brief covers multi-system rollout or material business risk
+- Use standard reasoning effort by default; escalate to heavy effort only when the brief covers multi-system rollout or material business risk
 - Revise the brief until 8/10
 - If the brief reaches 8/10 after the first pass, proceed to technical plan review
 
@@ -82,7 +82,7 @@ Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match reas
 
 ### 5. Write Final Scores
 
-Append the scores to the plan location the caller specified (typically `PLAN.md` for standard-path workflows; sometimes a section of PROJECT.md for moderate-path):
+Append the scores to the plan location the caller specified. For standard-path workflows this is typically `PLAN.md`. If a moderate path needs durable plan-review scores, reclassify to STANDARD before using this loop.
 
 ```markdown
 ## Plan Review Scores

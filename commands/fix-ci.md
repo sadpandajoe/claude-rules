@@ -24,6 +24,7 @@
 - Run local verification before review, and emit a Review Gate block whenever repo-tracked files changed.
 - Update PROJECT.md at standard-path boundaries.
 - The main thread owns `CI_FIX.md` and PROJECT.md. Subagents return compact handoffs; they do not update durable state directly.
+- Do not commit, amend, rebase, push, or force-push unless the user explicitly authorized that git boundary for this run.
 
 ## Happy Paths
 
@@ -47,7 +48,7 @@ Stop if no actual log output or artifact source can be resolved.
 
 Use [skills/debug/references/ci-classify-failure.md](../skills/debug/references/ci-classify-failure.md) for log classification.
 
-Then load [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md) for grouping, ours/pre-existing classification, complexity routing, and commit strategy. Do not load the full orchestration reference before real logs exist.
+Then load [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md) for grouping, ours/pre-existing classification, complexity routing, and commit recommendation strategy. Do not load the full orchestration reference before real logs exist.
 
 If all failures are pre-existing or not caused by this branch, exit early with evidence and no fix/review cycle.
 
@@ -76,9 +77,9 @@ For zero-logic diffs, apply the skip rule from `rules/review-gate.md`. For true 
 
 ### 8. Commit Recommendation
 
-Use the commit strategy in [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md).
+Use the commit recommendation strategy in [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md).
 
-Do not commit standard-path or PARTIAL/WEAK fixes automatically. Present the diagnosis, verification gap, and recommended next action.
+Do not commit standard-path or PARTIAL/WEAK fixes automatically. Do not commit, amend, rebase, push, or force-push any fix unless the user explicitly authorized that git boundary for this run. Present the diagnosis, verification gap, and recommended next action.
 
 ### 9. Summary + Metrics
 

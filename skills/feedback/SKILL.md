@@ -33,4 +33,4 @@ For large review rounds, keep the main thread as orchestrator:
 
 - Always verify reviewer claims against code before accepting or rejecting them.
 - Human reviewer threads stay open unless the user explicitly asks to resolve them.
-- Bot threads may be resolved when the fix is verified.
+- Bot threads are eligible for resolution only when the fix is verified and posting/resolution was authorized for this run.

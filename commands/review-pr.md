@@ -5,7 +5,7 @@
 > **When**: Asked to review someone else's GitHub PR.
 > **Produces**: Team-reviewed findings, recommendation, and optional GitHub review posting.
 
-Use `--draft` to show the review locally without posting. Use `--auto` to skip confirmations.
+Use `--draft` to show the review locally without posting. Use `--auto` to skip confirmations and authorize posting/approval for the reviewed PRs.
 
 ## Usage
 
@@ -60,7 +60,7 @@ Follow [skills/review/references/pr-posting.md](../skills/review/references/pr-p
 
 Respect:
 - `--draft`: never post
-- `--auto`: skip confirmations
+- `--auto`: skip confirmations and authorize posting/approval for this review
 - clean Standard reviews: confirm before approving unless `--auto`
 - findings: post only user-confirmed finding descriptions
 
@@ -81,6 +81,6 @@ Emit the summary from [skills/review/references/pr-posting.md](../skills/review/
 
 ## Notes
 
-- Batch mode defaults to `--auto` unless the user asked for draft/review-only behavior.
+- Batch mode defaults to draft/summary output. It posts or approves only when the user passes `--auto` or explicitly authorizes posting.
 - Read-only reviews should not mutate the worktree.
 - For security-sensitive areas, suggest or run the adversarial lane when appropriate.

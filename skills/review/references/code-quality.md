@@ -12,7 +12,7 @@ Findings use severity tags from `rules/severity.md` and scoring from `rules/code
 
 ## Goal
 
-Wrap Claude's built-in `/review` in a repo-standard loop:
+Wrap the available code-review mechanism in a repo-standard loop:
 
 - scope the review to the changed files or requested path
 - normalize findings against `rules/code-review.md`

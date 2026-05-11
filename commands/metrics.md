@@ -1,6 +1,6 @@
 # /metrics - Workflow Metrics Summary
 
-> **When**: You want to understand how your workflows are performing — pass rates, review round counts, model usage, and trends.
+> **When**: You want to understand how your workflows are performing — pass rates, review round counts, worker usage, and trends.
 > **Produces**: Aggregate summary from `.claude/metrics.jsonl`.
 
 ## Usage
@@ -37,7 +37,7 @@ From the filtered events, compute:
 
 **Round counts**: average and max review rounds per command
 
-**Model distribution**: total subagent invocations by model (`opus`, `sonnet`, `haiku`)
+**Worker usage**: total subagent/worker invocations by role or reasoning tier when recorded
 
 **Complexity gate accuracy**: ratio of TRIVIAL classifications that ended `clean` without re-classification (indicates the gate is correctly identifying easy work)
 
@@ -61,12 +61,10 @@ Events: [total count]
 |---------|------------|------------|
 | [name] | [N.N] | [N] |
 
-### Model Distribution
-| Model | Invocations | % |
+### Worker Usage
+| Worker / Tier | Invocations | % |
 |-------|-------------|---|
-| opus | [N] | [%] |
-| sonnet | [N] | [%] |
-| haiku | [N] | [%] |
+| [name or tier] | [N] | [%] |
 
 ### Complexity Gate
 - Trivial workflows: [N] ([%] of total)

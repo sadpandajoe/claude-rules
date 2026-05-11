@@ -24,16 +24,18 @@ Prefer API/GraphQL thread data when resolution status matters.
 
 Classify scope before acting:
 
-| Signal | Trivial | Standard |
-|--------|---------|----------|
-| Comment count | 1-3 | 4+ |
-| Fix type | Cosmetic, naming | Logic, behavior |
-| Scope | Single area | Cross-cutting |
-| Discussion items | 0 | 1+ |
+| Signal | Trivial | Moderate | Standard |
+|--------|---------|----------|----------|
+| Comment count | 1-2 | 3-6, one subsystem | 7+ or several subsystems |
+| Fix type | Cosmetic, naming | Contained logic or test update | Behavioral, architectural, or cross-cutting |
+| Scope | Single file/area | Single subsystem | Cross-cutting |
+| Discussion items | 0 | 0-1 with clear answer | 1+ requiring user/product decision |
 
 Emit the Complexity Gate block from `rules/complexity-gate.md`.
 
-Trivial plus confidence 8/10 or higher can use the quick-fix path: fix, post, summarize, and skip the full triage table.
+Trivial plus confidence 8/10 or higher can use the quick-fix path: fix, draft the reply, summarize, and skip the full triage table. Post only when `--auto` or explicit user authorization grants the GitHub posting boundary.
+
+Moderate path: run the triage table, fix approved items inline or in one bounded wave, verify, then draft replies. Use full standard handling only when comments span subsystems, require user/product decisions, or need multiple fix/review waves.
 
 ## Investigate
 

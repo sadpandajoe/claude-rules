@@ -13,6 +13,8 @@
 /address-feedback <pr-number-or-url> --auto
 ```
 
+`--auto` skips triage/posting confirmations where verification is clean. It does not authorize commit, amend, rebase, push, or force-push by itself.
+
 ## Routing
 
 Use the `feedback` skill phase-by-phase. Do not preload every reference up front:
@@ -34,7 +36,8 @@ For large review rounds, batch independent fixes into subagent waves only when o
 - Pause after triage unless `--auto` was passed.
 - Run `/verify` or equivalent pre-flight checks before `/review-code`, and record the result in the Review Gate.
 - Use the Review Gate skip/micro-fix exceptions only when `rules/review-gate.md` allows them; otherwise run `/review-code` after substantive fixes.
-- Stop before posting when `--draft` was passed, a discussion needs user wording, verification failed, or push safety is unclear.
+- Stop before posting when `--draft` was passed, a discussion needs user wording, verification failed, the fix is not visible on the PR branch, or push/post safety is unclear.
+- Stop before commit, amend, rebase, push, force-push, GitHub posting, or thread resolution unless the user explicitly authorized that boundary or the command flag clearly grants it.
 
 ## Summary Contract
 

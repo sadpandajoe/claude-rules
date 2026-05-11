@@ -28,7 +28,7 @@ That reference dispatches:
 
 ## Orchestration Model
 
-The main thread is the orchestrator. It gathers changed files, runs the Complexity Gate, dispatches reviewer subagents, deduplicates findings, applies approved fixes, verifies, and emits the Review Gate.
+The main thread is the orchestrator. It gathers changed files, runs the Complexity Gate, runs repo-appropriate pre-flight verification, dispatches reviewer subagents, deduplicates findings, applies approved fixes, re-verifies, and emits the Review Gate.
 
 All review judgment comes from fresh-context reviewer lanes. The main thread synthesizes and fixes; it does not replace the reviewers.
 
@@ -38,8 +38,8 @@ Use fresh reviewer subagents for each review pass after material code changes. R
 
 - Stop when no changes are found.
 - Formatting-only and micro-fix diffs may skip reviewer dispatch only after the `rules/review-gate.md` preconditions, including applicable pre-flight checks, are satisfied.
-- CORE impact escalates to the full review team even when the diff looks small.
-- Run `/verify` or equivalent repo-appropriate pre-flight checks before declaring clean, and record the result in the Review Gate.
+- CORE impact calibrates severity. TRIVIAL + CORE escalates to the full review team. MODERATE + CORE stays on triggered lanes with stricter severity unless security, data-loss, unclear ownership, or cross-cutting behavior escalates it to STANDARD handling.
+- Run `/verify` or equivalent repo-appropriate pre-flight checks before reviewer dispatch, then re-run targeted checks after fixes. Record the final result in the Review Gate.
 - Suggest `/review-code-adversarial` when security-sensitive files or inputs are touched.
 
 ## Summary Contract

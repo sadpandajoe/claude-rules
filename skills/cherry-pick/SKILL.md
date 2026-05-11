@@ -1,7 +1,7 @@
 ---
 name: cherry-pick
 description: Use when the user asks to cherry-pick, backport, port a fix, or apply commits/PRs onto another branch. Covers safety gates, scope-leak detection, adaptation, and per-change validation. Do NOT use for ordinary same-branch bug fixes, broad refactors, dependency upgrades, or behavior-changing rewrites without an explicit cross-branch move.
-argument-hint: "[pr-url | sha...] [--target branch] [--force] [--plan-only]"
+argument-hint: "[pr-url | sha...] [--target branch] [--force] [--plan-only] [--push]"
 allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Edit
 ---
 
@@ -19,9 +19,11 @@ Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present. Ch
 
 **Out of scope:** broad refactors, behavior-changing adaptations without approval, dependency reinstall or environment rebuild, forcing incompatible APIs onto the target.
 
-**Success criteria:** each change is classified `Applied | Partial | Blocked | Rejected | Skipped`; applied changes preserve source intent; validation status recorded; batch state lives in the execution table or `CHERRY_PICK.md`; PROJECT.md is updated by the parent workflow (this command does not own it).
+**Success criteria:** each change is classified `Applied | Partial | Blocked | Rejected | Skipped`; applied changes preserve source intent; validation status recorded; push status recorded; batch state lives in the execution table or `CHERRY_PICK.md`; PROJECT.md is updated by the parent workflow (this command does not own it).
 
 If the workflow would cross a contract boundary, stop and ask — do not cross first and report after.
+
+`--push` explicitly authorizes the per-cherry push boundary. Without `--push` or explicit user authorization during the run, validate locally and stop with a push recommendation before publishing.
 
 ## Usage
 
@@ -32,13 +34,14 @@ If the workflow would cross a contract boundary, stop and ask — do not cross f
 /cherry-pick <sha> --force                     # Override reject-category gate
 /cherry-pick <sha-1> <sha-2> <sha-3>           # Batch
 /cherry-pick <sha-1> <sha-2> --plan-only       # Plan without applying
+/cherry-pick <sha-1> <sha-2> --push            # Validate and push each successful cherry as it completes
 ```
 
 ## Single Cherry-Pick Flow
 
-Each cherry-pick runs all 8 phases. No phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see gotchas.md), and the push in step 8 is what attributes CI signal to the right cherry.
+Each cherry-pick runs all validation phases. No validation phase may be skipped — the diff audit in step 7 is the only defense against scope leak (see gotchas.md). Step 8 is a publish boundary: run it only when `--push` or explicit user authorization grants push permission.
 
-### 1. Investigate (Opus)
+### 1. Investigate (heavy effort)
 
 Source analysis, target compatibility scan, prerequisite scan. Investigation produces raw analysis only — the gate decides go/no-go.
 
@@ -47,13 +50,13 @@ Source analysis, target compatibility scan, prerequisite scan. Investigation pro
 
 ### 2. Gate
 
-Decide should-we-cherry against the accept/reject matrix (see [references/gate.md](references/gate.md)), classify difficulty (TRIVIAL vs NON-TRIVIAL), pick model tier for plan/validate phases.
+Decide should-we-cherry against the accept/reject matrix (see [references/gate.md](references/gate.md)), classify difficulty (TRIVIAL vs NON-TRIVIAL), pick reasoning effort for plan/validate phases.
 
 `--force` overrides reject decisions only — it does not skip downstream phases.
 
 → Full decision matrix: [references/gate.md](references/gate.md)
 
-### 3. Plan (model from gate)
+### 3. Plan (reasoning effort from gate)
 
 Per-cherry application strategy: file include/exclude, conflict forecast, adaptation strategy, validation approach.
 
@@ -66,7 +69,7 @@ For non-trivial changes, run plan as a subagent so the review in step 4 gets a f
 
 Review against investigation. Cycle back with feedback if needed. Repeat until approved.
 
-### 5. Apply (Opus)
+### 5. Apply (heavy effort)
 
 ```bash
 git checkout <target-branch>
@@ -77,7 +80,7 @@ Always `-x` to preserve source reference. For merge commits, add `-m 1`. For mod
 
 → Full escalation ladder, modify/delete handling, CHERRY_PICK_HEAD recovery: [references/apply.md](references/apply.md)
 
-### 6. Adapt (Opus — non-trivial only)
+### 6. Adapt (heavy effort, non-trivial only)
 
 Resolve conflicts surgically. **Never** use `git checkout --theirs` or `--ours` (see gotchas.md).
 
@@ -91,7 +94,7 @@ Two distinct jobs, run on different threads:
 
 **7a. Scope-leak audit — subagent, mandatory, every cherry, no exceptions.**
 
-Post-apply, spawn a subagent (model from gate: Sonnet for trivial, Opus for non-trivial). Its only job is leak detection. Single rule: every cherry, every time, including clean applies — clean applies are the highest-risk vector for scope leak.
+Post-apply, spawn a subagent (reasoning effort from gate: standard for trivial, heavy for non-trivial). Its only job is leak detection. Single rule: every cherry, every time, including clean applies — clean applies are the highest-risk vector for scope leak.
 
 The subagent must:
 1. Run `${CLAUDE_SKILL_DIR}/scripts/scope-audit.sh <source-commit>` and capture the literal output.
@@ -106,17 +109,19 @@ Conflict-marker scan, **pre-commit on changed files**, build, type-check, target
 
 → Full procedure (subagent contract, LLM audit, validation order, status labels, dependency manifest rule): [references/validate.md](references/validate.md)
 
-### 8. Push (main thread — mandatory, per cherry)
+### 8. Push Recommendation / Authorized Push
 
 ```bash
 git push
 ```
 
-Push **immediately after** step 7 passes for *this* cherry, before starting the next one. Do not batch pushes at the end of a multi-cherry run.
+When push is authorized, push **immediately after** step 7 passes for *this* cherry, before starting the next one. Do not batch pushes at the end of a multi-cherry run unless the user explicitly asked for batched push.
 
-**Why:** CI must run against each cherry independently so a failure points at the offending change, not the bundle. Batching defeats per-cherry attribution and forces bisection later.
+When push is not authorized, stop before publishing and record `Push: pending authorization` in the execution table or `CHERRY_PICK.md`. Continue to independent planning/investigation work only if it does not depend on the unpublished cherry being on the remote.
 
-The only exception is when the user explicitly asks for batched push (e.g., to reduce CI cost). In that case, confirm before deferring.
+**Why:** CI can attribute each cherry independently only when each authorized push is per cherry. Batching defeats per-cherry attribution and forces bisection later.
+
+The only exception is when the user explicitly asks for batched push (e.g., to reduce CI cost). In that case, confirm before deferring and record the batched-push decision.
 
 ## Batch Cherry-Pick Flow
 
@@ -140,7 +145,7 @@ Never commit `CHERRY_PICK.md`. Prefer `.git/info/exclude` for this workspace-loc
 
 ### Wave Size Policy
 
-Batch size means an orchestration wave, not permission to weaken per-cherry validation or per-cherry push.
+Batch size means an orchestration wave, not permission to weaken per-cherry validation or to publish without authorization.
 
 | Case | Wave size |
 |------|----------:|
@@ -163,17 +168,18 @@ Each per-cherry or per-wave subagent returns only:
 - conflicts: `none` or compact summary
 - scope audit: `CLEAN` / `LEAKED-REVERTED` / `ESCALATED`
 - validation label: `Tested` / `Checked` / `Build-only` / `Structural` / `Not run`
+- push status: `pushed` / `pending authorization` / `deferred by request`
 - commands run
 - residual risk
 - dependency implications for later rows
 
 No full diffs or long logs unless blocked. If a blocked handoff needs raw evidence, put file paths or the shortest decisive excerpt in the manifest.
 
-1. **Sequence planning** — run [references/batch-sequence.md](references/batch-sequence.md) to determine execution order based on dependencies. Sonnet is sufficient.
-2. **Per-cherry execution** — for each cherry in sequence, run the full single flow (steps 1–8) in an isolated context. **Step 8 (push) runs per cherry, not after the batch.** If you find yourself thinking "I'll push them all at the end," stop — re-read step 8.
+1. **Sequence planning** — run [references/batch-sequence.md](references/batch-sequence.md) to determine execution order based on dependencies. Standard reasoning effort is sufficient.
+2. **Per-cherry execution** — for each cherry in sequence, run the full single flow through validation in an isolated context. **Step 8 is a push boundary:** when authorized, it runs per cherry, not after the batch; when unauthorized, record `pending authorization` and stop before publishing dependent work.
 3. **Status tracking** — record results in the execution table or `CHERRY_PICK.md`. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
 4. **Escalation** — surface escalations to the user, relay answers back.
-5. **Final report** — collect results and produce the document phase output. By this point all successful cherries are already pushed; the report summarizes, it does not push.
+5. **Final report** — collect results and produce the document phase output. Include pushed cherries and any cherries waiting on push authorization; the report summarizes, it does not silently publish.
 
 **Why isolation matters:** with 15 cherry-picks, inline processing pollutes context with prior diffs by cherry #10. Quality degrades silently — conflicts start looking alike, decisions bleed across cherries.
 
@@ -196,7 +202,7 @@ The full 13-column execution table format is in [examples/execution-table.md](ex
 
 ## Continuation Checkpoint
 
-Phases: investigate / gate / plan / plan-review / apply / adapt / validate / push / document
+Phases: investigate / gate / plan / plan-review / apply / adapt / validate / push-authorization / document
 
 State to checkpoint:
 - Target branch

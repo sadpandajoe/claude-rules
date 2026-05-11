@@ -1,6 +1,6 @@
 # /optimize-cost - Usage Pattern Analysis and Recommendations
 
-> **When**: You want actionable insights on how to reduce Claude Code token usage.
+> **When**: You want actionable insights on how to reduce agent token usage.
 > **Produces**: Analysis of usage patterns with severity-ranked findings and specific recommendations.
 
 ## Usage
@@ -29,7 +29,7 @@ The script handles all formatting. Present its output directly.
 ### 3. Offer Context-Specific Follow-Up
 
 After presenting the analysis, offer to:
-- Apply model tiering changes to specific commands (if the model concentration finding fires)
+- Apply reasoning-effort or worker-routing changes to specific commands (if the concentration finding fires)
 - Adjust checkpoint thresholds in `rules/context-management.md` (if expensive sessions are flagged)
 - Review a specific command or project that dominates cost
 
@@ -37,7 +37,7 @@ After presenting the analysis, offer to:
 
 | Pattern | Severity | Trigger |
 |---------|----------|---------|
-| 100% Opus usage | high | >90% cost on Opus |
+| Heavy-worker concentration | high | >90% cost on the heaviest available tier |
 | Expensive sessions (no checkpoint) | high | Sessions exceeding $8 |
 | Long sessions (>150 messages) | medium | Quadratic cost growth |
 | Low cache hit rate | medium | <70% cache reads |

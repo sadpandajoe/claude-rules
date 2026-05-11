@@ -35,6 +35,8 @@ For truly minimal edits, such as typo fixes or mechanical renames, review may be
 
 Prefer fixing the originating in-PR commit when the branch is not merged and the source commit is clear.
 
+This section recommends a git shape only. Do not commit, amend, rebase, push, or force-push unless the user explicitly authorized that exact boundary for this feedback round. `--auto` may skip triage or posting confirmations, but it does not authorize git history mutation by itself.
+
 | Scenario | Action |
 |----------|--------|
 | Fix corrects one prior in-PR commit | `git commit --fixup=<originating-sha>` then autosquash rebase |
@@ -50,7 +52,7 @@ git rebase --autosquash <base>
 git push --force-with-lease
 ```
 
-Force-push only on the current feature branch and only with `--force-with-lease`. Never force-push main/master or a protected branch.
+Force-push only after explicit user authorization, only on the current feature branch, and only with `--force-with-lease`. Never force-push main/master or a protected branch.
 
 ## Stop Conditions
 

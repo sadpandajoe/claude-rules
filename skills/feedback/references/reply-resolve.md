@@ -47,15 +47,22 @@ If `gh` is authenticated as a teammate or automation account that could surprise
 
 ## Resolve Threads
 
-- Bot threads may be resolved when the associated fix is verified.
+- Bot threads are eligible for resolution only when the associated fix is verified and resolution was authorized for this run.
 - Human reviewer threads stay open. Post the reply and let the reviewer resolve or re-review.
 - Never resolve ambiguous or discussion threads unless the user explicitly asks.
 
 ## Push + Post Gate
 
-Mechanical fixes may be pushed and posted automatically unless `--draft` was passed.
+Do not push, post GitHub replies, approve/request changes, or resolve threads unless the user explicitly authorized that boundary or a command flag clearly grants it.
 
-For substantive fixes, pause with:
+Boundary meanings:
+- `--draft`: never post or resolve; return reply drafts and resolution recommendations only.
+- `--auto`: may skip posting confirmation for already-verified replies, but does not authorize commit, amend, rebase, push, or force-push by itself.
+- No flag: prepare replies and ask before posting or resolving.
+
+Replies that claim a fix was made should only be posted after the fix is visible on the PR branch, or after the user explicitly asks to post draft wording before pushing.
+
+When confirmation is needed, pause with:
 
 ```markdown
 Ready to push [N] commits and reply to [N] threads:
@@ -65,7 +72,7 @@ Ready to push [N] commits and reply to [N] threads:
 Push and post?
 ```
 
-`--auto` skips this pause.
+With `--auto`, skip this pause only for posting replies or resolving eligible bot threads after verification is clean and identity checks pass.
 
 ## Summary
 
@@ -90,7 +97,7 @@ PR #[number] - [N] fixed, [N] skipped, [N] discussed
 Record metrics with:
 
 - `command`: `address-feedback`
-- `complexity`: `trivial` or `standard`
+- `complexity`: `trivial`, `moderate`, or `standard`
 - `status`: `clean`, `blocked`, `user-decision`, `skipped`, or `micro-fix`
 - `rounds`: review rounds if any
 - `gate_decisions`: complexity, triage, review

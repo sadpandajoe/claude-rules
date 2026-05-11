@@ -23,7 +23,7 @@ Match subagent resources to the **actual reasoning load of this specific task**,
 
 **The decision rule**: assess the *substance* of this specific task before choosing. Default to standard reasoning. Drop to mechanical only for purely mechanical work. Escalate to heavy only when this specific instance genuinely requires deep reasoning. Role labels do not auto-promote the task — the actual scope does.
 
-Provider mapping is runtime-specific. For Claude-style aliases, mechanical/standard/heavy often map to Haiku/Sonnet/Opus. For Codex-style reasoning controls, they map to low/medium-or-high/high-or-xhigh effort on the configured model. Prefer the neutral load/effort boundary in reusable rules and translate only at invocation time.
+Provider mapping is runtime-specific. Keep reusable rules in neutral mechanical/standard/heavy terms, then translate to the platform's available model or reasoning-effort controls at invocation time.
 
 **Cherry-pick reasoning tiering**: Cherry-pick phases use gate-driven reasoning selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines worker effort for plan, validate, and adapt phases. See `skills/cherry-pick/references/gate.md` for the tier table.
 

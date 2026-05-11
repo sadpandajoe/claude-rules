@@ -17,14 +17,14 @@ Stop if no changes are found.
 
 ## Complexity Gate
 
-Classify scope with `rules/complexity-gate.md`:
+Classify scope with `rules/complexity-gate.md` and this review-specific routing:
 
-| Signal | Trivial | Standard |
-|--------|---------|----------|
-| Files changed | 1-3 | 4+ |
-| Lines changed | < 50 | 50+ |
-| Logic changes | None or cosmetic | Functional |
-| Cross-cutting | No | Yes |
+| Signal | Trivial | Moderate | Standard |
+|--------|---------|----------|----------|
+| Files changed | 1-2 | 2-4 in one subsystem | 5+ or unclear ownership |
+| Lines changed | < 50 | 50-200 | 200+ |
+| Logic changes | None or cosmetic | Contained functional change | Cross-cutting behavior |
+| Reviewer lanes | Code quality only | Triggered lanes only | Full triggered team, plus optional second opinion |
 
 Formatting-only diffs and micro-fixes may skip the review loop under `rules/review-gate.md`.
 
@@ -38,8 +38,19 @@ Run these in parallel when possible:
 Escalate CORE impact:
 
 - TRIVIAL + CORE: run full review team.
+- MODERATE + CORE: run triggered reviewer lanes and escalate any security-sensitive or data-loss risk to Standard handling.
 - STANDARD + CORE: run full team and suggest adversarial review for security-sensitive areas.
 - CORE test gaps use stricter severity calibration.
+
+## Pre-Flight Verification
+
+Run the repo's relevant checks before reviewer dispatch:
+
+- Build/typecheck/lint when applicable.
+- Tests covering changed files or changed behavior when they are quick enough for the review scope.
+- A clear skipped reason when the app or suite is not runnable locally.
+
+If pre-flight fails, fix the failure or report it as a blocker before launching reviewer lanes. Reviewer context should include the pre-flight result.
 
 ## Dispatch Reviewers
 
@@ -48,6 +59,7 @@ The main thread is an orchestrator. Dispatch fresh-context reviewer subagents wi
 - Diff and full changed-file contents.
 - Acceptance criteria from PROJECT.md if relevant.
 - Complexity and impact assessment.
+- Pre-flight verification result.
 - The selected reviewer reference.
 
 Use triggered references from `classify-diff.md`, including:
@@ -61,9 +73,9 @@ Use triggered references from `classify-diff.md`, including:
 
 Collect findings, dedupe, sort by severity, and fix `[major]` and `[minor]` issues.
 
-## Verify + Iterate
+## Re-Verify + Iterate
 
-Run the repo's relevant checks:
+After applying reviewer fixes, re-run relevant checks:
 
 - Build/typecheck/lint.
 - Tests covering changed files or changed behavior.
@@ -71,11 +83,11 @@ Run the repo's relevant checks:
 
 If checks fail, fix and re-run classification/review as needed.
 
-## Optional Codex Second Opinion
+## Optional Second Opinion
 
-For STANDARD complexity, use Codex review if available. Skip silently when unavailable and note that in the summary.
+For STANDARD complexity, use an external or platform-native second opinion if available. Skip silently when unavailable and note that in the summary.
 
-Map Codex findings to toolkit severity:
+Map second-opinion findings to toolkit severity:
 
 - Must fix / critical -> `[major]`
 - Should fix / improvement -> `[minor]`

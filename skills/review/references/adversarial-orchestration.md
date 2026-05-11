@@ -64,20 +64,20 @@ Rounds: [N]
 Pre-flight: [pass/fail/skipped]
 Status: [clean/blocked/user decision]
 Adversarial Rating: [Hardened/Adequate/Vulnerable/Critical]
-Reviewers: [Claude + Codex | Claude only]
+Reviewers: [primary + second opinion | primary only]
 ```
 
-Never claim dual-model coverage when only one model ran.
+Never claim dual-reviewer coverage when only one reviewer ran.
 
 ## Summary
 
 ```markdown
 ## Review-Code-Adversarial Complete
 Rating: [Hardened/Adequate/Vulnerable/Critical] | Rounds: [N] | Status: [clean/blocked]
-Reviewers: [Claude + Codex | Claude only]
+Reviewers: [primary + second opinion | primary only]
 
 ### Findings
-- [N] high confidence, [N] Claude only, [N] Codex only
+- [N] high confidence, [N] primary only, [N] second-opinion only
 
 ### Fixed
 - [...]

@@ -19,7 +19,7 @@ Append a single structured event to `.claude/metrics.jsonl` at the end of any co
 The calling command provides these values in its prompt:
 
 - `command` — the slash command name (e.g., `create-feature`, `fix-bug`)
-- `complexity` — `trivial` or `standard`
+- `complexity` — `trivial`, `moderate`, or `standard`
 - `status` — the final outcome: `clean`, `blocked`, `user-decision`, `skipped`, `micro-fix`, or command-specific
 - `rounds` — number of review iterations (0 if no review loop)
 - `gate_decisions` — object with gate outcomes (e.g., `{complexity: "standard", action: "proceed", review: "clean"}`)
@@ -35,7 +35,7 @@ All fields are best-effort. If a value is unknown or not applicable, omit it rat
 {
   "timestamp": "<ISO 8601>",
   "command": "<command-name>",
-  "complexity": "<trivial|standard>",
+  "complexity": "<trivial|moderate|standard>",
   "status": "<outcome>",
   "rounds": <number>,
   "gate_decisions": {},

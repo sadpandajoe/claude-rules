@@ -33,7 +33,7 @@ Parse the first argument:
 
 ## Contract
 
-- Use Claude Code's existing auto-memory directory at `~/.claude/projects/<path>/memory/`.
+- Use the configured agent memory directory. For Claude Code installs, this is usually `~/.claude/projects/<path>/memory/`.
 - Keep `MEMORY.md` in sync with memory files.
 - Ask before deleting memories or promoting them to rules.
 - A pattern seen once is a memory; a pattern seen across projects can become a rule candidate.

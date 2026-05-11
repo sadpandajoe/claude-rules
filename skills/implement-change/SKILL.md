@@ -33,6 +33,8 @@ When no structured slices exist (simple fix, trivial path), implement the full c
 
 ## Worktree Mode
 
+Default mode is the caller's current worktree. In default mode, do not commit, amend, rebase, push, or force-push. Return changed files and verification evidence only; the orchestrator owns review, durable state, and any authorized git action.
+
 When launched with `isolation: "worktree"`, this skill runs in a temporary git worktree — an isolated copy of the repository. Key differences:
 
 - **Dependencies may be missing**: check for `node_modules/` or equivalent before running tests. Install if needed.
@@ -64,6 +66,7 @@ When launched with `isolation: "worktree"`, this skill runs in a temporary git w
 - Exit criteria: <met — evidence>
 - Files changed:
   - <file>
+- Branch/commit: <only when launched with isolation: "worktree"; otherwise "N/A">
 - Tests added or updated:
   - <test>
 - Acceptance: <passed / failed / not runnable — reason>

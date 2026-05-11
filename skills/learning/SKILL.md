@@ -24,7 +24,7 @@ This skill owns memory management and rule-promotion workflows used by `/learn`.
 
 ## Notes
 
-- `/learn` works with Claude Code's auto-memory system at `~/.claude/projects/<path>/memory/`.
+- `/learn` works with the configured agent memory directory. For Claude Code installs, this is usually `~/.claude/projects/<path>/memory/`.
 - Memory files use YAML frontmatter plus structured body.
 - Rule changes require confirmation.
 - A pattern seen once is a memory; a pattern seen across projects can become a rule candidate.

@@ -25,7 +25,7 @@ The main thread must not accumulate full diffs or full review transcripts for ev
 
 For each PR, dispatch a subagent with:
 - PR number/ref
-- flags (`--auto` by default in batch mode unless user asked for draft)
+- flags (draft/summary by default; pass `--auto` only when the user explicitly requested auto-posting)
 - pointer to [pr-review.md](pr-review.md)
 - pointer to [pr-posting.md](pr-posting.md)
 - compact return contract
@@ -36,13 +36,13 @@ Return contract:
 PR:
 Title:
 Recommendation: approve | request-changes | comment
-Posted: yes | no
+Posted: yes | no | draft
 Top finding:
 Finding counts:
 Residual risk:
 ```
 
-Concurrency: run up to 4-5 PR reviews in parallel. Lower concurrency if PRs are unusually large or the repo is resource constrained.
+Concurrency: run up to 3-5 PR reviews in parallel. Lower concurrency if PRs are unusually large, share code ownership, or the repo is resource constrained.
 
 ## Aggregate
 
@@ -51,7 +51,7 @@ Concurrency: run up to 4-5 PR reviews in parallel. Lower concurrency if PRs are 
 
 | PR | Title | Recommendation | Key Finding | Posted |
 |----|-------|----------------|-------------|--------|
-| #1 |  | approve | Clean — no issues | yes |
+| #1 |  | approve | Clean — no issues | draft |
 
 ### Needs Attention
 - PR #<N>: <why it needs manual follow-up>

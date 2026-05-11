@@ -10,7 +10,8 @@ Use after PR review synthesis has produced a recommendation.
 
 Detail level scales with complexity and findings.
 
-- **Trivial + clean**: silent approve; no comments, no report, no pause.
+- **Trivial + clean**: return an approve recommendation; post/approve directly only with `--auto` or explicit user authorization.
+- **Moderate + clean**: approve with compact summary in draft/confirmation mode; post directly only with `--auto`.
 - **Standard + clean**: pause with a one-line confirmation before approving unless `--auto` was passed.
 - **Any findings**: post only user-confirmed findings with adjusted severities.
 - **`--draft`**: show review in conversation only. Do not post.

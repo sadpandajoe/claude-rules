@@ -15,6 +15,8 @@
 
 The command owns PR creation only. It does not review or rewrite code. Keep context bounded: gather enough diff and PROJECT.md context to write the PR, summarize large diffs by area, and do not paste full diffs into chat unless blocked.
 
+Creating a PR may require pushing the current branch to a remote. Treat `/create-pr` as authorization to push the current feature branch only when needed for PR creation; never push unrelated branches or amend/rebase history.
+
 ### 1. Validate Branch State
 
 - Verify current branch is not `main` (or the repo's default branch)

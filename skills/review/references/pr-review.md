@@ -20,18 +20,18 @@ Read full contents of changed files. Review comments target changed lines, but t
 
 ## Complexity Gate
 
-Classify the PR scope:
+Classify the PR scope with the shared TRIVIAL / MODERATE / STANDARD gate and this review-specific routing:
 
-| Signal | Trivial | Standard |
-|--------|---------|----------|
-| Files changed | 1-5 | 6+ |
-| Lines changed | < 100 | 100+ |
-| Behavioral change | None / cosmetic | Functional |
-| Cross-cutting | No | Yes |
+| Signal | Trivial | Moderate | Standard |
+|--------|---------|----------|----------|
+| Files changed | 1-3 | 4-8 in one subsystem | 9+ or unclear ownership |
+| Lines changed | < 100 | 100-400 | 400+ |
+| Behavioral change | None / cosmetic | Contained functional change | Cross-cutting or contract change |
+| Reviewer lanes | Code quality only | Triggered lanes only | Full triggered team, plus optional second opinion |
 
 Emit the Complexity Gate block per `rules/complexity-gate.md`.
 
-Trivial + confidence 8/10+: code quality review only, unless impact assessment escalates.
+Trivial + confidence 8/10+: code quality review only, unless impact assessment escalates. Moderate: triggered reviewer lanes only, with no premise deep-dive unless impact or uncertainty escalates. Standard: premise validation plus full triggered team.
 
 ## Assess Impact and Premise
 
@@ -39,9 +39,10 @@ Run [../../qa/references/assess-impact.md](../../qa/references/assess-impact.md)
 
 Impact escalation:
 - TRIVIAL + CORE -> full review team
+- MODERATE + CORE -> triggered reviewer lanes plus stricter severity calibration
 - STANDARD + CORE -> full team + suggest adversarial review for security-sensitive areas
 
-For Standard or CORE-impact PRs, validate the premise before reviewing implementation details:
+For Standard, CORE-impact, or low-confidence PRs, validate the premise before reviewing implementation details:
 1. Read linked issue/ticket, PR description, author comments, and prior reviewer comments.
 2. Investigate whether the stated problem exists.
 3. For bug fixes, check whether the fix addresses the actual cause.
@@ -62,7 +63,12 @@ For Standard or CORE-escalated PRs, include pattern analysis:
 
 Trivial:
 - Single-pass code quality review.
-- If clean, silent approve unless command flags require draft output.
+- If clean, return a compact approve recommendation. Post/approve only when `--auto` or explicit user authorization grants that boundary.
+
+Moderate:
+- Launch only the triggered reviewer lenses needed by the diff classification.
+- Keep the main thread compact: collect findings, recommendation, confidence, and any premise uncertainty.
+- Escalate to Standard only when reviewers find cross-cutting risk, unclear ownership, or security-sensitive behavior.
 
 Standard:
 - Launch triggered reviewer lenses in parallel.
