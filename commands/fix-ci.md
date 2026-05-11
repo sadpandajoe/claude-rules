@@ -25,12 +25,13 @@
 - Update PROJECT.md at standard-path boundaries.
 - The main thread owns `CI_FIX.md` and PROJECT.md. Subagents return compact handoffs; they do not update durable state directly.
 - Do not commit, amend, rebase, push, or force-push unless the user explicitly authorized that git boundary for this run.
+- For STANDARD or expensive CI work, checkpoint/clear after `CI_FIX.md` or PROJECT.md captures classification/grouping, after Action Gate/RCA decisions, after local verification, and after `/review-code` when commit recommendation work remains.
 
 ## Happy Paths
 
 - **Trivial**: gather logs, classify/group, apply the safe fix inline, verify locally, emit Review Gate `skipped`/`micro-fix` only when the Review Gate exception applies, update PROJECT.md when useful, summarize.
 - **Moderate**: gather logs, classify/group, plan inline, apply inline by default, verify locally, run `/review-code`, update PROJECT.md, summarize.
-- **Standard**: create/update `CI_FIX.md` when useful, validate RCA when needed, run Action Gate, apply only if the gate allows it, verify locally, review, then present commit recommendation.
+- **Standard**: create/update `CI_FIX.md` when useful, checkpoint/clear, validate RCA when needed, run Action Gate, checkpoint/clear, apply only if the gate allows it, verify locally, review, then present commit recommendation.
 
 ## Steps
 

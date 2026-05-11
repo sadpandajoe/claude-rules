@@ -54,7 +54,7 @@ When a workflow may process many units, inspect large logs, or run across multip
 - **Subagents own bounded expensive context**: each receives only the unit, wave, or lane it needs plus the output contract.
 - **Subagents return compact handoffs**: status, evidence summary, blockers, verification, residual risk, and next-action implications. Do not return full logs or diffs unless blocked.
 - **The main thread updates durable state after every unit or wave** before starting the next one.
-- **Checkpoint between waves/phases** when context or cost thresholds are near the limits in `rules/context-management.md`. Do not keep extending one long session just because context remains available.
+- **Checkpoint between waves/phases** per `rules/context-management.md`. For STANDARD or expensive work, phase resets are proactive: clear after durable artifacts are updated, not only when context or cost is near a limit.
 
 Use command-specific manifests when the work has a natural table of units, for example large cherry-pick trains, multi-failure CI fixes, or batch PR reviews. Keep those files local-only unless the command explicitly says otherwise.
 

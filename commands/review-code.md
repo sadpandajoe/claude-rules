@@ -34,6 +34,8 @@ All review judgment comes from fresh-context reviewer lanes. The main thread syn
 
 Use fresh reviewer subagents for each review pass after material code changes. Reuse a reviewer only to clarify that reviewer's own finding in the same pass.
 
+For STANDARD or expensive reviews, checkpoint/clear before reviewer dispatch once pre-flight verification and diff scope are recorded, and again after review fixes when QA/PR/final reporting remains. Resume from changed-file list, pre-flight result, and Review Gate state rather than from implementation chatter.
+
 ## Gates
 
 - Stop when no changes are found.

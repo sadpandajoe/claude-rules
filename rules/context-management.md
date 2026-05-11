@@ -1,6 +1,29 @@
 # Context Management
 
-At every **chain boundary** or **loop iteration**, check two things:
+At every **chain boundary** or **loop iteration**, apply proactive phase resets first, then check context depth and cost.
+
+## Proactive Phase Reset Policy
+
+When a phase has produced a durable artifact that the next phase can resume from, checkpoint and clear before continuing into the next expensive phase. Do this for STANDARD work by default, even when context depth and session cost are still low.
+
+The goal is to make chat history disposable: files hold state, the next session resumes from those files, and the agent does not pay to replay investigation, planning, implementation, and review in one growing context.
+
+Default by complexity:
+- **TRIVIAL**: stay in one session unless a tool/log output is unexpectedly large.
+- **MODERATE**: stay in one session by default; checkpoint/clear when logs, diffs, or review rounds become large, or before review if implementation context is noisy.
+- **STANDARD / expensive**: checkpoint/clear at every major phase boundary once the current phase's durable artifact is updated.
+
+STANDARD phase boundaries:
+1. **Investigation/planning artifact written**: `PLAN.md`, `BUG_FIX.md`, `CI_FIX.md`, `CHERRY_PICK.md`, or equivalent manifest is current.
+2. **Plan/RCA review accepted**: review scores, gate decision, and next implementation slice are written.
+3. **Implementation slice or wave complete**: changed files, verification run, and next review target are written.
+4. **Code review fixes complete**: Review Gate status, remaining risks, and next validation/PR action are written.
+
+For batch work, checkpoint/clear between waves by default. For non-trivial cherry-picks, checkpoint/clear after investigate/gate/plan and after apply/adapt/validate when a later push/report phase remains.
+
+Skip the reset only when the next phase is tiny and the durable artifact is already enough to avoid loading prior raw context; record the skip reason in PROJECT.md if the workflow is STANDARD.
+
+When the reset policy fires, run `/checkpoint --clear`. After `/clear`, run `/start` to reload PROJECT.md and resume from the artifact pointer.
 
 ### 1. Context depth (existing rule)
 - **Below ~70%**: Continue automatically.
@@ -24,7 +47,7 @@ Sub-invocations: when `/create-feature`, `/fix-bug`, `/update-tests`, or `/fix-c
 
 ## Save & Continue Protocol
 
-When either trigger fires (context ≥ 70% OR cost > $8), run `/checkpoint`. It handles the full protocol:
+When a proactive phase reset fires, or either reactive trigger fires (context ≥ 70% OR cost > $8), run `/checkpoint`. It handles the full protocol:
 1. Writes a continuation checkpoint to PROJECT.md (see `commands/checkpoint.md` for the canonical format)
 2. Leaves uncommitted work untouched unless the calling workflow already has explicit commit authorization; otherwise records dirty state in PROJECT.md
 3. Runs `/clear` to reset conversation context

@@ -25,6 +25,8 @@ If the workflow would cross a contract boundary, stop and ask — do not cross f
 
 `--push` explicitly authorizes the per-cherry push boundary. Without `--push` or explicit user authorization during the run, validate locally and stop with a push recommendation before publishing.
 
+For non-trivial or expensive cherry-picks, follow `rules/context-management.md`: checkpoint/clear after investigate/gate/plan is recorded in the execution table, and again after apply/adapt/validate when push authorization or final reporting remains. Batch runs checkpoint/clear between waves by default.
+
 ## Usage
 
 ```
@@ -142,6 +144,8 @@ For 10+ changes, or any run with meaningful dependencies, expected conflicts, or
 `CHERRY_PICK.md` owns the detailed execution table, execution waves, dependency notes, per-cherry validation, conflict notes, user decisions, and compact subagent handoffs.
 
 Never commit `CHERRY_PICK.md`. Prefer `.git/info/exclude` for this workspace-local file unless the repo should ignore it globally.
+
+Update `CHERRY_PICK.md` before every checkpoint/clear. After `/start`, resume from the manifest row/wave rather than from chat history.
 
 ### Wave Size Policy
 

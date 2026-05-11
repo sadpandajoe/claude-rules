@@ -99,3 +99,5 @@ Skip both if neither flag was specified.
 ---
 
 This command does not resume. `/start` handles that — it reads the Continuation Checkpoint and auto-continues the saved workflow.
+
+For STANDARD or expensive workflows, callers should use `/checkpoint --clear` at major phase boundaries after durable artifacts are current. This is proactive token control, not only an emergency response to full context.

@@ -16,6 +16,7 @@ Good command shape:
 - TRIVIAL paths stay inline; if reviewer subagents are needed, reclassify as MODERATE.
 - MODERATE paths run inline-first with `/verify` or equivalent pre-flight before review.
 - STANDARD paths, including workstream-shaped work, use fresh reviewer subagents after material revisions and bounded implementation handoffs.
+- STANDARD paths checkpoint/clear at major phase boundaries after durable artifacts are current; files are the memory, chat is disposable.
 - Implementation stays inline by default; delegate only when isolation, fresh context, or real parallelism helps.
 - Review Gate skip/micro-fix exceptions are explicit and never replace review for meaningful logic changes.
 

@@ -29,6 +29,8 @@ The main thread owns PR state: comment ids, triage verdicts, posting decisions, 
 
 For large review rounds, batch independent fixes into subagent waves only when ownership is disjoint. Send each subagent only the relevant comments, files, current diff, validation expectation, and reply-draft requirement. The subagent returns a compact handoff; the main thread reviews, verifies, and posts.
 
+For STANDARD or expensive feedback rounds, checkpoint/clear after triage decisions are recorded, after each fix wave, and after `/review-code` fixes when posting/re-resolution work remains. Resume from PROJECT.md plus the comment id/verdict table rather than carrying the whole review discussion in chat.
+
 ## Gates
 
 - Emit a Complexity Gate before fixing.

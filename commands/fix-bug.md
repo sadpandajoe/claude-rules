@@ -28,6 +28,7 @@ The command owns the visible gates and sequence. Each step loads only the refere
 - Run `/verify` or equivalent pre-flight checks before `/review-code`, and record the result in the Review Gate.
 - Do not commit without an added or updated regression test unless the gap is explicitly accepted.
 - Only the main thread writes PROJECT.md or `PLAN.md`. Subagents return handoffs; the orchestrator updates durable state.
+- For STANDARD or expensive bug work, follow `rules/context-management.md`: checkpoint/clear after RCA/plan artifacts are written, after RCA/plan review accepts, after implementation, and after code review fixes when QA/PR work remains.
 
 ## Planning Phase Boundary
 
@@ -61,7 +62,7 @@ MODERATE is the default for real but contained bug fixes. Use STANDARD when the 
 
 - **Trivial**: normalize input, fetch ticket context if present, emit Complexity Gate, implement inline, run smallest meaningful verification, emit Review Gate `skipped`/`micro-fix` only when the Review Gate exception applies; otherwise reclassify MODERATE.
 - **Moderate**: run existing-fix scan, investigate inline, add or update a regression test when feasible, implement inline by default, run `/verify` or equivalent pre-flight checks, then one fresh `/review-code` pass.
-- **Standard**: run existing-fix scan, validate RCA, write `PLAN.md`, run RCA/plan review and Action Gate, then implement slices inline by default or with bounded subagents only when isolation or parallelism helps.
+- **Standard**: run existing-fix scan, validate RCA, write `PLAN.md`, checkpoint/clear, run RCA/plan review and Action Gate, checkpoint/clear, then implement slices inline by default or with bounded subagents only when isolation or parallelism helps.
 
 ## Step Routing And Handoffs
 
