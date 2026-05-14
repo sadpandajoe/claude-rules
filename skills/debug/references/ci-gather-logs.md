@@ -62,6 +62,8 @@ For Jenkins or any authenticated external CI, resolve evidence before reasoning:
    - strip trailing `/`, `/console`, `/consoleFull`, or `/consoleText`
    - if the URL points at an exact numeric build, append `/consoleText`
    - if the URL points at a job with no build number, append `/lastBuild/consoleText`
+   - if the URL includes `/view/<name>/`, preserve that segment while normalizing the final `/job/<name>/<build>/consoleText` endpoint
+   - if the failure is a matrix or multibranch sub-build, fetch the exact child build URL first; use the parent build only to discover the failing axis/branch when the child URL is missing
    - if the URL is a Blue Ocean or dashboard URL that cannot be normalized to a job/build endpoint, ask for the classic build URL or log artifact
 
    Use the exact failing build URL when the user supplied one:

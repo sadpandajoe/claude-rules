@@ -37,6 +37,7 @@ If the user asks "why is this expensive?", look for:
 
 ## Notes
 - Costs shown are **API-equivalent estimates**, not actual billing. Subscription users pay a flat rate regardless of token usage. These numbers indicate relative usage weight.
+- Unknown models are shown with token/message counts but excluded from cost totals instead of being priced as a different provider/model.
 - Session data lives in `~/.claude/projects/*/` JSONL files.
 - The script skips subagent log files (they're under `/subagents/` subdirectories).
 - Multi-day sessions are attributed proportionally to each active day.

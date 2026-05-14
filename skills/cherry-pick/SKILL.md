@@ -162,6 +162,8 @@ For 10+ changes, or any run with meaningful dependencies, expected conflicts, or
 
 `CHERRY_PICK.md` owns the detailed execution table, execution waves, dependency notes, per-cherry validation, conflict notes, user decisions, and compact subagent handoffs.
 
+**Rule:** rows must stay short (≤3 lines per cell). No full diffs, raw logs, or worker transcripts in the manifest — only PR/SHA references and one-line outcomes. Long evidence belongs in the linked PR or a temp file, not here.
+
 Never commit `CHERRY_PICK.md`. Prefer `.git/info/exclude` for this workspace-local file unless the repo should ignore it globally.
 
 Update `CHERRY_PICK.md` before every checkpoint/clear. After `/start`, resume from the manifest row/wave rather than from chat history.
@@ -214,7 +216,7 @@ No full diffs or long logs unless blocked. If a blocked handoff needs raw eviden
 
 Workers may return prepared commits, branches, patches, or status blocks, but they do not own the shared target branch, final ordering, or final push unless a command-specific run explicitly grants that boundary. A worker that applies code must run in its own worktree/branch or produce a patch for orchestrator replay; a context-isolated session alone is not filesystem isolation. This prevents parallel workers from racing on one release branch.
 
-**Why isolation matters:** with 15 cherry-picks, inline processing pollutes context with prior diffs by cherry #10. Quality degrades silently — conflicts start looking alike, decisions bleed across cherries.
+**Why isolation matters:** with 15 cherry-picks, inline processing pollutes context with prior diffs by cherry #10. Quality degrades silently — conflicts start looking alike, decisions bleed across cherries. The batch design reduces in-wave context growth and per-cherry handoff size; it does not eliminate the need to checkpoint/clear between phases or resume from the manifest.
 
 **`--plan-only`:** run sequence + per-cherry investigate + gate (parallel where independent). Produce execution table without applying.
 

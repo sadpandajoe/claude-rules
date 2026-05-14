@@ -78,9 +78,16 @@ gh api graphql -F owner=<owner> -F repo=<repo> -F number=<number> -f query='
 
 The inventory must explicitly answer:
 - Which human reviewers commented or requested changes
-- Which bots commented, including Copilot and ultrareview/`aminghadersohi` when present
+- Which bots commented, including known review/security/coverage bots when present
 - How many top-level, review-body, and inline comments each author has
 - Whether any known expected source is absent or inaccessible
+
+Known bot/reviewer logins to call out explicitly when present:
+- GitHub/Copilot: `github-actions[bot]`, `copilot-pull-request-reviewer[bot]`, `Copilot`, `dependabot[bot]`
+- AI review: `coderabbitai[bot]`, `greptile-apps[bot]`, `chatgpt-codex-connector[bot]`, `ultrareview`
+- Security/quality/coverage: `snyk-bot`, `codecov[bot]`, `sonarcloud[bot]`, `deepsource-autofix[bot]`
+
+Also treat any login ending in `[bot]`, containing `bot`, or using a known app/service pattern as a bot bucket unless repository convention proves it is a human account. Do not let unknown bots fall into the generic human reviewer count without naming them.
 
 Do not begin triage until the inventory is complete. If `gh` cannot fetch one source, stop with the missing command/output and ask for the data instead of guessing.
 

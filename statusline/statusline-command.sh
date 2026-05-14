@@ -72,9 +72,9 @@ osc8_link() {
 
 # --- Data extraction ---
 
-# Model name: strip leading "Claude "
+# Model name: strip common provider prefixes from display labels
 model_raw=$(echo "$input" | jq -r '.model.display_name // empty')
-model_name=$(echo "$model_raw" | sed 's/^[Cc]laude //')
+model_name=$(echo "$model_raw" | sed -E 's/^([Cc]laude|OpenAI) //')
 
 # Effort level
 effort_str=""
@@ -242,6 +242,7 @@ agents_total=0
 agents_heavy=0
 agents_standard=0
 agents_light=0
+agents_unknown_tier=0
 if [ -n "$transcript" ] && [ -f "$transcript" ]; then
     while IFS= read -r agent_input; do
         [ -z "$agent_input" ] && continue
@@ -265,11 +266,12 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
             Standard|standard) agents_standard=$((agents_standard + 1)) ;;
             Light|light)       agents_light=$((agents_light + 1)) ;;
             *)
-                case "$model" in
-                    opus*)   agents_heavy=$((agents_heavy + 1)) ;;
-                    sonnet*) agents_standard=$((agents_standard + 1)) ;;
-                    haiku*)  agents_light=$((agents_light + 1)) ;;
-                    *)       agents_heavy=$((agents_heavy + 1)) ;;
+                model_lc=$(printf "%s" "$model" | tr '[:upper:]' '[:lower:]')
+                case "$model_lc" in
+                    *haiku*|*mini*)             agents_light=$((agents_light + 1)) ;;
+                    *opus*|gpt-*|o1*|o3*|o4*)   agents_heavy=$((agents_heavy + 1)) ;;
+                    *sonnet*|codex-*|*codex*)   agents_standard=$((agents_standard + 1)) ;;
+                    *)                          agents_unknown_tier=$((agents_unknown_tier + 1)) ;;
                 esac
                 ;;
         esac
@@ -354,6 +356,9 @@ agents_line=""
 if [ "$agents_total" -gt 0 ]; then
     agents_line=$(printf "agents %d | heavy %d | standard %d | light %d" \
         "$agents_total" "$agents_heavy" "$agents_standard" "$agents_light")
+    if [ "$agents_unknown_tier" -gt 0 ]; then
+        agents_line="$agents_line | tier? $agents_unknown_tier"
+    fi
 fi
 
 # --- Line 4: directory | branch | repo ---

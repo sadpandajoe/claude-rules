@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate Claude Code token usage and estimated costs from session JSONL files."""
+"""Aggregate token usage and estimated costs from Claude Code session JSONL files."""
 
 import json
 import os
@@ -8,7 +8,7 @@ import glob
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-# Per-model pricing ($/MTok) — API-equivalent costs for subscription users
+# Per-model pricing ($/MTok) for known Claude models.
 PRICING = {
     "claude-opus-4-6": {
         "input": 15.00, "output": 75.00,
@@ -24,8 +24,9 @@ PRICING = {
     },
 }
 
-# Fallback for unknown models — use Opus pricing as worst-case
-DEFAULT_PRICING = PRICING["claude-opus-4-6"]
+# Unknown models are reported with token/message counts but excluded from cost
+# instead of silently borrowing an unrelated provider's pricing.
+DEFAULT_PRICING = None
 
 # ANSI colors
 RESET = "\033[0m"
@@ -50,6 +51,8 @@ def get_pricing(model):
 def compute_cost(usage, model):
     """Compute cost in USD for a single usage record."""
     p = get_pricing(model)
+    if p is None:
+        return 0.0
     inp = usage.get("input_tokens", 0)
     out = usage.get("output_tokens", 0)
     cache_read = usage.get("cache_read_input_tokens", 0)
@@ -264,10 +267,14 @@ def print_period(label, dates_data, show_details=True):
         print(f"\n  {BOLD}By Model{RESET}")
         print(f"  {'Model':<25} {'Cost':>8} {'Msgs':>6} {'% Cost':>8}")
         print(f"  {'-' * 50}")
-        for model in sorted(model_totals, key=lambda m: model_totals[m]["cost"], reverse=True):
+        for model in sorted(model_totals, key=lambda m: (model_totals[m]["cost"], model_totals[m]["messages"]), reverse=True):
             mt = model_totals[model]
             pct = (mt["cost"] / total_cost * 100) if total_cost > 0 else 0
-            print(f"  {model:<25} {format_cost(mt['cost']):>8} {mt['messages']:>6} {pct:>7.0f}%")
+            cost_label = format_cost(mt["cost"]) if get_pricing(model) is not None else "n/a"
+            print(f"  {model:<25} {cost_label:>8} {mt['messages']:>6} {pct:>7.0f}%")
+
+        if any(get_pricing(model) is None for model in model_totals):
+            print(f"  {DIM}Unknown-model costs are shown as n/a and excluded from totals.{RESET}")
 
     # Project breakdown (top 5)
     proj_totals = defaultdict(lambda: {"cost": 0.0, "messages": 0})

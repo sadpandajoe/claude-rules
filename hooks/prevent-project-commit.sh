@@ -207,7 +207,15 @@ if has_unsafe_git_substitution(command):
     block("git commit/push inside command substitution or process substitution bypasses safety checks")
 
 
-def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, inherited_vars=None, inherited_functions=None):
+def parse_git_actions(
+    tokens,
+    base_workdir=None,
+    depth=0,
+    inherited_env=None,
+    inherited_vars=None,
+    inherited_functions=None,
+    inherited_aliases=None,
+):
     actions = []
     if depth > 8:
         return actions
@@ -216,6 +224,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
     env_assignments = dict(exported_env)
     shell_vars = dict(inherited_vars or {})
     shell_functions = dict(inherited_functions or {})
+    inherited_alias_map = dict(inherited_aliases or {})
     command_start = True
     separators = {";", "&&", "||", "|", "&", "(", ")"}
     shell_keywords = {"if", "then", "do", "else", "elif", "while", "until", "for", "select", "case", "!", "{"}
@@ -310,7 +319,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                         command_index += 1
                     if command_index < segment_end:
                         positional = tokens[command_index + 1 : segment_end]
-                        actions.extend(parse_git_actions(expand_shell_payload(tokens[command_index], positional), current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions)))
+                        actions.extend(parse_git_actions(expand_shell_payload(tokens[command_index], positional), current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions), dict(inherited_alias_map)))
                     break
                 j += 1
 
@@ -323,7 +332,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                 segment_end += 1
             eval_parts = tokens[i + 1 : segment_end]
             payload = eval_parts[0] if len(eval_parts) == 1 else " ".join(shlex.quote(part) for part in eval_parts)
-            actions.extend(parse_git_actions(shell_tokens(payload), current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions)))
+            actions.extend(parse_git_actions(shell_tokens(payload), current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions), dict(inherited_alias_map)))
             command_start = False
             i = segment_end
             continue
@@ -386,7 +395,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                     continue
                 break
             if j < segment_end:
-                actions.extend(parse_git_actions(tokens[j:segment_end], env_workdir, depth + 1, child_env, dict(shell_vars), dict(shell_functions)))
+                actions.extend(parse_git_actions(tokens[j:segment_end], env_workdir, depth + 1, child_env, dict(shell_vars), dict(shell_functions), dict(inherited_alias_map)))
             command_start = False
             i = segment_end
             continue
@@ -408,7 +417,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                 "git_dir": None,
                 "work_tree": None,
                 "configs": [],
-                "aliases": {},
+                "aliases": dict(inherited_alias_map),
                 "env": dict(env_assignments),
             }
             for raw_config in configs_from_env(env_assignments):
@@ -427,7 +436,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                 segment_end += 1
             positional = tokens[i + 1 : segment_end]
             function_tokens = expand_positional_tokens(shell_functions[token], positional)
-            actions.extend(parse_git_actions(function_tokens, current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions)))
+            actions.extend(parse_git_actions(function_tokens, current_workdir, depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions), dict(inherited_alias_map)))
             command_start = False
             i = segment_end
             continue
@@ -445,7 +454,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
             "git_dir": None,
             "work_tree": None,
             "configs": [],
-            "aliases": {},
+            "aliases": dict(inherited_alias_map),
             "env": dict(env_assignments),
         }
         for raw_config in configs_from_env(env_assignments):
@@ -530,7 +539,7 @@ def parse_git_actions(tokens, base_workdir=None, depth=0, inherited_env=None, in
                         shell_alias = True
                     if alias_tokens and not shell_alias and not is_git_executable(alias_tokens[0]):
                         alias_tokens = ["git"] + alias_tokens
-                    nested_actions = parse_git_actions(alias_tokens + tokens[j + 1 :], action["workdir"], depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions))
+                    nested_actions = parse_git_actions(alias_tokens + tokens[j + 1 :], action["workdir"], depth + 1, dict(exported_env), dict(shell_vars), dict(shell_functions), dict(action.get("aliases", {})))
                     for nested_action in nested_actions:
                         nested_action["configs"] = action["configs"] + nested_action.get("configs", [])
                         nested_action["env"] = dict(action.get("env", {}), **nested_action.get("env", {}))
@@ -574,7 +583,7 @@ def expand_configured_alias(action):
     if alias_tokens and not shell_alias and not is_git_executable(alias_tokens[0]):
         alias_tokens = ["git"] + alias_tokens
 
-    nested = parse_git_actions(alias_tokens + action.get("args", []), action.get("workdir"), 1, action.get("env", {}))
+    nested = parse_git_actions(alias_tokens + action.get("args", []), action.get("workdir"), 1, action.get("env", {}), inherited_aliases=action.get("aliases", {}))
     for nested_action in nested:
         nested_action["configs"] = action.get("configs", []) + nested_action.get("configs", [])
         nested_action["env"] = dict(action.get("env", {}), **nested_action.get("env", {}))
@@ -609,7 +618,8 @@ def config_value_false(value):
 
 
 def long_option_prefix(arg, option, min_prefix):
-    return arg.startswith("--") and len(arg) >= len(min_prefix) and option.startswith(arg)
+    name = arg.split("=", 1)[0]
+    return name.startswith("--") and len(name) >= len(min_prefix) and option.startswith(name)
 
 
 for action in actions:
@@ -685,11 +695,17 @@ for action in actions:
                 break
             if long_option_prefix(arg, "--no-verify", "--no-veri"):
                 block("git push --no-verify bypasses pre-push hooks")
-            if arg in {"--force", "--force-with-lease", "-f"} or long_option_prefix(arg, "--force", "--forc") or long_option_prefix(arg, "--force-with-lease", "--force-with"):
+            if "=" in arg and (long_option_prefix(arg, "--force-with-lease", "--force-w") or long_option_prefix(arg, "--force-with-includes", "--force-w")):
+                push_force = True
+                lease_ref = arg.split("=", 1)[1].split(":", 1)[0]
+                if re.fullmatch(r"(refs/heads/)?(main|master)", lease_ref):
+                    dest_main = True
+                    has_explicit_ref = True
+            if arg in {"--force", "--force-with-lease", "-f"} or long_option_prefix(arg, "--force", "--forc") or long_option_prefix(arg, "--force-with-lease", "--force-w") or long_option_prefix(arg, "--force-with-includes", "--force-w"):
                 push_force = True
             elif arg in {"--delete", "-d"} or long_option_prefix(arg, "--delete", "--del"):
                 delete_push = True
-            elif arg.startswith("--force=") or arg.startswith("--force-with-lease="):
+            elif arg.startswith("--force="):
                 push_force = True
                 lease_ref = arg.split("=", 1)[1].split(":", 1)[0]
                 if re.fullmatch(r"(refs/heads/)?(main|master)", lease_ref):

@@ -8,10 +8,11 @@
 ## Usage
 
 ```bash
-/review-code
-/review-code src/api/
+/review-code                  # branch-wide: committed + uncommitted vs base
+/review-code src/api/         # filter to path
 /review-code --files a.ts b.ts
-/review-code --committed
+/review-code --committed      # committed only (base..HEAD)
+/review-code --uncommitted    # uncommitted only (working tree + staged)
 ```
 
 ## Routing

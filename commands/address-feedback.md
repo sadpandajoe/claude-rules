@@ -19,7 +19,16 @@
 
 Use the `feedback` skill phase-by-phase. Do not preload every reference up front:
 
-1. Gather comments and triage with [skills/feedback/references/gather-triage.md](../skills/feedback/references/gather-triage.md).
+1. Gather comments and triage with [skills/feedback/references/gather-triage.md](../skills/feedback/references/gather-triage.md). Step 1 must emit an explicit **Reviewer Inventory** table before any triage starts:
+
+   ```
+   ## Reviewer Inventory
+   | Author | Type | Open threads | Notes |
+   |--------|------|--------------|-------|
+   ```
+
+   Include every distinct comment author (humans + bots) and the per-author open-thread count. Cross-check against the known-bot list in `gather-triage.md`; do not proceed to triage if any expected reviewer is missing or inaccessible.
+
 2. Apply approved fixes and run review with [skills/feedback/references/fix-review.md](../skills/feedback/references/fix-review.md).
 3. Draft/post replies and resolve eligible bot threads with [skills/feedback/references/reply-resolve.md](../skills/feedback/references/reply-resolve.md).
 

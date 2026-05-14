@@ -8,12 +8,20 @@ Use for `/review-code` on local uncommitted, staged, committed, or path-filtered
 
 ## Gather Changed Files
 
-- Default: combine `git diff --name-only` and `git diff --cached --name-only`.
-- `--committed`: compare `<base>..HEAD`.
+Default scope is **branch-wide**: combine `<base>..HEAD` (committed) with `git diff --name-only` and `git diff --cached --name-only` (uncommitted). This avoids the common re-invocation where a user reviews a branch and the first pass only sees uncommitted work.
+
+- `--committed`: only `<base>..HEAD`.
+- `--uncommitted`: only working tree and staged changes (legacy behavior).
 - Path args or `--files`: filter to requested files.
 - Read full content for changed files plus the relevant diff.
 
-Stop if no changes are found.
+Before dispatching reviewers, print a one-line scope summary so the user can intervene early:
+
+```
+Scope: <N> committed + <M> uncommitted files (<base>..HEAD = <short-sha>..HEAD)
+```
+
+Stop if no changes are found in the resolved scope.
 
 ## Complexity Gate
 
@@ -37,7 +45,7 @@ Run these in parallel when possible:
 
 Escalate CORE impact:
 
-- TRIVIAL + CORE: run full review team.
+- TRIVIAL + CORE: run code-quality plus **only the reviewer lens that matches why the change is CORE** (e.g., security/auth → adversarial; data-loss/migration → backend; hooks/safety → code-quality alone is sufficient). Escalate to the full team only when multiple CORE lenses apply or the safety-relevant lens is ambiguous. The point of CORE is calibration, not fan-out.
 - MODERATE + CORE: run triggered reviewer lanes and escalate any security-sensitive or data-loss risk to Standard handling.
 - STANDARD + CORE: run full team and suggest adversarial review for security-sensitive areas.
 - CORE test gaps use stricter severity calibration.

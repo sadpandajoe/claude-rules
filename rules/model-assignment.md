@@ -18,6 +18,7 @@ Use neutral task tiers in reusable commands and skills. Translate those tiers to
 - Prefer the cheapest tier that can do the specific task safely.
 - Keep deterministic discovery in shell and files before asking any model to reason.
 - Do not hard-code provider model names in reusable skill contracts unless the file is provider-specific.
+- The dispatching skill or runtime chooses the concrete model/reasoning setting from the tier; provider-specific startup docs such as `CLAUDE.md` or `AGENTS.md` own the tier-to-model mapping.
 - Subagent prompts should say `Tier: Light/Standard/Heavy` plus the concrete task, exit criteria, and compact handoff format.
 - Escalate a worker from Standard to Heavy when it hits conflicts, unclear ownership, security-sensitive code, cross-cutting APIs, migrations, auth, generated artifacts, or a low-confidence gate.
 - The orchestrator owns final branch mutation, shared-state updates, and push decisions unless a command explicitly grants those actions to an isolated worker.

@@ -5,6 +5,8 @@ Source branch:
 Created:
 Policy:
 
+**Rule:** rows ≤3 lines per cell. No full diffs, raw logs, or worker transcripts — only PR/SHA refs and one-line outcomes. Decisive short excerpts only.
+
 ## Current Batch
 
 Wave:
