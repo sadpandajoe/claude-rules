@@ -131,6 +131,25 @@ When multiple PRs/SHAs are provided, the main agent acts as a **thin orchestrato
 
 **Invariant: each cherry must start with clean context.** Subagents are the usual mechanism, but any isolation that prevents cherry #10 from inheriting cherry #1's diffs and decisions works. What matters is that the agent working on cherry N does not carry state from cherries 1..N-1.
 
+### Deterministic Batch Pre-Flight
+
+Before any deep LLM investigation, run a bash-first pre-flight over the full list and write the compact results into `CHERRY_PICK.md`. If a large raw sidecar is unavoidable, place it under a workspace-local ignored path, add that path to `.git/info/exclude`, and reference it from `CHERRY_PICK.md`; do not leave unprotected preflight state in the worktree.
+
+Pre-flight should gather, when applicable:
+- PR title, merge state, merge commit, base/head refs
+- source SHA(s) resolved from PRs
+- already-applied evidence on the target branch. Prefer exact `-x` markers (`cherry picked from commit <sha>`); PR number/title grep is advisory only unless paired with source-SHA evidence.
+- obvious not-merged / no-merge-commit cases
+- touched file list and overlap signals for dependency ordering
+
+The main agent reads the pre-flight table once and sorts rows into:
+- `ALREADY_APPLIED` — skip without per-cherry investigation only when exact source-SHA evidence or an explicit manifest decision supports the skip
+- `NOT_MERGED` — stop or queue for user decision
+- `NEEDS_INVESTIGATION` — run investigate/gate
+- `PREFLIGHT_BLOCKED` — missing PR, missing target, auth failure, or ambiguous source
+
+Do not spend LLM tokens re-discovering facts already present in the pre-flight table.
+
 ### Durable Batch Manifest
 
 For 10+ changes, or any run with meaningful dependencies, expected conflicts, or multiple blocked/intervention points, create or update local `CHERRY_PICK.md` from [templates/cherry-pick-manifest.md](templates/cherry-pick-manifest.md).
@@ -180,10 +199,20 @@ Each per-cherry or per-wave subagent returns only:
 No full diffs or long logs unless blocked. If a blocked handoff needs raw evidence, put file paths or the shortest decisive excerpt in the manifest.
 
 1. **Sequence planning** — run [references/batch-sequence.md](references/batch-sequence.md) to determine execution order based on dependencies. Standard reasoning effort is sufficient.
-2. **Per-cherry execution** — for each cherry in sequence, run the full single flow through validation in an isolated context. **Step 8 is a push boundary:** when authorized, it runs per cherry, not after the batch; when unauthorized, record `pending authorization` and stop before publishing dependent work.
-3. **Status tracking** — record results in the execution table or `CHERRY_PICK.md`. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
-4. **Escalation** — surface escalations to the user, relay answers back.
-5. **Final report** — collect results and produce the document phase output. Include pushed cherries and any cherries waiting on push authorization; the report summarizes, it does not silently publish.
+2. **Dispatch** — after pre-flight, sequence, and per-cherry gate classification:
+   - `ALREADY_APPLIED`, `NOT_MERGED`, and `PREFLIGHT_BLOCKED` rows do not get workers.
+   - TRIVIAL independent rows may use Standard-tier workers. Applying workers must use isolated worktrees/branches or return patch-only output; short-lived sessions are acceptable only for investigation, gating, planning, or status synthesis that does not mutate the checkout.
+   - NON-TRIVIAL, conflict-prone, dependency-chain, or shared-file rows use Heavy-tier handling and usually run one at a time.
+   - Headless workers are allowed only for TRIVIAL, independent rows with a tight contract such as [references/headless-trivial.md](references/headless-trivial.md). Treat this as an opt-in execution mode until validated on one cherry in the repo.
+3. **Per-cherry execution** — for each cherry in sequence, run the full single flow through validation in an isolated context. **Step 8 is a push boundary:** when authorized, the orchestrator performs the final shared-branch push per cherry; when unauthorized, record `pending authorization` and stop before publishing dependent work.
+   - If a worker returns a prepared commit, branch, or patch from an isolated context, the orchestrator must replay it onto the current live target branch in planned order.
+   - After replay, rerun the mandatory scope-leak audit and the minimum assigned validation on the live target branch before marking the row `Applied` or pushing.
+   - Worker validation is useful evidence, but it is stale once fan-in happens; live-branch replay validation is the gate.
+4. **Status tracking** — record results in the execution table or `CHERRY_PICK.md`. If one fails, do NOT continue with subsequent dependent picks. Independent picks may continue.
+5. **Escalation** — surface escalations to the user, relay answers back.
+6. **Final report** — collect results and produce the document phase output. Include pushed cherries and any cherries waiting on push authorization; the report summarizes, it does not silently publish.
+
+Workers may return prepared commits, branches, patches, or status blocks, but they do not own the shared target branch, final ordering, or final push unless a command-specific run explicitly grants that boundary. A worker that applies code must run in its own worktree/branch or produce a patch for orchestrator replay; a context-isolated session alone is not filesystem isolation. This prevents parallel workers from racing on one release branch.
 
 **Why isolation matters:** with 15 cherry-picks, inline processing pollutes context with prior diffs by cherry #10. Quality degrades silently — conflicts start looking alike, decisions bleed across cherries.
 

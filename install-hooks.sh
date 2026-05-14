@@ -25,6 +25,38 @@ step() { echo -e "${BLUE}[STEP]${NC} $1"; }
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SETTINGS="$HOME/.claude/settings.json"
 
+usage() {
+    cat <<EOF
+Usage: ./install-hooks.sh [--remove|--help]
+
+Installs toolkit hooks into ~/.claude/settings.json.
+
+Options:
+  --remove   Remove toolkit hooks
+  --help     Show this help
+EOF
+}
+
+if [[ "$#" -gt 1 ]]; then
+    error "Too many arguments."
+    usage
+    exit 1
+fi
+
+case "${1:-}" in
+    ""|--remove)
+        ;;
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    *)
+        error "Unknown argument: $1"
+        usage
+        exit 1
+        ;;
+esac
+
 # Check prerequisites
 if ! command -v jq &>/dev/null; then
     error "jq is required but not installed."
@@ -61,13 +93,13 @@ if [[ "${1:-}" == "--remove" ]]; then
     jq --arg repo "$REPO_DIR" '
         (if .hooks.PreToolUse then
             .hooks.PreToolUse |= [.[] | select(
-                (.hooks // []) | all(.command | test($repo) | not)
+                (.hooks // []) | all((.command // "") | contains($repo) | not)
             )] |
             if .hooks.PreToolUse == [] then del(.hooks.PreToolUse) else . end
         else . end) |
         (if .hooks.Stop then
             .hooks.Stop |= [.[] | select(
-                (.hooks // []) | all(.command | test($repo) | not)
+                (.hooks // []) | all((.command // "") | contains($repo) | not)
             )] |
             if .hooks.Stop == [] then del(.hooks.Stop) else . end
         else . end) |
@@ -76,6 +108,12 @@ if [[ "${1:-}" == "--remove" ]]; then
 
     info "Toolkit hooks removed."
     exit 0
+fi
+
+if ! command -v python3 &>/dev/null; then
+    error "python3 is required but not installed."
+    echo "  Install with: brew install python (macOS) or apt-get install python3 (Linux)"
+    exit 1
 fi
 
 # Install hooks
@@ -91,13 +129,12 @@ HOOK_ENTRIES=$(cat <<HOOKJSON
 [
   {
     "matcher": "Bash",
-    "if": "Bash(git commit*)",
-    "hooks": [{"type": "command", "command": "bash $REPO_DIR/hooks/prevent-project-commit.sh"}]
+    "hooks": [{"type": "command", "command": "bash \"$REPO_DIR/hooks/prevent-project-commit.sh\""}]
   },
   {
     "matcher": "Bash",
     "if": "Bash(jest*|pytest*|npm test*|npx jest*|playwright*)",
-    "hooks": [{"type": "command", "command": "bash $REPO_DIR/hooks/check-resources.sh"}]
+    "hooks": [{"type": "command", "command": "bash \"$REPO_DIR/hooks/check-resources.sh\""}]
   }
 ]
 HOOKJSON
@@ -106,7 +143,7 @@ HOOKJSON
 STOP_HOOK_ENTRIES=$(cat <<HOOKJSON
 [
   {
-    "hooks": [{"type": "command", "command": "bash $REPO_DIR/hooks/check-plan-drift.sh"}]
+    "hooks": [{"type": "command", "command": "bash \"$REPO_DIR/hooks/check-plan-drift.sh\""}]
   }
 ]
 HOOKJSON
@@ -121,10 +158,10 @@ jq --argjson new_hooks "$HOOK_ENTRIES" --argjson new_stop_hooks "$STOP_HOOK_ENTR
     .hooks.Stop //= [] |
     # Remove any existing entries that reference our repo (idempotent re-run)
     .hooks.PreToolUse |= [.[] | select(
-        (.hooks // []) | all(.command | test($repo) | not)
+        (.hooks // []) | all((.command // "") | contains($repo) | not)
     )] |
     .hooks.Stop |= [.[] | select(
-        (.hooks // []) | all(.command | test($repo) | not)
+        (.hooks // []) | all((.command // "") | contains($repo) | not)
     )] |
     # Append new entries
     .hooks.PreToolUse += $new_hooks |
@@ -164,7 +201,7 @@ echo "  Hooks Installed!"
 echo "========================================"
 echo ""
 info "Hooks:"
-echo "  prevent-project-commit — Blocks commit if local workflow state is staged"
+echo "  prevent-project-commit — Blocks unsafe git flags, main/master force-pushes, and local workflow state commits"
 echo "  check-resources        — Warns when tests run with constrained resources"
 echo "  check-plan-drift       — Warns at turn end when PLAN.md outpaces PROJECT.md"
 echo ""

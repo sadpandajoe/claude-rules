@@ -1,7 +1,7 @@
 ---
 name: feedback-classify
 description: Classify review findings as code-level (fix in review loop) or plan-level (route back to planning).
-model: sonnet
+tier: Standard
 ---
 
 # Feedback Classify

@@ -38,8 +38,10 @@ Umbrella for reviewer lenses that critique a *technical plan* before implementat
 Each reference is a subagent prompt. The `planning` skill's iterate-review reference dispatches them in parallel:
 
 ```
-Agent(subagent_type: "general-purpose", reasoning_effort: "high", prompt: <reference contents>)
+Agent(subagent_type: "general-purpose", prompt: "Tier: Heavy\n<reference contents>")
 ```
+
+Map the tier to the current runtime's actual model or reasoning-effort controls at dispatch time.
 
 Each returns severity-tagged findings + score. The iterate loop continues until the 8/10 threshold is met or a blocker surfaces.
 

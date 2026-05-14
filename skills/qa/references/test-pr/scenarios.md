@@ -1,5 +1,5 @@
 ---
-model: opus
+tier: Heavy
 ---
 
 # Test PR Scenarios

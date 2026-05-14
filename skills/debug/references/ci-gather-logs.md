@@ -1,5 +1,5 @@
 ---
-model: sonnet
+tier: Light
 ---
 
 # CI Gather Logs
@@ -51,6 +51,35 @@ gh api repos/{owner}/{repo}/actions/jobs/{job-id}/logs
 If `gh` commands fail or CI is external:
 - Use the provided local log file or artifact bundle when available.
 - If no log source is available, ask for one. Do not classify without actual log output.
+
+### Jenkins / External Auth Gate
+
+For Jenkins or any authenticated external CI, resolve evidence before reasoning:
+
+1. If a Jenkins URL is provided and `JENKINS_USER` plus `JENKINS_TOKEN` or equivalent configured credentials are available, fetch only the failing console tail first.
+
+   Normalize the URL before fetching:
+   - strip trailing `/`, `/console`, `/consoleFull`, or `/consoleText`
+   - if the URL points at an exact numeric build, append `/consoleText`
+   - if the URL points at a job with no build number, append `/lastBuild/consoleText`
+   - if the URL is a Blue Ocean or dashboard URL that cannot be normalized to a job/build endpoint, ask for the classic build URL or log artifact
+
+   Use the exact failing build URL when the user supplied one:
+
+   ```bash
+   curl -fsSL -u "$JENKINS_USER:$JENKINS_TOKEN" "<build-url>/consoleText" | tail -200
+   ```
+
+   Use `lastBuild` only when the input is a Jenkins job URL with no specific build number:
+
+   ```bash
+   curl -fsSL -u "$JENKINS_USER:$JENKINS_TOKEN" "<job-url>/lastBuild/consoleText" | tail -200
+   ```
+
+2. If credentials are missing, incomplete, or the request returns auth/permission HTML, stop and ask the user for a log excerpt, local log file, or artifact bundle. Do not keep trying anonymous fetches.
+3. Once a log excerpt or artifact is available, continue with classification.
+
+The first CI LLM step must consume actual failing output, not the run page, dashboard status, or an inferred failure name.
 
 If the input is a zip bundle:
 - unzip it automatically

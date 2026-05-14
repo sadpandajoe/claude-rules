@@ -27,6 +27,7 @@ skills/<name>/
 | `disable-model-invocation: true` | Hide from auto-routing list. Use for coordination-only helpers the orchestrator must own. |
 | `allowed-tools` | Restrict tool access for safety (e.g. `Bash(git *) Read Edit`). |
 | `argument-hint` | Shown in `/<name>` autocomplete. |
+| `tier` | Optional provider-neutral dispatch tier (`Light`, `Standard`, `Heavy`, `Orchestrator`). See `rules/model-assignment.md`; do not use provider model names in reusable skill frontmatter. |
 
 **The "Before Starting" line** at the top of every SKILL.md:
 ```

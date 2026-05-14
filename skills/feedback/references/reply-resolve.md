@@ -1,5 +1,5 @@
 ---
-model: sonnet
+tier: Standard
 ---
 
 # Reply + Resolve PR Feedback

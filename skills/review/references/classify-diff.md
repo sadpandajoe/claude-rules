@@ -1,7 +1,7 @@
 ---
 name: classify-diff
 description: Analyze a changeset and return which review domains are relevant, with trigger reasons.
-model: sonnet
+tier: Standard
 ---
 
 # Classify Diff

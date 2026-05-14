@@ -44,6 +44,7 @@ Accept a GitHub Actions run URL, PR number, local log file, local zip artifact b
 Follow [skills/debug/references/ci-gather-logs.md](../skills/debug/references/ci-gather-logs.md).
 
 Stop if no actual log output or artifact source can be resolved.
+For Jenkins or authenticated external CI, stop after the first auth failure and ask for a log excerpt/artifact instead of reasoning from the dashboard.
 
 ### 3. Classify + Group Failures
 

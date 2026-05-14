@@ -1,5 +1,5 @@
 ---
-model: opus
+tier: Heavy
 ---
 
 # Adversarial Review Orchestration
@@ -35,8 +35,8 @@ If no second-opinion reviewer is available, continue with the primary reviewer a
 
 Deduplicate findings:
 
-- Found by both models: high confidence.
-- Unique to one model: include at normal confidence.
+- Found by both independent reviewers: high confidence.
+- Unique to one reviewer: include at normal confidence.
 
 Sort by risk:
 

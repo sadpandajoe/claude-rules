@@ -3,7 +3,7 @@ name: plan-implementation
 description: Produce a slice-based implementation plan after RCA (bug fix) or after the feature brief is approved (feature). Defines slices with scope, entrance/exit/acceptance, and the test-first mode the implementer will use. Internal helper.
 user-invocable: false
 disable-model-invocation: true
-model: opus
+tier: Heavy
 ---
 
 # Plan Implementation

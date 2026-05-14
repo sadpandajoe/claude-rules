@@ -57,8 +57,10 @@ The `/review-pr` command uses `pr-review`, `pr-batch`, and `pr-posting` for PR-s
 Reviewer lens references are subagent prompts. Orchestration and posting references are read by the main thread.
 
 ```
-Agent(subagent_type: "general-purpose", reasoning_effort: "high", prompt: <reference contents>)
+Agent(subagent_type: "general-purpose", prompt: "Tier: Heavy\n<reference contents>")
 ```
+
+Map the tier to the current runtime's actual model or reasoning-effort controls at dispatch time.
 
 ## Notes
 

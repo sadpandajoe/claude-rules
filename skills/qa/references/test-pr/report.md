@@ -1,5 +1,5 @@
 ---
-model: sonnet
+tier: Standard
 ---
 
 # Test PR Report

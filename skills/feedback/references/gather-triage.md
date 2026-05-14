@@ -1,5 +1,5 @@
 ---
-model: opus
+tier: Standard
 ---
 
 # Gather + Triage PR Feedback
@@ -11,14 +11,87 @@ model: opus
 
 ## Gather
 
-Detect the PR input, then fetch both top-level discussion and inline review comments:
+Detect the PR input, then run the deterministic reviewer inventory before any LLM triage.
+
+### Reviewer Inventory (Mandatory Bash-First)
+
+Fetch every visible review source, then print a compact reviewer/bot table:
+
+```bash
+gh pr view <number> --json reviews,comments,reviewRequests \
+  --jq '
+    [
+      (.reviews[]? | [(.author.login // "unknown"), (.state // "UNKNOWN"), "review"]),
+      (.comments[]? | [(.author.login // "unknown"), "COMMENT", "top-level-comment"]),
+      (.reviewRequests[]? | [(.login // .slug // .name // "unknown"), "REQUESTED", (.__typename // "review-request")])
+    ][]
+    | @tsv
+  ' | sort
+
+gh api --paginate repos/<owner>/<repo>/pulls/<number>/comments \
+  --jq '.[] | [.user.login, "COMMENT", "inline-review-comment", (.path // ""), (.line // .original_line // "")] | @tsv' \
+  | sort
+
+gh api --paginate repos/<owner>/<repo>/pulls/<number>/reviews \
+  --jq '.[] | [(.user.login // "unknown"), (.state // "UNKNOWN"), "review-submission", (.body // "" | length)] | @tsv' \
+  | sort
+
+gh api --paginate repos/<owner>/<repo>/issues/<number>/comments \
+  --jq '.[] | [.user.login, "COMMENT", "top-level-issue-comment"] | @tsv' \
+  | sort
+```
+
+If the workflow may reply to or resolve threads (`--auto`, explicit posting permission, or requested resolution), GraphQL review-thread data is mandatory before triage. Include unresolved counts in the inventory and stop if thread state cannot be fetched.
+
+When combining the sources above, dedupe by stable IDs (`databaseId` / REST `id` / GraphQL node id) before counting authors. `gh pr view --comments` is useful for display, but paginated REST/GraphQL IDs are the inventory authority.
+
+Use this paginated query shape for unresolved thread inventory. For the first page, omit `cursor`; for later pages add `-F cursor=<endCursor>` from the prior `PAGEINFO` row. Repeat until `hasNextPage` is false:
+
+```bash
+gh api graphql -F owner=<owner> -F repo=<repo> -F number=<number> -f query='
+  query($owner:String!, $repo:String!, $number:Int!, $cursor:String) {
+    repository(owner:$owner, name:$repo) {
+      pullRequest(number:$number) {
+        reviewThreads(first:100, after:$cursor) {
+          pageInfo { hasNextPage endCursor }
+          nodes {
+            id
+            isResolved
+            comments(first:1) {
+              nodes {
+                databaseId
+                author { login }
+                path
+                line
+              }
+            }
+          }
+        }
+      }
+    }
+  }' \
+  --jq '.data.repository.pullRequest.reviewThreads as $threads
+    | ($threads.nodes[] | [(.id // ""), (.comments.nodes[0].databaseId // ""), (.comments.nodes[0].author.login // "unknown"), (if .isResolved then "resolved" else "unresolved" end), (.comments.nodes[0].path // ""), (.comments.nodes[0].line // "")] | @tsv),
+      (["PAGEINFO", ($threads.pageInfo.hasNextPage|tostring), ($threads.pageInfo.endCursor // "")] | @tsv)' \
+  | sort
+```
+
+The inventory must explicitly answer:
+- Which human reviewers commented or requested changes
+- Which bots commented, including Copilot and ultrareview/`aminghadersohi` when present
+- How many top-level, review-body, and inline comments each author has
+- Whether any known expected source is absent or inaccessible
+
+Do not begin triage until the inventory is complete. If `gh` cannot fetch one source, stop with the missing command/output and ask for the data instead of guessing.
+
+After the inventory, fetch the detailed top-level discussion and inline review comments for investigation:
 
 ```bash
 gh pr view <number> --comments
-gh api repos/<owner>/<repo>/pulls/<number>/comments
+gh api --paginate repos/<owner>/<repo>/issues/<number>/comments
+gh api --paginate repos/<owner>/<repo>/pulls/<number>/comments
+gh api --paginate repos/<owner>/<repo>/pulls/<number>/reviews
 ```
-
-Prefer API/GraphQL thread data when resolution status matters.
 
 ## Complexity Gate
 

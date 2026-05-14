@@ -33,6 +33,7 @@ For STANDARD or expensive feedback rounds, checkpoint/clear after triage decisio
 
 ## Gates
 
+- Start with the mandatory reviewer/bot inventory from `feedback/references/gather-triage.md`; do not triage only the first visible comments.
 - Emit a Complexity Gate before fixing.
 - Investigate before triage; never accept or reject comments by guess.
 - Pause after triage unless `--auto` was passed.

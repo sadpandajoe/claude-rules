@@ -1,5 +1,5 @@
 ---
-model: haiku
+tier: Light
 ---
 
 # Prepare Environment

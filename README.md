@@ -67,6 +67,7 @@ ai-toolkit/
 ├── rules/
 │   ├── universal.md        # Core principles (loaded first)
 │   ├── orchestration.md    # Multi-agent workflow rules
+│   ├── model-assignment.md # Provider-neutral model/effort tiers
 │   ├── context-management.md   # Context depth thresholds and checkpoint protocol
 │   ├── rule-maintenance.md     # How to strengthen, update, or extract rules
 │   ├── investigation.md    # Debugging & root cause
@@ -102,7 +103,8 @@ ai-toolkit/
 │   ├── superset-local/      # Superset-specific local stack + Playwright helpers
 │   └── workstreams/         # Post-parallel-implementation fan-in and merge sequencing
 ├── hooks/
-│   ├── prevent-project-commit.sh  # Block commit if local workflow state is staged
+│   ├── prevent-project-commit.sh  # Block unsafe git flags and local workflow state commits
+│   ├── test-prevent-project-commit.sh # Smoke tests for git safety hook behavior
 │   ├── check-resources.sh         # Warn on constrained resources before tests
 │   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
 ├── extensions/
@@ -291,6 +293,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/stop-rules.md` | Any iterative loop (universal stop conditions) |
 | `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
+| `rules/model-assignment.md` | Worker dispatch and provider-neutral model/effort tiering |
 | `rules/rule-maintenance.md` | `/learn propose-rule`, rule editing |
 
 ## Hooks (optional)
@@ -299,7 +302,7 @@ Hooks enforce toolkit rules at runtime via Claude Code's hook system. They are s
 
 | Hook | Event | Behavior |
 |------|-------|----------|
-| `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks `git commit` if `PROJECT.md`, `CHERRY_PICK.md`, or `CI_FIX.md` is staged |
+| `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks unsafe git flags, force-pushes to main/master, and commits of local workflow state files |
 | `check-resources.sh` | PreToolUse (Bash) | Warns when running tests with constrained resources |
 
 ```bash

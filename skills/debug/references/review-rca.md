@@ -1,7 +1,7 @@
 ---
 name: review-rca
 description: Review root cause analysis and proposed fix before implementation.
-model: opus
+tier: Heavy
 ---
 
 # Review RCA

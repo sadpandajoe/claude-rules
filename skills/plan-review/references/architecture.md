@@ -1,7 +1,7 @@
 ---
 name: review-architecture
 description: Review plan from a system design and architecture perspective.
-model: opus
+tier: Heavy
 ---
 
 # Architecture Review

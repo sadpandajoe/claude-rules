@@ -3,7 +3,7 @@ name: investigate-change
 description: Investigate or run RCA on broken behavior as an internal phase of a larger workflow. Identifies root cause with evidence and hands a compact summary back. Use the "When Investigating a Bug" section for bug-specific framing fields. Internal helper.
 user-invocable: false
 disable-model-invocation: true
-model: opus
+tier: Heavy
 ---
 
 # Investigate Change

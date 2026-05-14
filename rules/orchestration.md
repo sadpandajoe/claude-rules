@@ -25,6 +25,8 @@ Match subagent resources to the **actual reasoning load of this specific task**,
 
 Provider mapping is runtime-specific. Keep reusable rules in neutral mechanical/standard/heavy terms, then translate to the platform's available model or reasoning-effort controls at invocation time.
 
+Use `rules/model-assignment.md` for the shared Light / Standard / Heavy / Orchestrator tier table when a command dispatches workers or chooses a cheaper classifier model.
+
 **Cherry-pick reasoning tiering**: Cherry-pick phases use gate-driven reasoning selection rather than the general reasoning-load heuristic above. The gate classifies difficulty (TRIVIAL vs NON-TRIVIAL) and that classification determines worker effort for plan, validate, and adapt phases. See `skills/cherry-pick/references/gate.md` for the tier table.
 
 The orchestrator may run on any model the user has selected. These tiers apply to **subagents/workers** spawned from it. A standard orchestrator escalating one genuinely hard subtask to a heavier worker is the canonical cost-efficient pattern.

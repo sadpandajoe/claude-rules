@@ -35,7 +35,7 @@ Most QA phases are checklist + output-template work the orchestrator does inline
 2. Follow its steps.
 3. Emit its output block into the conversation.
 
-When fresh context matters (long-running session, parallel work, separation from the implementation thread), spawn a `general-purpose` subagent and pass the reference content as the prompt. Each reference declares its recommended model in frontmatter.
+When fresh context matters (long-running session, parallel work, separation from the implementation thread), spawn a `general-purpose` subagent and pass the reference content as the prompt. Each reference declares its recommended provider-neutral tier in frontmatter.
 
 ## Phase Composition
 

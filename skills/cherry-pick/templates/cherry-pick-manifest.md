@@ -11,6 +11,12 @@ Wave:
 Status:
 Next action:
 
+## Batch Pre-Flight
+
+| PR/SHA | Title | Source SHA | Merge State | Target Evidence | Preflight Status | Notes |
+|--------|-------|------------|-------------|-----------------|------------------|-------|
+|  |  |  |  |  | NEEDS_INVESTIGATION |  |
+
 ## Execution Waves
 
 | Wave | PR/SHA | Depends On | Risk | Status | Notes |

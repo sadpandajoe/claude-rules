@@ -1,7 +1,7 @@
 ---
 name: review-feature-brief
 description: Review a feature brief for scope clarity, acceptance quality, milestone framing, and product-level risks.
-model: opus
+tier: Heavy
 ---
 
 # Feature Brief Review

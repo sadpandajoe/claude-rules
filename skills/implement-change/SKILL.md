@@ -3,7 +3,7 @@ name: implement-change
 description: Use when an approved plan, RCA, or slice is ready for code changes. Implements one scoped slice, follows the requested test-first mode, verifies acceptance, and hands changed files back for review. Do NOT use for root-cause investigation, plan creation, broad unsliced refactors, or final code review.
 user-invocable: false
 disable-model-invocation: true
-model: opus
+tier: Heavy
 ---
 
 # Implement Change

@@ -1,5 +1,5 @@
 ---
-model: haiku
+tier: Light
 ---
 
 # Classify CI Failure
