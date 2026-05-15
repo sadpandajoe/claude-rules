@@ -22,7 +22,7 @@
 - Group failures by root cause before fixing.
 - Keep fixes scoped to the failing surface.
 - Run local verification before review, and emit a Review Gate block whenever repo-tracked files changed.
-- Update PROJECT.md at standard-path boundaries.
+- Update PROJECT.md at standard-path boundaries. Two updates are **hard gates with confirmation blocks** on every path: initial-triage entry before path branching (step 3 tail), Completed entry before the chat summary (step 9 head).
 - The main thread owns `CI_FIX.md` and PROJECT.md. Subagents return compact handoffs; they do not update durable state directly.
 - Do not commit, amend, rebase, push, or force-push unless the user explicitly authorized that git boundary for this run.
 - For STANDARD or expensive CI work, checkpoint/clear after `CI_FIX.md` or PROJECT.md captures classification/grouping, after Action Gate/RCA decisions, after local verification, and after `/review-code` when commit recommendation work remains.
@@ -53,6 +53,16 @@ Use [skills/debug/references/ci-classify-failure.md](../skills/debug/references/
 Then load [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md) for grouping, ours/pre-existing classification, complexity routing, and commit recommendation strategy. Do not load the full orchestration reference before real logs exist.
 
 If all failures are pre-existing or not caused by this branch, exit early with evidence and no fix/review cycle.
+
+**Initial-triage PROJECT.md update (hard gate, all paths)**: Before branching to a path — including the not-our-failure exit — write the classification to PROJECT.md (failing run/source, classified failures, ours/pre-existing split, hypothesis per failure). Then emit:
+
+```markdown
+## PROJECT.md Updated — Initial Triage
+Failures recorded: [count]
+Path likely: [trivial/moderate/standard/not-our-failure]
+```
+
+This gate exists because a "this is mechanical, I already know what to do" mental frame forms at this exact moment and silently swallows every later PROJECT.md update. Writing the triage entry first breaks the frame. Do not proceed without emitting the block.
 
 ### 4. Complexity Gate
 
@@ -85,7 +95,17 @@ Do not commit standard-path or PARTIAL/WEAK fixes automatically. Do not commit, 
 
 ### 9. Summary + Metrics
 
-Use the summary shapes in [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md).
+**PROJECT.md Completed Entry first (hard gate, all paths)**: Before emitting the chat summary, append a `Completed` entry to PROJECT.md (date, one-line scope, commit SHA(s) if any, verification strength) and remove any now-resolved "Not done" / "Pending" bullets that this run closed out. Chat summary and PROJECT.md Completed entry serve **different audiences** — chat is in-session, PROJECT.md is the cross-session handoff that `/start` reloads. Letting the chat summary stand in for the PROJECT.md entry is the single most common way this discipline is silently dropped.
+
+Do not emit the chat summary template below until this confirmation block is emitted:
+
+```markdown
+## PROJECT.md Updated — Completed Entry
+Entry appended: [one-line scope]
+Resolved bullets removed: [count, or "none"]
+```
+
+Then use the summary shapes in [skills/debug/references/ci-fix-orchestration.md](../skills/debug/references/ci-fix-orchestration.md).
 
 Record metrics with:
 - `command`: `fix-ci`
@@ -97,11 +117,13 @@ Record metrics with:
 
 ## PROJECT.md Update Discipline
 
-Standard path updates PROJECT.md:
-- after log collection and initial failure classification
+Two updates are **hard gates** with confirmation blocks (every path):
+- Initial triage — emitted at the end of step 3, before path branching
+- Completed entry — emitted at the start of step 9, before the chat summary
+
+On the **standard path**, also update PROJECT.md compactly at these mid-flow points (no confirmation block required, but expected):
 - after RCA validation when it runs
 - after the Action Gate
 - after local verification and `/review-code`
-- at final completion with verification strength and commit recommendation
 
-Keep updates compact. If `CI_FIX.md` exists, PROJECT.md should point to it rather than duplicating its table.
+Keep updates compact. If `CI_FIX.md` exists, PROJECT.md should point to it rather than duplicating its table. The chat summary at step 9 does **not** substitute for the PROJECT.md Completed entry — they serve different audiences (in-session vs. cross-session).
