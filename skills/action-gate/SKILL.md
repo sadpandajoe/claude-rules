@@ -1,16 +1,12 @@
 ---
 name: action-gate
-description: Use when a workflow needs an Execution Gate block after investigation, classification, or cold-read planning. Produces Risk, Confidence, Decision Required, Verification Strength, and proceed/ask/stop guidance. Do NOT use for code review gates, test verification reports, or PR approval verdicts.
+description: Execution Gate block (Risk, Confidence, Decision Required, Verification Strength, proceed/ask/stop) emitted after investigation, classification, or cold-read planning. Referenced by review and gate workflows.
 user-invocable: false
 disable-model-invocation: true
 tier: Standard
 ---
 
 # Action Gate
-
-## Before Starting
-
-Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
 Use this helper after an investigation or classification phase has produced a root-cause hypothesis, a proposed fix, and a validation plan.
 
@@ -43,15 +39,16 @@ Proceed without asking the user only when all of the following are true:
 
 Otherwise stop and surface the reason clearly.
 
-## Verification Strength Reference
+## Verification Strength
 
-Default tier definitions:
+Default tier definitions (when `debug/references/ci-verify-fix.md` is in play, use its expanded definitions instead):
 
-- **STRONG**: ran the failing command (or close equivalent) locally and it passes
-- **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command
-- **WEAK**: code review only, no local execution
-
-When `debug/references/ci-verify-fix.md` is in play, use that reference's expanded definitions instead.
+- **STRONG**: ran the failing command (or close equivalent) locally and it passes.
+  Example: "Ran `pytest tests/unit/test_dashboard.py` — the same test CI reported failing — and it passes after the fix."
+- **PARTIAL**: ran related checks that exercise the changed code, not the exact failing command.
+  Example: "Ran `mypy superset/models/dashboard.py` (type-check on the changed file), but the CI failure was in an integration test that requires Docker."
+- **WEAK**: code review only, no local execution.
+  Example: "Reviewed the diff and confirmed the logic change matches the root cause, but no local execution was possible — the test requires a running app with seed data."
 
 ## Rating Guidance
 
@@ -69,12 +66,6 @@ Treat confidence numerically:
 - `8-10` = high confidence
 - `5-7` = medium confidence
 - `1-4` = low confidence
-
-## Verification Strength Examples
-
-- **STRONG**: "Ran `pytest tests/unit/test_dashboard.py` — the same test that CI reported failing — and it passes after the fix."
-- **PARTIAL**: "Ran `mypy superset/models/dashboard.py` (type-check on the changed file), but the CI failure was in an integration test that requires Docker."
-- **WEAK**: "Reviewed the diff and confirmed the logic change matches the root cause, but no local execution was possible — the test requires a running app with seed data."
 
 ## Decision Required: YES Example
 
