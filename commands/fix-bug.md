@@ -25,10 +25,11 @@ The command owns the visible gates and sequence. Each step loads only the refere
 - Run the existing-fix check unless the fix is TRIVIAL mechanical work.
 - For STANDARD work, write `PLAN.md` and update PROJECT.md before implementation.
 - Do not implement STANDARD work until the `PLAN.md Written` block is emitted.
+- For STANDARD work, run plan-review iteration on `PLAN.md` via `skills/planning/references/iterate-review.md` after `PLAN.md Written` and before implementation; require the reviewer threshold and cold-read Go documented in that helper.
 - Run `/verify` or equivalent pre-flight checks before `/review-code`, and record the result in the Review Gate.
 - Do not commit without an added or updated regression test unless the gap is explicitly accepted.
 - Only the main thread writes PROJECT.md or `PLAN.md`. Subagents return handoffs; the orchestrator updates durable state.
-- For STANDARD or expensive bug work, follow `rules/context-management.md`: checkpoint/clear after RCA/plan artifacts are written, after RCA/plan review accepts, after implementation, and after code review fixes when QA/PR work remains.
+- For STANDARD or expensive bug work, follow `rules/context-management.md`: checkpoint/clear after RCA review accepts, after `PLAN.md` is written, after plan review accepts, after implementation, and after code review fixes when QA/PR work remains.
 
 ## Planning Phase Boundary
 
@@ -62,7 +63,7 @@ MODERATE is the default for real but contained bug fixes. Use STANDARD when the 
 
 - **Trivial**: normalize input, fetch ticket context if present, emit Complexity Gate, implement inline, run smallest meaningful verification, emit Review Gate `skipped`/`micro-fix` only when the Review Gate exception applies; otherwise reclassify MODERATE.
 - **Moderate**: run existing-fix scan, investigate inline, add or update a regression test when feasible, implement inline by default, run `/verify` or equivalent pre-flight checks, then one fresh `/review-code` pass.
-- **Standard**: run existing-fix scan, validate RCA, write `PLAN.md`, checkpoint/clear, run RCA/plan review and Action Gate, checkpoint/clear, then implement slices inline by default or with bounded subagents only when isolation or parallelism helps.
+- **Standard**: run existing-fix scan, validate RCA, run RCA review and Action Gate, write `PLAN.md`, checkpoint/clear, run plan-review iteration on `PLAN.md`, checkpoint/clear, then implement slices inline by default or with bounded subagents only when isolation or parallelism helps.
 
 ## Step Routing And Handoffs
 
@@ -77,7 +78,8 @@ Use the happy paths and path rules as the primary flow. Use this table as a phas
 | Environment prep | Main thread | [skills/preflight/references/prepare-environment.md](../skills/preflight/references/prepare-environment.md) | Load only when repro or validation needs a runnable app. |
 | RCA investigation | Main thread by default; bounded investigation lanes only when causes are independent | [skills/debug/references/investigate-change.md](../skills/debug/references/investigate-change.md) | Load when root cause is not obvious. Lanes return compact evidence, candidate RCA, confidence, ruled-out alternatives, and next action. |
 | RCA review | Fresh reviewer subagent | [skills/debug/references/review-rca.md](../skills/debug/references/review-rca.md), `action-gate` | STANDARD path before `PLAN.md`. Continue after material findings are resolved and the Action Gate says proceed; otherwise stop. |
-| Implementation | Main thread for trivial/tightly-coupled work; bounded subagent only for isolated slices | [skills/implement-change/SKILL.md](../skills/implement-change/SKILL.md) | Start after inline RCA for MODERATE, or after `PLAN.md Written` for STANDARD. Prompt includes root cause, scope/files, regression expectation, acceptance checks, relevant plan excerpt, branch/base. Return `Implementation Handoff`. |
+| Plan review | Fresh reviewer subagents driven by the iterate-review helper | [skills/planning/references/iterate-review.md](../skills/planning/references/iterate-review.md) with reviewer set `plan-review/references/implementation.md`, `testing/references/review-testplan.md`, plus conditional `plan-review/references/architecture.md` (cross-cutting fixes), `plan-review/references/frontend.md` (UI), `plan-review/references/backend.md` (API/DB/migrations); scope `substantial`; include `action-gate` | STANDARD path after `PLAN.md Written` and before implementation. Reviews the Fix Approach and Test Strategy sections written into `PLAN.md` — the RCA review does not cover them. Continue after threshold + cold-read Go; otherwise revise `PLAN.md` and re-run failing reviewers. |
+| Implementation | Main thread for trivial/tightly-coupled work; bounded subagent only for isolated slices | [skills/implement-change/SKILL.md](../skills/implement-change/SKILL.md) | Start after inline RCA for MODERATE, or after plan-review threshold + cold-read Go for STANDARD. Prompt includes root cause, scope/files, regression expectation, acceptance checks, relevant plan excerpt, branch/base. Return `Implementation Handoff`. |
 | Review | `/review-code` reviewer subagents | [skills/review/references/local-review.md](../skills/review/references/local-review.md) | Run after `/verify` or equivalent pre-flight checks when repo-tracked files changed. Branch on Review Gate status. |
 | QA validation | Main thread by default; QA subagent only for large independent scenario sets | [skills/qa/references/validate-fix.md](../skills/qa/references/validate-fix.md) | Load when a user-visible workflow bug changed and app is runnable. State why skipped if not runnable. |
 | Summary | Main thread | [skills/reporting/templates/fix-bug-summary.md](../skills/reporting/templates/fix-bug-summary.md), `metrics-emit` when available for the workflow | End of workflow or stop point. State RCA confidence, regression test status, verification strength, Review Gate status, QA result, and residual risk. |
@@ -86,7 +88,7 @@ Use the happy paths and path rules as the primary flow. Use this table as a phas
 
 - **Trivial**: skip existing-fix scan and formal planning; add a cheap regression assertion when possible; implement and test inline. Zero-logic diffs emit Review Gate `skipped`; true micro-fixes emit `micro-fix` only when the micro-fix rule passes. If logic review is needed beyond those exceptions, reclassify as MODERATE.
 - **Moderate**: run existing-fix scan, investigate inline, add/update regression coverage when feasible, implement inline by default, run `/verify` or equivalent pre-flight checks, then one fresh `/review-code` pass.
-- **Standard**: use the planning phase for investigation/RCA design only; write `PLAN.md`; run RCA/plan review and Action Gate; then implement in slices.
+- **Standard**: use the planning phase for investigation/RCA design only; run RCA review and Action Gate; write `PLAN.md`; run plan-review iteration on `PLAN.md` until threshold + cold-read Go; then implement in slices.
 
 For multiple plausible causes, use bounded investigation lanes only when they save context or real time. Do not start the next lane wave while a current lane has unresolved blockers, conflicting evidence, or a user decision.
 
