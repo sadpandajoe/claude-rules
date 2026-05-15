@@ -52,8 +52,9 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Maintenance
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/audit-agent-setup` | Audit commands, skills, rules, and agent docs against the primer model | After agent setup edits, before restructuring | — |
 | `/toolkit-doctor` | Validate symlinks, imports, paths, permissions, extensions | After install, after edits | — |
+
+Note: agent-setup audits now happen automatically — the `agent-setup-edit-reminder` PostToolUse hook activates the `agent-setup-maintainer` skill whenever an agent-setup file is edited.
 
 ### Extension (PGM) — install with `--with-pgm`
 | Command | What it does | When to call | Gates |

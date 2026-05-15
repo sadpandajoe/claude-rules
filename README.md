@@ -133,7 +133,6 @@ ai-toolkit/
     ├── checkpoint.md            # Save workflow state, log progress, or full save-and-clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
-    ├── audit-agent-setup.md     # Audit commands, skills, rules, and agent docs
     ├── complete-project.md      # Project capstone summary
     ├── metrics.md               # Workflow metrics summary
     ├── show-cost.md             # Token usage and cost summary
@@ -209,9 +208,10 @@ ai-toolkit/
 ### Toolkit Maintenance
 | Command | Purpose |
 |---------|---------|
-| `/audit-agent-setup` | Audit command/skill/rule/docs layout against the agentic primer model |
 | `/toolkit-doctor` | Validate symlinks, build output, imports, path portability, and README accuracy |
 | `/custom-skills-info` | Print reference card of all commands with gates |
+
+The `agent-setup-maintainer` skill activates automatically when you edit any agent-setup file (skills, commands, rules, CLAUDE.md, hooks) — see `hooks/agent-setup-edit-reminder.sh`.
 
 Claude's built-in `/review` is still available for review-only output; `/review-code` is the repo-standard wrapper when you want fix + verify loops.
 
