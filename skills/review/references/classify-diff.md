@@ -1,7 +1,7 @@
 ---
 name: classify-diff
 description: Analyze a changeset and return which review domains are relevant, with trigger reasons.
-model: sonnet
+tier: Standard
 ---
 
 # Classify Diff
@@ -14,7 +14,7 @@ This skill replaces inline reviewer-selection logic in commands. The calling com
 
 The caller provides:
 - The diff (staged, unstaged, or commit range)
-- The complexity tier (`TRIVIAL` or `STANDARD`) from the Complexity Gate
+- The complexity tier (`TRIVIAL`, `MODERATE`, or `STANDARD`) from the Complexity Gate
 
 ## Steps
 
@@ -22,31 +22,33 @@ The caller provides:
 
 2. **Classify each file** into domains based on path patterns and content:
 
-   | Domain | File Signals | Content Signals |
-   |--------|-------------|-----------------|
-   | Frontend | `*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css`, `*.scss`, `components/`, `pages/`, `views/` | React hooks, state management, DOM manipulation, CSS-in-JS |
-   | Backend | `*.py` (non-test), `*.go`, `*.rs`, `*.java`, `api/`, `server/`, `handlers/`, `middleware/` | Route definitions, DB queries, auth logic, API handlers |
-   | Tests | `*_test.*`, `*.test.*`, `*.spec.*`, `test_*`, `tests/`, `__tests__/`, `conftest.py` | Test assertions, mocks, fixtures, test utilities |
-   | Infrastructure | `Dockerfile`, `*.yml`/`*.yaml` (CI/CD), `terraform/`, `k8s/`, `.github/workflows/` | Pipeline configs, deploy scripts, container definitions |
-   | Config | `*.json` (config), `*.toml`, `*.ini`, `.env*`, `settings.*` | Environment variables, feature flags, connection strings |
+| Domain | File Signals | Content Signals |
+|--------|-------------|-----------------|
+| Frontend | `*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css`, `*.scss`, `components/`, `pages/`, `views/` | React hooks, state management, DOM manipulation, CSS-in-JS |
+| Backend | `*.py` (non-test), `*.go`, `*.rs`, `*.java`, `api/`, `server/`, `handlers/`, `middleware/` | Route definitions, DB queries, auth logic, API handlers |
+| Tests | `*_test.*`, `*.test.*`, `*.spec.*`, `test_*`, `tests/`, `__tests__/`, `conftest.py` | Test assertions, mocks, fixtures, test utilities |
+| Infrastructure | `Dockerfile`, `*.yml`/`*.yaml` (CI/CD), `terraform/`, `k8s/`, `.github/workflows/` | Pipeline configs, deploy scripts, container definitions |
+| Config | `*.json` (config), `*.toml`, `*.ini`, `.env*`, `settings.*` | Environment variables, feature flags, connection strings |
 
 3. **Determine review domains** by mapping file domains to reviewers:
 
-   | Review Domain | Trigger | Skill |
-   |---------------|---------|-------|
-   | Code quality | Always | `review/references/code-quality.md` |
-   | Architecture | STANDARD + logic changes in source files (not just config/test) | `plan-review/references/architecture.md` |
-   | Tests | STANDARD + test files exist in diff OR test files exist for changed source files | `testing/references/review-tests.md` |
-   | Test plan | STANDARD + no test files exist in diff AND no test files found for changed source files | `testing/references/review-testplan.md` |
-   | Frontend | Frontend files changed | `plan-review/references/frontend.md` |
-   | Backend | Backend files changed | `plan-review/references/backend.md` |
+| Review Domain | Trigger | Skill |
+|---------------|---------|-------|
+| Code quality | Always | `review/references/code-quality.md` |
+| Architecture | STANDARD + logic changes in source files; MODERATE only when ownership/design placement is unclear | `plan-review/references/architecture.md` |
+| Tests | MODERATE or STANDARD + test files exist in diff OR test files exist for changed source files | `testing/references/review-tests.md` |
+| Test plan | MODERATE or STANDARD + behavior changed AND no test files exist in diff AND no test files found for changed source files | `testing/references/review-testplan.md` |
+| Frontend | MODERATE or STANDARD + frontend files changed | `plan-review/references/frontend.md` |
+| Backend | MODERATE or STANDARD + backend files changed | `plan-review/references/backend.md` |
 
-   Rules:
-   - Code quality **always** triggers regardless of complexity tier
-   - Architecture, Tests/Test Plan only trigger for STANDARD complexity
-   - Frontend and Backend are additive — both can trigger on the same diff
-   - Tests and Test Plan are mutually exclusive — if tests exist, use Tests; if not, use Test Plan
-   - TRIVIAL complexity: code quality reviewer only
+Rules:
+- Code quality **always** triggers regardless of complexity tier.
+- TRIVIAL complexity: code quality reviewer only unless impact or security sensitivity escalates.
+- MODERATE complexity: triggered lanes only; do not launch the full review team just because one lane triggers.
+- STANDARD complexity: launch all triggered lanes, include architecture for logic changes, and consider optional second opinion.
+- Frontend and Backend are additive for MODERATE/STANDARD diffs — both can trigger on the same diff.
+- Tests and Test Plan are mutually exclusive — if tests exist, use Tests; if not, use Test Plan.
+- Security-sensitive diffs escalate to STANDARD handling even when initial size signals look MODERATE.
 
 4. **Assess security sensitivity**: Flag as security-sensitive if the diff touches:
    - Authentication or authorization logic
@@ -61,7 +63,7 @@ The caller provides:
 ```markdown
 ## Diff Classification
 
-Complexity: TRIVIAL / STANDARD
+Complexity: TRIVIAL / MODERATE / STANDARD
 Security-sensitive: YES / NO
 Files analyzed: [count]
 

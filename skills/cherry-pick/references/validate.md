@@ -7,7 +7,7 @@ Validate is two distinct jobs:
 - **Scope-leak audit (7a)** — runs as a subagent, mandatory for every cherry, no exceptions. Catches the silent failure mode that build/test cannot catch.
 - **Correctness validation (7b)** — runs on the main thread. Build/type-check/tests fail loudly when the cherry is broken; no fresh context required.
 
-**Model selection** for the scope-leak subagent: set by the gate (Sonnet for trivial, Opus for non-trivial). The caller spawns the subagent with the correct model.
+**Reasoning-effort selection** for the scope-leak subagent: set by the gate (standard for trivial, heavy for non-trivial). The caller spawns the subagent with the correct available model or reasoning effort for the runtime.
 
 ## Goal
 
@@ -112,6 +112,8 @@ pre-commit run --files <changed-file-1> <changed-file-2>
 # or, if pre-commit isn't the repo's tool, use the equivalent CI lint/format command
 ```
 
+`/cherry-pick` authorizes local amend of the in-progress cherry-pick commit for validation-only cleanup before any push. Do not amend older commits, rebase, or push unless the calling command separately authorizes that boundary.
+
 **If pre-commit auto-fixes files** (ruff-format, end-of-files, trailing whitespace, etc.):
 ```bash
 git add <fixed-files>
@@ -124,7 +126,7 @@ git commit --amend --no-edit
 
 **Pre-existing failures on unrelated files** (warnings on files the cherry-pick didn't touch) are out of scope — note them in the validation summary but do not attempt to fix them within the cherry-pick.
 
-The amend stays local since the push step is gated on validation passing. Do not push, then amend, then force-push, when amending pre-push would have worked.
+The validation amend stays local since publishing is gated on `--push` or explicit user authorization. Do not push, then amend, then force-push, when amending pre-push would have worked.
 
 ## Minimum Validation Bar
 

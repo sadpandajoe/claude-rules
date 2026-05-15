@@ -67,6 +67,7 @@ Exclude `build/` (those are resolved copies, not source).
 
 1. **Source imports**: Extract all `@{{TOOLKIT_DIR}}/path` references from files in `commands/` and `config/`. For each, verify `$REPO_DIR/path` exists on disk.
 2. **Build imports**: Extract all `@/absolute/path` references from files in `build/commands/` and `build/config/`. For each, verify the absolute path exists on disk.
+3. **Skill imports from commands**: In `commands/`, any source import that resolves under `skills/` is DRIFT. Commands should import only short rules needed immediately, then name or link skill phases for lazy loading.
 
 #### E. Structural Inventory
 
@@ -115,6 +116,7 @@ Check for optional external tools that specific commands depend on. All checks a
 | **GitHub CLI** | `gh auth status` succeeds | `/review-pr`, `/address-feedback`, `/create-pr` |
 | **Codex plugin** | `/codex:setup` is a recognized command in the session | `/review-code` (step 7), `/review-code-adversarial`, `/review-pr` (Lane 2) |
 | **jq** | `command -v jq` succeeds | `install-hooks.sh`, hooks |
+| **Python 3** | `command -v python3` succeeds | git safety hook parsing |
 | **Playwright MCP** | Playwright MCP tools are available in the session | `/run-test-plan` (UI testing) |
 
 For each capability:

@@ -1,7 +1,7 @@
 ---
 name: review-adversarial
 description: Red-team code review focused on security, edge cases, race conditions, and failure modes.
-model: opus
+tier: Heavy
 ---
 
 # Adversarial Code Review

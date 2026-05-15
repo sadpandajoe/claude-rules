@@ -21,8 +21,8 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Quality & Testing
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/review-code` | Orchestrated team review: quality, architecture, tests, Codex second opinion | Before commit, quality pass | Complexity, Review Gate |
-| `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) | Security-sensitive changes | Adversarial Rating, Review Gate |
+| `/review-code` | Orchestrated team review: quality, architecture, tests, optional second opinion | Before commit, quality pass | Complexity, Review Gate |
+| `/review-code-adversarial` | Adversarial red-team with optional second opinion | Security-sensitive changes | Adversarial Rating, Review Gate |
 | `/review-plan` | Iterate plan reviewers to 8/10 | One-off plan quality check | All reviewers 8/10, Cold Read |
 | `/create-tests` | Create first meaningful tests for untested area | No tests exist yet | Review Gate |
 | `/update-tests` | Improve an existing test suite | Tests exist but need work | Review Gate |
@@ -32,7 +32,7 @@ Print the reference card below and stop. No investigation, no file reading — j
 ### Review & PR
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/review-pr` | Orchestrated team PR review: quality, tests, patterns, Codex, auto-approve | Reviewing someone's PR | Complexity, Review Gate |
+| `/review-pr` | Orchestrated team PR review: quality, tests, patterns, optional second opinion, recommendation/posting | Reviewing someone's PR | Complexity, recommendation gates |
 | `/address-feedback` | Fix PR review comments, post replies | PR has review feedback | Complexity, Review Gate |
 | `/create-pr` | Generate PR title + description from diff/commits | Ready to open a PR | — |
 

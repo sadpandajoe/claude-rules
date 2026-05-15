@@ -1,6 +1,6 @@
 # Cherry-Pick Plan
 
-Per-cherry application strategy. Runs as a subagent — model is set by the gate's difficulty classification (Sonnet for trivial, Opus for non-trivial).
+Per-cherry application strategy. Runs as a subagent — reasoning effort is set by the gate's difficulty classification (standard for trivial, heavy for non-trivial).
 
 ## Goal
 
@@ -48,7 +48,7 @@ Fill in the template at [../assets/plan-template.md](../assets/plan-template.md)
 
 ## Plan Review Cycle
 
-The main thread (Opus) reviews. If feedback comes back:
+The main thread reviews. If feedback comes back:
 
 1. Read the feedback carefully
 2. Revise the plan to address concerns

@@ -1,5 +1,5 @@
 ---
-model: opus
+tier: Heavy
 ---
 
 # Cherry-Pick Adapt

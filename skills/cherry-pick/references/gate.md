@@ -79,18 +79,18 @@ Difficulty: TRIVIAL / NON-TRIVIAL
 Reject Criteria Hit: [list or "none"]
 Force Override: YES / NO
 
-### Model Tier
-Plan: sonnet / opus
-Validate: sonnet / opus
+### Reasoning Tier
+Plan: standard / heavy
+Validate: standard / heavy
 Adapt Required: YES / NO
 ```
 
-## Model Tier Selection
+## Reasoning Tier Selection
 
 | Phase | Trivial | Non-Trivial |
 |-------|---------|-------------|
-| Plan (subagent) | Sonnet | Opus |
-| Plan Review | Main thread (Opus) | Main thread (Opus) |
-| Apply | Opus | Opus |
-| Adapt | skipped | Opus |
-| Validate (subagent) | Sonnet | Opus |
+| Plan (subagent) | Standard | Heavy |
+| Plan Review | Main thread | Main thread |
+| Apply | Main thread, heavy effort | Main thread, heavy effort |
+| Adapt | skipped | Heavy |
+| Validate (subagent) | Standard | Heavy |

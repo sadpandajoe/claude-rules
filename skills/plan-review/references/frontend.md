@@ -1,7 +1,7 @@
 ---
 name: review-frontend
 description: Review plan from a frontend and UI/UX perspective.
-model: opus
+tier: Heavy
 ---
 
 # Frontend Review

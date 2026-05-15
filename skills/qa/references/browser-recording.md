@@ -1,7 +1,7 @@
 ---
 name: browser-recording
 description: Canonical recipe for QA scenario execution — drive the browser via a standalone Playwright script with recordVideo + an injected cursor dot, producing a .webm of just the browser viewport
-recommended_model: sonnet
+tier: Standard
 ---
 
 # Browser Recording for QA

@@ -1,7 +1,7 @@
 ---
 name: review-backend
 description: Review plan from a backend, API, and data modeling perspective.
-model: opus
+tier: Heavy
 ---
 
 # Backend Review

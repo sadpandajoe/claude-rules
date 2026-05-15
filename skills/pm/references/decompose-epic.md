@@ -1,5 +1,5 @@
 ---
-model: opus
+tier: Heavy
 ---
 
 # Decompose Epic into Wave Plan

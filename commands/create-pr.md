@@ -13,6 +13,10 @@
 
 ## Steps
 
+The command owns PR creation only. It does not review or rewrite code. Keep context bounded: gather enough diff and PROJECT.md context to write the PR, summarize large diffs by area, and do not paste full diffs into chat unless blocked.
+
+Creating a PR may require pushing the current branch to a remote. Treat `/create-pr` as authorization to push the current feature branch only when needed for PR creation; never push unrelated branches or amend/rebase history.
+
 ### 1. Validate Branch State
 
 - Verify current branch is not `main` (or the repo's default branch)
@@ -28,7 +32,8 @@ Collect all available context for generating the PR:
 - `git log base..HEAD --oneline` — commit titles
 - `git log base..HEAD --format="%B"` — full commit messages
 - `git diff base..HEAD --stat` — changed files summary
-- `git diff base..HEAD` — full diff for understanding scope
+- `git diff base..HEAD --name-only` — changed file list
+- targeted diffs only when a section needs details that commits, stats, names, PROJECT.md, and templates cannot answer
 
 **From PROJECT.md** (if it exists):
 - Feature Brief or Overview — for the "why"
@@ -114,13 +119,13 @@ Base: [base branch] ← [head branch]
 Commits: [N]
 ```
 
-**Record metrics**: include `metrics-emit` context with:
+**Record metrics** when available for the workflow:
 - `command`: `create-pr`
 - `complexity`: `standard`
 - `status`: `clean` if the PR was created, `blocked` otherwise
 - `rounds`: 0
 - `gate_decisions`: `{ pr_created: <yes | no>, draft: <yes | no> }`
-- `models_used`: subagent model invocation counts
+- `worker_usage`: subagent/worker invocation counts when applicable
 
 ## Notes
 - This command generates and creates the PR — it does not review the code

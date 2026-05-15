@@ -72,9 +72,9 @@ osc8_link() {
 
 # --- Data extraction ---
 
-# Model name: strip leading "Claude "
+# Model name: strip common provider prefixes from display labels
 model_raw=$(echo "$input" | jq -r '.model.display_name // empty')
-model_name=$(echo "$model_raw" | sed 's/^[Cc]laude //')
+model_name=$(echo "$model_raw" | sed -E 's/^([Cc]laude|OpenAI) //')
 
 # Effort level
 effort_str=""
@@ -239,28 +239,43 @@ fi
 
 # Agent invocations grouped by model (parse current transcript)
 agents_total=0
-agents_opus=0
-agents_sonnet=0
-agents_haiku=0
+agents_heavy=0
+agents_standard=0
+agents_light=0
+agents_unknown_tier=0
 if [ -n "$transcript" ] && [ -f "$transcript" ]; then
-    while IFS=$'\t' read -r stype emodel; do
-        [ -z "$stype$emodel" ] && continue
+    while IFS= read -r agent_input; do
+        [ -z "$agent_input" ] && continue
         agents_total=$((agents_total + 1))
-        model="$emodel"
+        stype=$(printf "%s" "$agent_input" | jq -r '.subagent_type // ""' 2>/dev/null)
+        model=$(printf "%s" "$agent_input" | jq -r '.model // ""' 2>/dev/null)
+        tier=$(printf "%s" "$agent_input" | jq -r '.tier // ""' 2>/dev/null)
+        eprompt=$(printf "%s" "$agent_input" | jq -r '.prompt // ""' 2>/dev/null)
+        if [ -z "$tier" ] && [ -n "$eprompt" ]; then
+            tier=$(printf "%s\n" "$eprompt" | awk 'BEGIN{IGNORECASE=1} { gsub(/\\n/, "\n") } /^Tier:[ \t]*/ { sub(/^[Tt]ier:[ \t]*/, ""); sub(/\n.*/, ""); sub(/[ \t]+$/, ""); print; exit }')
+        fi
         if [ -z "$model" ] && [ -n "$stype" ]; then
             def=$(find "$HOME/.claude/plugins/marketplaces" -name "${stype}.md" -path "*/agents/*" -print -quit 2>/dev/null)
             if [ -n "$def" ]; then
                 model=$(awk '/^model:/ { sub(/^[ \t]*model:[ \t]*/, ""); sub(/[ \t]+$/, ""); print; exit }' "$def" 2>/dev/null)
+                tier=$(awk '/^tier:/ { sub(/^[ \t]*tier:[ \t]*/, ""); sub(/[ \t]+$/, ""); print; exit }' "$def" 2>/dev/null)
             fi
         fi
-        [ -z "$model" ] && model="opus"
-        case "$model" in
-            opus*)   agents_opus=$((agents_opus + 1)) ;;
-            sonnet*) agents_sonnet=$((agents_sonnet + 1)) ;;
-            haiku*)  agents_haiku=$((agents_haiku + 1)) ;;
-            *)       agents_opus=$((agents_opus + 1)) ;;
+        case "$tier" in
+            Heavy|heavy)       agents_heavy=$((agents_heavy + 1)) ;;
+            Standard|standard) agents_standard=$((agents_standard + 1)) ;;
+            Light|light)       agents_light=$((agents_light + 1)) ;;
+            *)
+                model_lc=$(printf "%s" "$model" | tr '[:upper:]' '[:lower:]')
+                case "$model_lc" in
+                    *haiku*|*mini*)             agents_light=$((agents_light + 1)) ;;
+                    *opus*|gpt-*|o1*|o3*|o4*)   agents_heavy=$((agents_heavy + 1)) ;;
+                    *sonnet*|codex-*|*codex*)   agents_standard=$((agents_standard + 1)) ;;
+                    *)                          agents_unknown_tier=$((agents_unknown_tier + 1)) ;;
+                esac
+                ;;
         esac
-    done < <(jq -r 'select(.message.content) | .message.content[]? | select(.type == "tool_use" and .name == "Agent") | "\(.input.subagent_type // "")\t\(.input.model // "")"' "$transcript" 2>/dev/null)
+    done < <(jq -c 'select(.message.content) | .message.content[]? | select(.type == "tool_use" and .name == "Agent") | (.input // {})' "$transcript" 2>/dev/null)
 fi
 
 # --- Line 1: model effort | session dur | msgs | cost | time | diff ---
@@ -336,11 +351,14 @@ for part in "${line2_parts[@]}"; do
     fi
 done
 
-# --- Line 3: agents N | opus N | sonnet N | haiku N ---
+# --- Line 3: agents N | heavy N | standard N | light N ---
 agents_line=""
 if [ "$agents_total" -gt 0 ]; then
-    agents_line=$(printf "agents %d | opus %d | sonnet %d | haiku %d" \
-        "$agents_total" "$agents_opus" "$agents_sonnet" "$agents_haiku")
+    agents_line=$(printf "agents %d | heavy %d | standard %d | light %d" \
+        "$agents_total" "$agents_heavy" "$agents_standard" "$agents_light")
+    if [ "$agents_unknown_tier" -gt 0 ]; then
+        agents_line="$agents_line | tier? $agents_unknown_tier"
+    fi
 fi
 
 # --- Line 4: directory | branch | repo ---

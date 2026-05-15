@@ -60,7 +60,7 @@ Format per entry: **Symptom** → **Why** → **Do instead** → **First seen**.
 
 **Why:** Plan operates downstream of the gate and should treat the go/no-go as decided. Re-litigating wastes the cycle and confuses orchestration.
 
-**Do instead:** The plan can note disagreement for the reviewer to consider, but produces a plan as instructed. Only the main thread (Opus) re-evaluates gate decisions.
+**Do instead:** The plan can note disagreement for the reviewer to consider, but produces a plan as instructed. Only the main thread re-evaluates gate decisions.
 
 **First seen:** Standing rule encoded in plan phase.
 
@@ -90,13 +90,13 @@ Format per entry: **Symptom** → **Why** → **Do instead** → **First seen**.
 
 ---
 
-## Batched push at end of batch instead of per-cherry
+## Authorized push batched at end instead of per-cherry
 
-**Symptom:** All cherry-picks in a multi-PR batch get committed locally, then pushed in a single `git push` at the end. CI runs once against the bundle. If a later cherry breaks something, the failure can't be attributed without bisecting the bundled push.
+**Symptom:** Push was authorized for a multi-PR batch, but all cherry-picks get committed locally and pushed in a single `git push` at the end. CI runs once against the bundle. If a later cherry breaks something, the failure can't be attributed without bisecting the bundled push.
 
-**Why:** `git push` happening once per batch is the natural rhythm when you're orchestrating a tight loop ("apply, validate, next, …, done, push"). The skill's per-cherry push directive is easy to skim past because it sits as a trailing note after the validate references rather than as a numbered phase, and the Batch Flow section doesn't restate it.
+**Why:** `git push` happening once per batch is the natural rhythm when you're orchestrating a tight loop ("apply, validate, next, …, done, push"). When push has been authorized, the per-cherry push directive is easy to skim past because it sits as a trailing note after the validate references rather than as a numbered phase, and the Batch Flow section doesn't restate it.
 
-**Do instead:** Step 8 (push) is a numbered phase that runs **per cherry, before starting the next one**. Treat the per-cherry loop body as steps 1–8, not 1–7. If you're tempted to defer push, re-read step 8. Only batch pushes when the user explicitly requests it (e.g., to reduce CI cost) — confirm first.
+**Do instead:** Step 8 is a numbered push boundary. If push is authorized, it runs **per cherry, before starting the next dependent one**. If push is not authorized, stop with `Push: pending authorization`. Only batch pushes when the user explicitly requests it (e.g., to reduce CI cost) — confirm first.
 
 **First seen:** 4-PR batch into 6.0-release, 2026-05-06. Pushed once at the end; user flagged it.
 

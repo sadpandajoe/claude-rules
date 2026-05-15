@@ -3,7 +3,7 @@ name: implement-change
 description: Use when an approved plan, RCA, or slice is ready for code changes. Implements one scoped slice, follows the requested test-first mode, verifies acceptance, and hands changed files back for review. Do NOT use for root-cause investigation, plan creation, broad unsliced refactors, or final code review.
 user-invocable: false
 disable-model-invocation: true
-model: opus
+tier: Heavy
 ---
 
 # Implement Change
@@ -32,6 +32,8 @@ When the plan defines structured slices (with scope, entrance/exit criteria, acc
 When no structured slices exist (simple fix, trivial path), implement the full change as a single unit.
 
 ## Worktree Mode
+
+Default mode is the caller's current worktree. In default mode, do not commit, amend, rebase, push, or force-push. Return changed files and verification evidence only; the orchestrator owns review, durable state, and any authorized git action.
 
 When launched with `isolation: "worktree"`, this skill runs in a temporary git worktree — an isolated copy of the repository. Key differences:
 
@@ -64,9 +66,14 @@ When launched with `isolation: "worktree"`, this skill runs in a temporary git w
 - Exit criteria: <met — evidence>
 - Files changed:
   - <file>
+- Branch/commit: <only when launched with isolation: "worktree"; otherwise "N/A">
 - Tests added or updated:
   - <test>
 - Acceptance: <passed / failed / not runnable — reason>
 - Unverified areas:
   - <gap or none>
 ```
+
+## Orchestrator Responsibility (After Handoff)
+
+The orchestrator owns durable state. After receiving this handoff, the calling workflow (`/create-feature`, `/fix-bug`) must append a `## Slice N Complete` block to PROJECT.md before invoking `/checkpoint --clear`. This is a hard gate — context-management.md boundary #3 ("Implementation slice or wave complete") is not met until the block is written. See `commands/create-feature.md` step 8 and `commands/fix-bug.md` slice exit for the canonical block shape.

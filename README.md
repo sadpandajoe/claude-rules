@@ -67,6 +67,7 @@ ai-toolkit/
 ├── rules/
 │   ├── universal.md        # Core principles (loaded first)
 │   ├── orchestration.md    # Multi-agent workflow rules
+│   ├── model-assignment.md # Provider-neutral model/effort tiers
 │   ├── context-management.md   # Context depth thresholds and checkpoint protocol
 │   ├── rule-maintenance.md     # How to strengthen, update, or extract rules
 │   ├── investigation.md    # Debugging & root cause
@@ -84,8 +85,10 @@ ai-toolkit/
 │   ├── planning/            # Technical planning — plan-implementation, iterate-review, finalize, feedback-classify
 │   ├── pm/                  # Product management — create-feature-brief, plan-milestones, review-feature-brief, decompose-epic
 │   ├── plan-review/         # Plan-reviewer lenses — architecture, backend, frontend, implementation
-│   ├── review/              # Code-reviewer lenses + dispatch — classify-diff, code-quality, adversarial
-│   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, ci-classify-failure, ci-verify-fix
+│   ├── review/              # Code/PR reviewer orchestration + lenses — local-review, pr-review, classify-diff, adversarial
+│   ├── feedback/            # PR feedback response — triage comments, fix approved items, post replies
+│   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, CI gather/classify/fix/verify
+│   ├── learning/            # Memory capture, review/prune, failure postmortems, rule promotion
 │   ├── qa/                  # QA — triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
@@ -100,7 +103,8 @@ ai-toolkit/
 │   ├── superset-local/      # Superset-specific local stack + Playwright helpers
 │   └── workstreams/         # Post-parallel-implementation fan-in and merge sequencing
 ├── hooks/
-│   ├── prevent-project-commit.sh  # Block commit if PROJECT.md staged
+│   ├── prevent-project-commit.sh  # Block unsafe git flags and local workflow state commits
+│   ├── test-prevent-project-commit.sh # Smoke tests for git safety hook behavior
 │   ├── check-resources.sh         # Warn on constrained resources before tests
 │   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
 ├── extensions/
@@ -151,13 +155,13 @@ ai-toolkit/
 | Command | Purpose |
 |---------|---------|
 | `/create-tests` | Standalone test-only workflow for creating the first meaningful tests in an area |
-| `/update-tests` | End-to-end workflow for improving an existing suite, reviewing it, and auto-committing when ready |
+| `/update-tests` | End-to-end workflow for improving an existing suite, verifying it, and reviewing it |
 | `/run-test-plan` | Standalone validation workflow that derives or reviews a test plan, executes it, and summarizes findings |
 | `/test-pr` | Manual PR testing via Playwright browser against a running local app |
 | `/fix-ci` | Diagnose CI failures, apply safe fixes, and stop before commit |
-| `/review-code` | Adaptive team review: code quality + architecture + test check + Codex second opinion |
-| `/review-code-adversarial` | Dual-model red-team (Claude + Codex in parallel) |
-| `/review-plan` | One-off plan review with reviewer iteration to 8/10 |
+| `/review-code` | Adaptive team review: code quality + architecture + test check + optional second opinion |
+| `/review-code-adversarial` | Adversarial red-team with optional second opinion |
+| `/review-plan` | One-off plan review with fresh reviewers to 8/10 |
 | `/verify` | Run tests on changed files and report verification strength |
 
 ### Review & Branch Workflows
@@ -250,11 +254,11 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 
 ### Plan Review
 ```bash
-/review-plan                # Review plan in PROJECT.md with all applicable reviewers
+/review-plan                # Review PLAN.md or PROJECT.md-referenced plan with all applicable reviewers
 /review-plan --pm           # Include PM brief review
 ```
 
-`/review-plan` is standalone plan quality review — the same reviewer iteration as `/create-feature` step 4, without the full workflow.
+`/review-plan` is standalone plan quality review — the same fresh-reviewer loop as `/create-feature` step 4, without the full workflow.
 
 ### PR Feedback Analysis
 ```bash
@@ -289,6 +293,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/stop-rules.md` | Any iterative loop (universal stop conditions) |
 | `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
+| `rules/model-assignment.md` | Worker dispatch and provider-neutral model/effort tiering |
 | `rules/rule-maintenance.md` | `/learn propose-rule`, rule editing |
 
 ## Hooks (optional)
@@ -297,7 +302,7 @@ Hooks enforce toolkit rules at runtime via Claude Code's hook system. They are s
 
 | Hook | Event | Behavior |
 |------|-------|----------|
-| `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks `git commit` if PROJECT.md is staged |
+| `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks unsafe git flags, force-pushes to main/master, and commits of local workflow state files |
 | `check-resources.sh` | PreToolUse (Bash) | Warns when running tests with constrained resources |
 
 ```bash

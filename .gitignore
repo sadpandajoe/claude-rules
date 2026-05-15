@@ -1,5 +1,7 @@
 .claude/
 PROJECT.md
+CHERRY_PICK.md
+CI_FIX.md
 build/
 config/CLAUDE.md
 .DS_Store

@@ -27,6 +27,7 @@ skills/<name>/
 | `disable-model-invocation: true` | Hide from auto-routing list. Use for coordination-only helpers the orchestrator must own. |
 | `allowed-tools` | Restrict tool access for safety (e.g. `Bash(git *) Read Edit`). |
 | `argument-hint` | Shown in `/<name>` autocomplete. |
+| `tier` | Optional provider-neutral dispatch tier (`Light`, `Standard`, `Heavy`, `Orchestrator`). See `rules/model-assignment.md`; do not use provider model names in reusable skill frontmatter. |
 
 **The "Before Starting" line** at the top of every SKILL.md:
 ```
@@ -49,6 +50,8 @@ End-to-end workflow umbrellas:
 | Umbrella | Use for |
 |----------|---------|
 | [debug/](debug/) | Investigating bugs, diagnosing failures, RCA review, CI failure classification, fix verification |
+| [feedback/](feedback/) | PR review feedback triage, approved fixes, reviewer replies, and thread handling |
+| [learning/](learning/) | Memory capture, memory review/prune, failure postmortems, rule promotion |
 | [planning/](planning/) | Producing/iterating technical plans, finalize cold read, classifying review findings as plan vs code |
 | [pm/](pm/) | Product scoping before planning — feature briefs, acceptance criteria, milestones |
 | [plan-review/](plan-review/) | Reviewer lenses that critique a plan: architecture, backend, frontend, feasibility |

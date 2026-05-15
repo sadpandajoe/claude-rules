@@ -1,7 +1,7 @@
 ---
 name: workstreams-sync
 description: Reference for collecting subagent results, updating slice status in PROJECT.md, merging worktree branches, and surfacing failures.
-model: sonnet
+tier: Standard
 ---
 
 # Sync Workstreams

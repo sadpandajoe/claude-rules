@@ -1,7 +1,7 @@
 ---
 name: review-testplan
 description: Review a plan's testing strategy for coverage approach, test layers, and edge cases.
-model: opus
+tier: Heavy
 ---
 
 # Test Plan Review

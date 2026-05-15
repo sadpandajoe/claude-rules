@@ -2,6 +2,8 @@
 
 The 13-column table tracks each cherry through every phase. Produced by the plan phase, updated by apply/adapt/validate, preserved through the final report as detailed notes.
 
+For large runs, the full table belongs in local `CHERRY_PICK.md` using [../templates/cherry-pick-manifest.md](../templates/cherry-pick-manifest.md). The final report should use the compact table from [final-report.md](final-report.md) and link back to the local manifest for detailed audit context. Chat should not become the durable store for every row, log, and handoff.
+
 ```markdown
 | # | SHA | PR | Description | Depends On | Risk | Confidence | Decision | Status | Adaptation | Scope Audit | Validation | Notes |
 |---|-----|----|-------------|------------|------|------------|----------|--------|------------|-------------|------------|-------|

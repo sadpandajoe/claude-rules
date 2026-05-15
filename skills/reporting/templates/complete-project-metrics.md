@@ -11,8 +11,8 @@ Filter `.claude/metrics.jsonl` events to those relevant to this project (timesta
 | Pass rate (clean/micro-fix) | [N%] |
 | Blocked/failed | [N] |
 | Average review rounds | [N.N] |
-| Complexity distribution | [N] trivial / [N] standard |
-| Model usage | opus: [N], sonnet: [N], haiku: [N] |
+| Complexity distribution | [N] trivial / [N] moderate / [N] standard |
+| Worker usage | [role/tier]: [N] |
 
 ### Command Breakdown
 | Command | Runs | Clean | Blocked |

@@ -94,4 +94,14 @@ After emitting the summary, include `metrics-emit` context with:
 - `status`: `clean` (or `blocked` if step 5 left services running, etc.)
 - `rounds`: 0 (no review loop)
 - `gate_decisions`: include any user decisions made during memory promotion
-- `models_used`: track subagent invocations from this command
+- `worker_usage`: subagent/worker invocation counts when applicable
+
+### 9. Suggest Final Clear
+
+The capstone is also a natural context boundary — the project is closed, durable state is archived, and the next thing the user does will be a fresh project or unrelated work. Suggest a clean slate:
+
+```
+Project closed. Run /checkpoint --clear to start the next session fresh.
+```
+
+Do not auto-clear. The user may want to stay in-session to push the PR, deploy, or pick up the suggested final action from step 7.

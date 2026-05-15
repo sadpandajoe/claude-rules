@@ -1,7 +1,7 @@
 ---
 name: review-tests
 description: Evaluate test quality, regression signal, production failure scenarios, and recommended safeguards before merge.
-model: opus
+tier: Heavy
 ---
 
 # Review Tests

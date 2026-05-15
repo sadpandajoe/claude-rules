@@ -1,7 +1,7 @@
 ---
 name: review-implementation
 description: Review plan from an implementation feasibility and sequencing perspective.
-model: opus
+tier: Heavy
 ---
 
 # Implementation Review

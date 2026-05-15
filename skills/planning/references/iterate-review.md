@@ -15,11 +15,11 @@ This skill iterates **reviews of a plan**, not iterations of code review. It is 
 
 The caller provides:
 
-- **Plan location**: where the plan lives (usually PROJECT.md sections, sometimes a plan file)
+- **Plan location**: where the plan lives (usually `PLAN.md`; PROJECT.md should point to it rather than duplicate it)
 - **Reviewer set**: which reviewers to run. Always + conditional:
   - Always: whichever reviewers the caller designates as mandatory
   - Conditional: add based on what the plan actually touches
-- **Scope**: `trivial` / `moderate` / `substantial` — determines model tier
+- **Scope**: `trivial` / `moderate` / `standard` — determines reasoning effort
 - **Optional PM brief review**: when the plan has a feature brief that needs `pm/references/review-feature-brief.md`
 - **Optional action gate**: when the caller wants an action gate block after cold read
 
@@ -34,7 +34,7 @@ Default: **8/10 or better** on every applicable reviewer, plus a **Go** from col
 When the caller provides PM context:
 
 - Spawn `pm/references/review-feature-brief.md` as a subagent
-- Model: `sonnet` by default; escalate to `opus` only when the brief covers multi-system rollout or material business risk
+- Use standard reasoning effort by default; escalate to heavy effort only when the brief covers multi-system rollout or material business risk
 - Revise the brief until 8/10
 - If the brief reaches 8/10 after the first pass, proceed to technical plan review
 
@@ -51,10 +51,10 @@ Add conditional reviewers when the plan touches their area:
 - `plan-review/references/frontend.md` — React, CSS, UI components
 - `plan-review/references/backend.md` — API, database, migrations
 
-**Model selection** per the scope input (see `rules/orchestration.md`):
+**Reasoning effort selection** per the scope input (see `rules/orchestration.md`):
 
-- `trivial` / `moderate` — `model: "sonnet"`
-- `substantial` — `model: "opus"` (multi-system, real trade-offs, novel design, ambiguous constraints)
+- `trivial` / `moderate` — standard reasoning effort
+- `standard` — heavy reasoning effort when the plan has multi-system scope, real trade-offs, novel design, or ambiguous constraints
 
 Each reviewer:
 - Reads the plan from the location provided by the caller
@@ -66,15 +66,15 @@ Each reviewer:
 After collecting scores:
 
 - **All reviewers ≥ 8/10** → proceed to cold read
-- **Any reviewer below 8/10** → revise the plan based on feedback, then re-run **only the failing reviewers** (not all of them)
+- **Any reviewer below 8/10** → revise the plan based on feedback, then re-run fresh reviewers for material revisions. Reuse the same reviewer only to clarify that reviewer's own finding in the same pass.
 - Auto-iterate — do not ask the user whether to continue or which reviewers to re-run
 - Only stop for a blocking decision that requires user input, or if stop rules in `rules/stop-rules.md` trigger
 
-**Shallow-analysis escalation**: If a Sonnet reviewer scored low because their analysis was shallow (not because the plan has real issues), re-run that specific reviewer on `model: "opus"` rather than revising a plan that doesn't need revising.
+**Shallow-analysis escalation**: If a reviewer scored low because their analysis was shallow (not because the plan has real issues), re-run that specific reviewer with heavier reasoning rather than revising a plan that doesn't need revising.
 
 ### 4. Cold Read
 
-Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match the model to the plan's reasoning load (same rule as step 2).
+Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match reasoning effort to the plan's reasoning load (same rule as step 2).
 
 - **Go** → proceed to step 5
 - **No-Go** with blocking issues → revise and re-run sibling [finalize.md](finalize.md)
@@ -82,7 +82,7 @@ Spawn sibling [finalize.md](finalize.md) as a fresh-eyes final check. Match the 
 
 ### 5. Write Final Scores
 
-Append the scores to the plan location the caller specified (typically `PLAN.md` for standard-path workflows; sometimes a section of PROJECT.md for moderate-path):
+Append the scores to the plan location the caller specified. For standard-path workflows this is typically `PLAN.md`. If a moderate path needs durable plan-review scores, reclassify to STANDARD before using this loop.
 
 ```markdown
 ## Plan Review Scores

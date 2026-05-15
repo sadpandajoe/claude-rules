@@ -3,7 +3,7 @@ name: action-gate
 description: Use when a workflow needs an Execution Gate block after investigation, classification, or cold-read planning. Produces Risk, Confidence, Decision Required, Verification Strength, and proceed/ask/stop guidance. Do NOT use for code review gates, test verification reports, or PR approval verdicts.
 user-invocable: false
 disable-model-invocation: true
-model: sonnet
+tier: Standard
 ---
 
 # Action Gate

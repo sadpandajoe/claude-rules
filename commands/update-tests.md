@@ -1,9 +1,8 @@
 # /update-tests - Improve an Existing Test Suite
 
-@{{TOOLKIT_DIR}}/skills/testing/references/review-tests.md
 
-> **When**: You want to improve an existing test suite in a specific area, path, or function and have the workflow analyze gaps, update tests, verify, review, and auto-commit when confidence is strong.
-> **Produces**: Scoped test updates, verification results, remaining follow-up gaps, and either an automatic `test:` commit or a clear handoff.
+> **When**: You want to improve an existing test suite in a specific area, path, or function and have the workflow analyze gaps, update tests, verify, and review.
+> **Produces**: Scoped test updates, verification results, remaining follow-up gaps, and either an authorized `test:` commit or a clear handoff.
 
 ## Usage
 ```
@@ -12,6 +11,17 @@
 /update-tests tests/unit/sql_lab/
 /update-tests --function normalize_query
 ```
+
+## Command Contract
+
+- Only the main thread writes PROJECT.md. Subagents return compact handoffs.
+- For STANDARD or expensive runs (large suite, multi-subsystem target, repeated `/review-code` rounds), follow `rules/context-management.md`: write durable state to PROJECT.md at each phase boundary, then `/checkpoint --clear` before the next expensive phase. The internal `/review-code` loop counts as one of those phases.
+- Required PROJECT.md updates on STANDARD/expensive runs:
+  - After step 3 (gap analysis): `## Test Suite Analysis` (target, weak tests, missing coverage, planned updates).
+  - After step 6 (updates applied): `## Test Updates Applied` (files changed, tests added/updated, replaced low-signal tests).
+  - After step 7 (verify + review): `## Test Review Status` (verification strength, review rounds, Review Gate status).
+- These writes are **hard gates before any `/checkpoint --clear`** on STANDARD/expensive runs — clearing without them loses the gap analysis or fix queue.
+- For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` after classification.
 
 ## Steps
 
@@ -36,7 +46,7 @@
 
 3. **Analyze the Current Suite**
 
-   Run the shared test reviewer to identify:
+   Load [skills/testing/references/review-tests.md](../skills/testing/references/review-tests.md) to identify:
    - weak or low-signal tests
    - missing behavioral coverage
    - production blind spots
@@ -58,7 +68,7 @@
 
 6. **Update the Tests**
 
-   Follow [skills/testing/references/update-tests.md](../skills/testing/references/update-tests.md):
+   Load [skills/testing/references/update-tests.md](../skills/testing/references/update-tests.md):
 
    This helper owns:
    - updating existing tests first
@@ -67,14 +77,14 @@
    - writing failing tests first when feasible
    - targeted verification
 
-7. **Review Changed Test Files**
+7. **Verify and Review Changed Test Files**
 
-   Run `/review-code` on the changed repo-tracked files as an internal loop.
+   Run `/verify` or equivalent targeted checks first, then run `/review-code` on the changed repo-tracked files as an internal loop.
    Keep iterating until only nitpicks remain or a real blocker/user decision appears.
 
-8. **Auto-Commit When Ready**
+8. **Commit Boundary**
 
-   If verification is strong and `/review-code` leaves no unresolved `[major]` or `[minor]` issues:
+   If the user explicitly requested commit behavior, verification is strong, and `/review-code` leaves no unresolved `[major]` or `[minor]` issues:
    - create a `test:` commit
 
    Commit message format:
@@ -82,6 +92,7 @@
    - fallback: `test: update targeted coverage`
 
    Stop instead of committing when:
+   - commit behavior was not explicitly requested
    - verification is partial or blocked
    - meaningful ambiguity remains
    - the workflow handed off to `/create-tests`
@@ -123,3 +134,4 @@
 - Favor replacing low-signal tests over adding redundant ones
 - Write the failing test first when feasible; if blocked, document why before changing the suite
 - `/review-code` is an internal phase here, not the expected next top-level user step
+- TRIVIAL runs (single tiny test fix) skip the PROJECT.md hard gates; MODERATE runs update PROJECT.md once at the end; STANDARD/expensive runs follow the hard-gate cadence in the Command Contract.

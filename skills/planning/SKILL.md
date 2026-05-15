@@ -54,3 +54,4 @@ During post-implementation review (via `/review-code`), if findings surface:
 - `iterate-review` is the loop-runner that dispatches `plan-review/` lens subagents. They work together: this umbrella owns the loop; `plan-review/` owns the lenses.
 - `finalize` fires once per plan iteration cycle as the last gate before implementation begins.
 - `feedback-classify` is how the planning umbrella reaches back into implementation/review to say "this isn't a code fix — re-plan."
+- End-to-end command sequencing belongs in the command file. This skill owns planning phases only; implementation, review, QA, and reporting are routed to their own skills by the command.
