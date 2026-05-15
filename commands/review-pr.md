@@ -28,6 +28,7 @@ Use `--draft` to show the review locally without posting. Use `--auto` to skip c
 - Show findings and severity reasoning to the user before posting unless `--auto` is passed.
 - Post only clean, user-confirmed finding text to GitHub.
 - For batch reviews, keep the main thread as a thin orchestrator and use compact per-PR handoffs.
+- For batch reviews of 4+ PRs, follow `rules/context-management.md`: after each wave of 3 PRs, the main thread must append a `## Review-PR Batch Wave N` block to PROJECT.md (per-PR recommendation, posted status, top finding, residual risk), then `/checkpoint --clear` before launching the next wave. This is a hard gate — without the PROJECT.md write, the per-PR posting state is lost on clear.
 
 ## Steps
 

@@ -15,6 +15,17 @@
 /run-test-plan https://github.com/owner/repo/pull/123
 ```
 
+## Command Contract
+
+- The main thread owns scenario state, evidence paths, and reporting destinations. Subagents return compact scenario/review handoffs only.
+- For STANDARD or expensive runs (large scenario matrix, multi-flow validation, repeated plan-review rounds), follow `rules/context-management.md`: write durable state to PROJECT.md at each phase boundary, then `/checkpoint --clear` before the next expensive phase.
+- Required PROJECT.md updates on STANDARD/expensive runs:
+  - After step 3 (plan at 8/10): `## Test Plan` (final scenario matrix, plan source, review score).
+  - After step 4 (execution): `## Test Plan Results` (per-scenario PASS/FAIL/BLOCKED/SKIP, evidence paths).
+  - After step 6 (report): `## Test Plan Reported` (where posted: Shortcut story link, PR comment, or local only).
+- These writes are **hard gates before any `/checkpoint --clear`** on STANDARD/expensive runs — chat-only scenario state is unrecoverable after clear.
+- The plan matrix and per-scenario evidence paths must land in PROJECT.md before clear regardless of whether the run is reactive or proactive checkpoint.
+
 ## Steps
 
 1. **Resolve the Starting Point**

@@ -30,6 +30,16 @@ Within that flow:
 - Fix, reject with evidence, or surface each finding as a user decision.
 - Emit the adversarial Review Gate before the final summary.
 
+## PROJECT.md Discipline
+
+Adversarial review is expensive by definition (dual-lane reasoning, often security-sensitive). For STANDARD runs, follow `rules/context-management.md`:
+
+- After finding merge (before fixes): append `## Adversarial Findings` to PROJECT.md (per-finding scenario, severity, both-lane attribution, fix/reject/discuss verdict).
+- After each fix wave: append `## Adversarial Fix Round N` (findings fixed, files changed, verification result, residual risk).
+- After re-review: update the adversarial Review Gate status in PROJECT.md.
+
+These writes are **hard gates before any `/checkpoint --clear`** — the per-finding scenarios are exactly the thing that's expensive to reconstruct and must not be lost to chat-only state.
+
 ## Summary Contract
 
 End with:

@@ -44,10 +44,32 @@ MODERATE is the **default classification** — most real work lands here. Use TR
 When classification is `STANDARD` (or confidence is below `8/10` for any classification):
 - Full workflow: durable plan or investigation artifact as the command requires, reviewer subagents, and validation gates
 - Spawn subagents per command-specific steps and `rules/orchestration.md` reasoning-load boundaries
+- **Emit a Phase Plan block immediately after the Complexity Gate** (see below). This announces the cadence — including planned checkpoint/clear boundaries — upfront, before the first phase starts.
+
+## Phase Plan Block (STANDARD only)
+
+After emitting the Complexity Gate, emit a Phase Plan that names the remaining phases and where checkpoint/clear will fire. This makes context cadence predictable to the user instead of firing silently mid-workflow.
+
+Format:
+
+```markdown
+## Phase Plan
+Phases: [phase 1] → [clear] → [phase 2] → [clear] → ... → [final phase]
+Checkpoints fire after: [list of durable artifacts that trigger /checkpoint --clear]
+Resume contract: PROJECT.md (+ manifest if any) carries state across clears.
+```
+
+Pull the phase list from the command's STANDARD happy path. Pull the checkpoint/clear list from the command's Command Contract and `rules/context-management.md` Proactive Phase Reset Policy. Examples:
+
+- `/create-feature` STANDARD: `plan → clear → plan-review → clear → implement-slice(s) → clear → /review-code → clear → feature-validation → summary`
+- `/fix-bug` STANDARD: `RCA → RCA-review → clear → PLAN.md → clear → plan-review → clear → implement → /review-code → clear → QA → summary`
+- `/fix-ci` STANDARD: `triage → action-gate → clear → apply → verify → /review-code → clear → commit-recommendation`
+
+If the user's request is genuinely too small for STANDARD (≤2 phases after Complexity Gate), reclassify MODERATE rather than emit a degenerate Phase Plan.
 
 ## Never Silently Decide
 
-Always emit the gate block above. Do not silently choose a path — the block must be visible in conversation so the user and any continuation checkpoint can see the classification.
+Always emit the gate block above. Do not silently choose a path — the block must be visible in conversation so the user and any continuation checkpoint can see the classification. STANDARD work must additionally emit the Phase Plan block; a silent STANDARD path is a defect.
 
 ## Worked Examples
 

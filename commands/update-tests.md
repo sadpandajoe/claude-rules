@@ -12,6 +12,17 @@
 /update-tests --function normalize_query
 ```
 
+## Command Contract
+
+- Only the main thread writes PROJECT.md. Subagents return compact handoffs.
+- For STANDARD or expensive runs (large suite, multi-subsystem target, repeated `/review-code` rounds), follow `rules/context-management.md`: write durable state to PROJECT.md at each phase boundary, then `/checkpoint --clear` before the next expensive phase. The internal `/review-code` loop counts as one of those phases.
+- Required PROJECT.md updates on STANDARD/expensive runs:
+  - After step 3 (gap analysis): `## Test Suite Analysis` (target, weak tests, missing coverage, planned updates).
+  - After step 6 (updates applied): `## Test Updates Applied` (files changed, tests added/updated, replaced low-signal tests).
+  - After step 7 (verify + review): `## Test Review Status` (verification strength, review rounds, Review Gate status).
+- These writes are **hard gates before any `/checkpoint --clear`** on STANDARD/expensive runs — clearing without them loses the gap analysis or fix queue.
+- For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` after classification.
+
 ## Steps
 
 1. **Normalize the Target**
@@ -123,3 +134,4 @@
 - Favor replacing low-signal tests over adding redundant ones
 - Write the failing test first when feasible; if blocked, document why before changing the suite
 - `/review-code` is an internal phase here, not the expected next top-level user step
+- TRIVIAL runs (single tiny test fix) skip the PROJECT.md hard gates; MODERATE runs update PROJECT.md once at the end; STANDARD/expensive runs follow the hard-gate cadence in the Command Contract.

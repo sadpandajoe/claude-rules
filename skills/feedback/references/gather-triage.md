@@ -144,11 +144,22 @@ Verdicts:
 - `Skip`: style preference, out of scope, misunderstanding, or false positive.
 - `Discuss`: architecture disagreement, ambiguous requirement, or user/product trade-off.
 
+## Persist Triage to PROJECT.md (Hard Gate)
+
+Before the Confirmation Gate, append a `## Feedback Triage` section to PROJECT.md containing:
+
+- PR identity (number, URL, head branch)
+- The Reviewer Inventory table from earlier in this reference
+- The triage table (comment id, reviewer, verdict, reasoning, confidence)
+- Open thread IDs that need resolution
+
+This is the source of truth for resuming after `/clear`. The triage table is the most expensive thing to reconstruct (it requires re-fetching every comment + redoing reviewer judgment), so it MUST land in PROJECT.md before any checkpoint/clear. STANDARD path: do not invoke `/checkpoint --clear` after triage until this section exists in PROJECT.md.
+
 ## Confirmation Gate
 
-Pause after triage unless `--auto` was passed.
+Pause after triage and the PROJECT.md write unless `--auto` was passed.
 
 Ask the user to confirm, adjust verdicts, or override. Do not start fixing or posting until approved.
 
 `--draft` still runs triage and draft response work, but does not post.
-`--auto` skips the pause; still include the triage table in the summary.
+`--auto` skips the pause; still include the triage table in the summary and still requires the PROJECT.md write.

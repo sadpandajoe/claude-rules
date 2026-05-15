@@ -11,6 +11,16 @@
 /create-tests --function <name>       # First meaningful tests for a specific function
 ```
 
+## Command Contract
+
+- Only the main thread writes PROJECT.md. Subagents return compact handoffs.
+- For STANDARD or expensive runs (large untested surface, multi-subsystem scope, repeated `/review-code` rounds), follow `rules/context-management.md`: write durable state to PROJECT.md at each phase boundary, then `/checkpoint --clear` before the next expensive phase.
+- Required PROJECT.md updates on STANDARD/expensive runs:
+  - After step 2 (initial tests written): `## Tests Created` (files added, behaviors covered, test layer chosen).
+  - After step 3 (verify + review): `## Test Review Status` (verification strength, review rounds, Review Gate status).
+- These writes are **hard gates before any `/checkpoint --clear`** on STANDARD/expensive runs.
+- For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` after classification.
+
 ## Steps
 
 1. **Determine Scope**
@@ -67,3 +77,4 @@
 - Favor the smallest set of high-signal tests over broad test quantity
 - `/review-code` is an internal phase here, not the expected next top-level user step
 - Stop before committing unless the user explicitly requested commit/push behavior.
+- TRIVIAL runs (one or two tests) skip the PROJECT.md hard gates; MODERATE runs update PROJECT.md once at the end; STANDARD/expensive runs follow the hard-gate cadence in the Command Contract.

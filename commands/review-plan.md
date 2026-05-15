@@ -23,6 +23,7 @@ The command owns one-off plan review only. It does not create the plan, implemen
 - Reuse a reviewer only to clarify that reviewer's own finding in the same pass.
 - The main thread revises `PLAN.md`; PROJECT.md stores state/pointers and final scores. Subagents return scored findings only.
 - Continue after material findings are resolved and the cold read says Go; otherwise stop on blocker, stop rule, or user decision.
+- For STANDARD plans or runs that hit 3+ review iterations, follow `rules/context-management.md`: after each review round, persist scores to PROJECT.md (`## Plan Review Round N`), then `/checkpoint --clear` before the next revision-plus-rereview cycle. After a cold-read No-Go, checkpoint/clear before launching the revision. This is a hard gate — the score history is needed for resume and pattern detection across rounds.
 
 ## Steps
 
@@ -113,8 +114,10 @@ Write final review scores to PROJECT.md:
 
 ## PROJECT.md Update Discipline
 
-- After review iterations complete: write final scores
-- If revisions were made: update `PLAN.md`, or PROJECT.md only when the plan is embedded there
+- After each review round: append a `## Plan Review Round N` block with reviewer scores, key findings, and cold-read result (when run).
+- After review iterations complete: write final scores under `## Plan Review Scores`.
+- If revisions were made: update `PLAN.md`, or PROJECT.md only when the plan is embedded there.
+- Per-round writes are hard gates before `/checkpoint --clear` on STANDARD or 3+ round runs.
 
 ## Notes
 - Standalone command — `/create-feature` step 4 does the same work inline, but this is for one-off use

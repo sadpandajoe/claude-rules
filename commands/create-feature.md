@@ -29,6 +29,8 @@ The command owns the visible gates and sequence. Each step loads only the refere
 - Stop before final commit/PR for MODERATE or STANDARD work unless the user already authorized that boundary.
 - Only the main thread writes PROJECT.md or `PLAN.md`. Subagents return handoffs; the orchestrator updates durable state.
 - For STANDARD work, follow `rules/context-management.md`: checkpoint/clear after `PLAN.md` is written, after plan review/action gate accepts, after each implementation slice or wave, and after code review fixes when validation/PR work remains.
+- For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` immediately after the Complexity Gate.
+- **`## Slice N Complete` PROJECT.md write is a hard gate** before every per-slice checkpoint/clear on the STANDARD path. No clear without the entry.
 
 ## Planning Phase Boundary
 
@@ -77,7 +79,17 @@ There is no `COMPLEX` classification. Larger efforts stay STANDARD with explicit
 5. Checkpoint/clear, then resume from `PLAN.md` and PROJECT.md before plan review.
 6. Load the plan-review loop; fresh reviewer subagents return findings and scores; the main thread updates the plan until material findings are resolved and the Action Gate says proceed.
 7. Checkpoint/clear, then implement one bounded slice or wave inline by default, or with one bounded implementation subagent when isolation or parallelism clearly helps; any subagent returns `Implementation Handoff` blocks only.
-8. Main thread updates `PLAN.md`/PROJECT.md, runs fan-in if needed, then runs `/verify` or equivalent pre-flight checks.
+8. Main thread updates `PLAN.md`/PROJECT.md, runs fan-in if needed, then runs `/verify` or equivalent pre-flight checks. **Hard gate before the next checkpoint/clear**: append a `## Slice N Complete` block to PROJECT.md (slice name, files changed, tests added/updated, acceptance result, next slice or "ready for review"). Do not invoke `/checkpoint --clear` until this block is written:
+
+   ```markdown
+   ## Slice N Complete
+   Slice: [name]
+   Files changed: [list]
+   Tests: [added/updated/none]
+   Acceptance: [passed/failed/not runnable — reason]
+   Next: [next slice name OR "ready for /review-code"]
+   ```
+
 9. Checkpoint/clear before `/review-code` when implementation context is non-trivial, then invoke `/review-code` from the changed-file list, plan pointer, and pre-flight result.
 10. After code review fixes are done, checkpoint/clear before feature validation or PR work if the review loop was non-trivial.
 11. Run feature validation when user-visible behavior changed.

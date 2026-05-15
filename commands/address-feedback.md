@@ -40,6 +40,14 @@ For large review rounds, batch independent fixes into subagent waves only when o
 
 For STANDARD or expensive feedback rounds, checkpoint/clear after triage decisions are recorded, after each fix wave, and after `/review-code` fixes when posting/re-resolution work remains. Resume from PROJECT.md plus the comment id/verdict table rather than carrying the whole review discussion in chat.
 
+**Hard gate — PROJECT.md write before any clear.** Each of the three boundaries below requires a PROJECT.md write *before* `/checkpoint --clear` fires. Clearing without the write throws away the comment-id verdict map that resume depends on.
+
+- After triage: append `## Feedback Triage` with the full Reviewer Inventory table + comment-id → verdict map.
+- After each fix wave: append `## Feedback Round N` (comments addressed, files changed, verification result, residual risk).
+- After posting/resolution: append `## Feedback Posted` (per-thread post + resolve status).
+
+For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` immediately after the Complexity Gate.
+
 ## Gates
 
 - Start with the mandatory reviewer/bot inventory from `feedback/references/gather-triage.md`; do not triage only the first visible comments.

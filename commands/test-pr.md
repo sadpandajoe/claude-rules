@@ -38,6 +38,16 @@ Use the `qa` skill and load only the needed references:
 
 The main thread owns PR identity, app URL, scenario selection, evidence paths, posting decisions, and final summary. Do not load execution/reporting references until setup and scenario selection are complete.
 
+## PROJECT.md Discipline
+
+For STANDARD or expensive runs (CORE impact, broad scenario set, repeated re-validation), follow `rules/context-management.md` and write durable state to PROJECT.md at each phase boundary before `/checkpoint --clear`:
+
+- After scenario selection: `## Test-PR Scenarios` (PR identity, app URL, impact tier, scenario list).
+- After execution: `## Test-PR Results` (per-scenario result, evidence paths, recording path).
+- After posting: `## Test-PR Posted` (Shortcut/PR comment link or "local only").
+
+These writes are **hard gates before any `/checkpoint --clear`** on STANDARD/expensive runs. Smoke runs (`--smoke`) typically stay TRIVIAL/MODERATE and skip the hard gates.
+
 ## Gates
 
 - Stop if the app URL cannot be resolved.

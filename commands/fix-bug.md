@@ -30,6 +30,8 @@ The command owns the visible gates and sequence. Each step loads only the refere
 - Do not commit without an added or updated regression test unless the gap is explicitly accepted.
 - Only the main thread writes PROJECT.md or `PLAN.md`. Subagents return handoffs; the orchestrator updates durable state.
 - For STANDARD or expensive bug work, follow `rules/context-management.md`: checkpoint/clear after RCA review accepts, after `PLAN.md` is written, after plan review accepts, after implementation, and after code review fixes when QA/PR work remains.
+- For STANDARD work, emit the Phase Plan block from `rules/complexity-gate.md` immediately after the Complexity Gate.
+- **`## Slice N Complete` PROJECT.md write is a hard gate** before every per-slice checkpoint/clear on the STANDARD path. Block shape matches `commands/create-feature.md` step 8. No clear without the entry.
 
 ## Planning Phase Boundary
 

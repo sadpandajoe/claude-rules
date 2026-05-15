@@ -44,6 +44,23 @@ Residual risk:
 
 Concurrency: run up to 3-5 PR reviews in parallel. Lower concurrency if PRs are unusually large, share code ownership, or the repo is resource constrained.
 
+## Per-Wave PROJECT.md Persistence (Hard Gate Before Clear)
+
+After each wave of ≤3 PRs completes, before launching the next wave, append a `## Review-PR Batch Wave N` block to PROJECT.md:
+
+```markdown
+## Review-PR Batch Wave N
+PRs: [#101, #102, #103]
+| PR | Recommendation | Posted | Top Finding | Residual Risk |
+|----|----------------|--------|-------------|---------------|
+| #101 | approve | draft | none | none |
+| #102 | request-changes | no | [...] | [...] |
+| #103 | comment | yes | [...] | [...] |
+Next wave: [PR numbers OR "aggregate"]
+```
+
+For batches of 4+ PRs, `/checkpoint --clear` after each wave block is written. The main thread resumes by reading the wave entries in PROJECT.md, not by replaying per-PR diffs. Without this write, the per-PR posting state and residual risks are lost.
+
 ## Aggregate
 
 ```markdown

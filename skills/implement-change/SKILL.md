@@ -73,3 +73,7 @@ When launched with `isolation: "worktree"`, this skill runs in a temporary git w
 - Unverified areas:
   - <gap or none>
 ```
+
+## Orchestrator Responsibility (After Handoff)
+
+The orchestrator owns durable state. After receiving this handoff, the calling workflow (`/create-feature`, `/fix-bug`) must append a `## Slice N Complete` block to PROJECT.md before invoking `/checkpoint --clear`. This is a hard gate — context-management.md boundary #3 ("Implementation slice or wave complete") is not met until the block is written. See `commands/create-feature.md` step 8 and `commands/fix-bug.md` slice exit for the canonical block shape.
