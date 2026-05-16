@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Use when triaging a bug report, validating that a fix actually resolved the user-visible problem, assessing the impact of a code change, discovering use cases for a feature, expanding regression scenarios, executing a manual test plan against a real environment, or filing a clean bug report. Trigger phrases include "triage", "validate the fix", "what should we test", "smoke test", "use cases", "regression scenarios", "file a bug". Do NOT use for writing automated test code (use testing/), reviewing test code quality, technical plan review, or code-quality review.
+description: Manual QA work — triage a bug, validate a fix, assess change impact, discover or expand use cases, execute scenarios in a real environment, or file a bug report. Do NOT use for writing automated tests (use testing/) or code review (use review/).
 user-invocable: false
 ---
 

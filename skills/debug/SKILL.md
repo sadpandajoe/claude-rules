@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Use when investigating a bug, diagnosing a failure, finding the root cause, classifying a CI failure, reviewing an RCA, searching for an existing upstream fix, or verifying a CI fix landed. Trigger phrases include "investigate", "diagnose", "what broke", "why is X failing", "find the root cause", "RCA". Do NOT use for implementing the fix itself, writing or reviewing tests, reviewing final code quality, or planning new features.
+description: Investigating a bug or failure — find the root cause, classify a CI failure, review an RCA, search for an existing upstream fix, or verify a CI fix landed. Do NOT use for implementing the fix (use implement-change/) or writing tests (use testing/).
 user-invocable: false
 ---
 

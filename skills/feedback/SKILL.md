@@ -1,6 +1,6 @@
 ---
 name: feedback
-description: Use when addressing GitHub PR review feedback, triaging reviewer comments, deciding which comments to fix or skip, drafting reviewer replies, resolving review threads, or managing a review-response round. Trigger phrases include "address feedback", "review comments", "requested changes", "respond to reviewer", "resolve PR comments". Do NOT use for writing a fresh code review of someone else's PR (use review/), normal bug fixing without review comments (use debug/ plus implement-change/), or manual PR QA (use qa/).
+description: Addressing GitHub PR review feedback — triage reviewer comments, decide which to fix or skip, draft replies, and resolve review threads. Do NOT use for reviewing someone else's PR (use review/), bug fixing without review comments (use debug/ + implement-change/), or manual PR QA (use qa/).
 user-invocable: false
 ---
 
