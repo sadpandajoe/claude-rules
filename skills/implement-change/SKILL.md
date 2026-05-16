@@ -1,6 +1,6 @@
 ---
 name: implement-change
-description: Use when an approved plan, RCA, or slice is ready for code changes. Implements one scoped slice, follows the requested test-first mode, verifies acceptance, and hands changed files back for review. Do NOT use for root-cause investigation, plan creation, broad unsliced refactors, or final code review.
+description: Implements one approved plan/RCA slice — test-first per spec, verifies acceptance, returns changed files for review. Worktree-aware. Invoked by /create-feature, /fix-bug, /update-tests, /fix-ci.
 user-invocable: false
 disable-model-invocation: true
 tier: Heavy

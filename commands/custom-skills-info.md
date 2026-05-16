@@ -43,10 +43,10 @@ Print the reference card below and stop. No investigation, no file reading — j
 | `/archive-project-file` | Move completed work to archive | PROJECT.md is cluttered | — |
 | `/complete-project` | Capstone: summarize, promote learnings, archive, hand off | Project or major work is done | — |
 
-### Learning & Memory
+### Reflection & Memory
 | Command | What it does | When to call | Gates |
 |---------|-------------|-------------|-------|
-| `/learn` | Add/list/review/prune/failure/promote memories and rules | Capture patterns, postmortems, promote to rules | — |
+| `/reflect` | Add/list/review/prune/failure/promote memories and rules | Capture patterns, postmortems, promote to rules | — |
 | `/metrics` | Summarize workflow pass rates, rounds, model usage | Understand workflow performance | — |
 
 ### Maintenance

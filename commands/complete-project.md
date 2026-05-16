@@ -44,8 +44,8 @@ For each candidate, present:
 **Suggested action**: Promote to rule / Keep as memory / Prune (outdated)
 ```
 
-Wait for user confirmation per candidate. Then follow the matching `/learn` flow:
-- **Promote**: `/learn promote` (drafts the rule, confirms, writes, deletes source memory, updates MEMORY.md)
+Wait for user confirmation per candidate. Then follow the matching `/reflect` flow:
+- **Promote**: `/reflect promote` (drafts the rule, confirms, writes, deletes source memory, updates MEMORY.md)
 - **Prune**: delete the memory file and MEMORY.md entry
 - **Keep**: no action
 

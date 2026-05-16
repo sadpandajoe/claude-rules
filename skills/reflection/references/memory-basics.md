@@ -1,6 +1,6 @@
 # Memory Basics
 
-Use for `/learn`, `/learn add`, and `/learn list`.
+Use for `/reflect`, `/reflect add`, and `/reflect list`.
 
 ## Add Flow
 

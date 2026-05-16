@@ -190,14 +190,14 @@ ai-toolkit/
 |---------|---------|
 | `/check-resources` | Local environment capacity check — running containers, stale ones, headroom verdict |
 
-### Learning & Memory
+### Reflection & Memory
 | Command | Purpose |
 |---------|---------|
-| `/learn` | Add a memory — capture workflow patterns, preferences, knowledge |
-| `/learn list` | Show all memories with type, description, and staleness |
-| `/learn review` | Assess memories for accuracy, staleness, and duplication |
-| `/learn prune` | Remove outdated or redundant memories |
-| `/learn propose-rule` | Extract a recurring pattern into a draft rule |
+| `/reflect` | Add a memory — capture workflow patterns, preferences, knowledge |
+| `/reflect list` | Show all memories with type, description, and staleness |
+| `/reflect review` | Assess memories for accuracy, staleness, and duplication |
+| `/reflect prune` | Remove outdated or redundant memories |
+| `/reflect propose-rule` | Extract a recurring pattern into a draft rule |
 
 ### Extension (PGM)
 | Command | Purpose |
@@ -294,7 +294,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
 | `rules/model-assignment.md` | Worker dispatch and provider-neutral model/effort tiering |
-| `rules/rule-maintenance.md` | `/learn propose-rule`, rule editing |
+| `rules/rule-maintenance.md` | `/reflect propose-rule`, rule editing |
 
 ## Hooks (optional)
 

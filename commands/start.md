@@ -79,7 +79,7 @@ It restores workflow state from PROJECT.md rather than relying on chat memory.
    - Validating a story, PR, or environment without fixing it → `/run-test-plan`
    - Cherry-picking → `/cherry-pick`
    - Ready to open a PR → `/create-pr`
-   - Capturing a pattern or reviewing memories → `/learn`
+   - Capturing a pattern or reviewing memories → `/reflect`
    - Completed phases cluttering PROJECT.md → `/archive-project-file`
    - Want to see all available commands → `/custom-skills-info`
 

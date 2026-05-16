@@ -1,17 +1,17 @@
 ---
-name: learning
-description: Use when capturing memories, reviewing or pruning memory files, recording workflow failures, proposing rules from recurring patterns, or promoting memories into rules. Do NOT use for ordinary project documentation, code review, or implementation planning.
+name: reflection
+description: Memory management and rule-promotion workflows used by /reflect (add, list, review, prune, propose-rule, promote, failure postmortem).
 user-invocable: false
 disable-model-invocation: true
 ---
 
-# Learning
+# Reflection
 
 ## Before Starting
 
 Read any sibling `rules.md`, `lessons.md`, and `gotchas.md` files if present.
 
-This skill owns memory management and rule-promotion workflows used by `/learn`.
+This skill owns memory management and rule-promotion workflows used by `/reflect`.
 
 ## Phases
 
@@ -24,7 +24,7 @@ This skill owns memory management and rule-promotion workflows used by `/learn`.
 
 ## Notes
 
-- `/learn` works with the configured agent memory directory. For Claude Code installs, this is usually `~/.claude/projects/<path>/memory/`.
+- `/reflect` works with the configured agent memory directory. For Claude Code installs, this is usually `~/.claude/projects/<path>/memory/`.
 - Memory files use YAML frontmatter plus structured body.
 - Rule changes require confirmation.
 - A pattern seen once is a memory; a pattern seen across projects can become a rule candidate.
