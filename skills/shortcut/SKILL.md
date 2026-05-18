@@ -1,6 +1,6 @@
 ---
 name: shortcut
-description: "Use when a workflow needs Shortcut story, epic, iteration, or report operations through the Shortcut REST API: fetching records, parsing story fields, uploading evidence, posting comments, or linking PRs. Do NOT use for GitHub-only issue/PR work, local QA execution, or generic HTTP API calls unrelated to Shortcut."
+description: "Shortcut REST API operations: fetch story/epic/iteration data, post comments, upload evidence, link PRs."
 user-invocable: false
 disable-model-invocation: true
 ---

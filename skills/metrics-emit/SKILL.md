@@ -1,6 +1,6 @@
 ---
 name: metrics-emit
-description: Use at the end of an end-to-end workflow summary to append one structured event to .claude/metrics.jsonl for later /metrics or /complete-project aggregation. Do NOT use as a progress log, checkpoint mechanism, or blocker for workflow completion.
+description: Append one structured event to .claude/metrics.jsonl at the end of an end-to-end workflow's summary, for later /metrics or /complete-project aggregation.
 user-invocable: false
 disable-model-invocation: true
 tier: Light

@@ -1,6 +1,6 @@
 ---
 name: testing
-description: "Use for HOW to test: creating or updating automated test suites, reviewing test code quality, and reviewing test-plan adequacy. Do NOT use for QA scenario discovery, manual product validation, bug triage, or general code review."
+description: "Umbrella for test-harness craft: create/update automated test suites, review test code, review test-plan adequacy."
 user-invocable: false
 disable-model-invocation: true
 ---
