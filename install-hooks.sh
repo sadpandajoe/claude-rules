@@ -103,6 +103,12 @@ if [[ "${1:-}" == "--remove" ]]; then
             )] |
             if .hooks.Stop == [] then del(.hooks.Stop) else . end
         else . end) |
+        (if .hooks.PostToolUse then
+            .hooks.PostToolUse |= [.[] | select(
+                (.hooks // []) | all((.command // "") | contains($repo) | not)
+            )] |
+            if .hooks.PostToolUse == [] then del(.hooks.PostToolUse) else . end
+        else . end) |
         if .hooks == {} then del(.hooks) else . end
     ' "$SETTINGS" > "$SETTINGS.tmp" && mv "$SETTINGS.tmp" "$SETTINGS"
 
@@ -149,13 +155,24 @@ STOP_HOOK_ENTRIES=$(cat <<HOOKJSON
 HOOKJSON
 )
 
+POSTTOOL_HOOK_ENTRIES=$(cat <<HOOKJSON
+[
+  {
+    "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+    "hooks": [{"type": "command", "command": "bash \"$REPO_DIR/hooks/agent-setup-edit-reminder.sh\""}]
+  }
+]
+HOOKJSON
+)
+
 # Merge: remove existing toolkit hooks (by repo path), then append new ones
 # This makes the operation idempotent
-jq --argjson new_hooks "$HOOK_ENTRIES" --argjson new_stop_hooks "$STOP_HOOK_ENTRIES" --arg repo "$REPO_DIR" '
-    # Initialize hooks.PreToolUse if it does not exist
+jq --argjson new_hooks "$HOOK_ENTRIES" --argjson new_stop_hooks "$STOP_HOOK_ENTRIES" --argjson new_posttool_hooks "$POSTTOOL_HOOK_ENTRIES" --arg repo "$REPO_DIR" '
+    # Initialize hook arrays if they do not exist
     .hooks //= {} |
     .hooks.PreToolUse //= [] |
     .hooks.Stop //= [] |
+    .hooks.PostToolUse //= [] |
     # Remove any existing entries that reference our repo (idempotent re-run)
     .hooks.PreToolUse |= [.[] | select(
         (.hooks // []) | all((.command // "") | contains($repo) | not)
@@ -163,11 +180,16 @@ jq --argjson new_hooks "$HOOK_ENTRIES" --argjson new_stop_hooks "$STOP_HOOK_ENTR
     .hooks.Stop |= [.[] | select(
         (.hooks // []) | all((.command // "") | contains($repo) | not)
     )] |
+    .hooks.PostToolUse |= [.[] | select(
+        (.hooks // []) | all((.command // "") | contains($repo) | not)
+    )] |
     # Append new entries
     .hooks.PreToolUse += $new_hooks |
     .hooks.Stop += $new_stop_hooks |
+    .hooks.PostToolUse += $new_posttool_hooks |
     # Drop empty arrays for cleanliness
-    if .hooks.Stop == [] then del(.hooks.Stop) else . end
+    (if .hooks.Stop == [] then del(.hooks.Stop) else . end) |
+    (if .hooks.PostToolUse == [] then del(.hooks.PostToolUse) else . end)
 ' "$SETTINGS" > "$SETTINGS.tmp"
 
 # Validate the output is valid JSON before replacing
@@ -185,10 +207,11 @@ step "Verifying..."
 
 HOOK_COUNT=$(jq '.hooks.PreToolUse | length' "$SETTINGS" 2>/dev/null)
 STOP_COUNT=$(jq '(.hooks.Stop // []) | length' "$SETTINGS" 2>/dev/null)
+POSTTOOL_COUNT=$(jq '(.hooks.PostToolUse // []) | length' "$SETTINGS" 2>/dev/null)
 TOTAL_KEYS=$(jq 'keys | length' "$SETTINGS" 2>/dev/null)
 BACKUP_KEYS=$(jq 'keys | length' "$BACKUP" 2>/dev/null)
 
-info "Hooks installed: $HOOK_COUNT PreToolUse + $STOP_COUNT Stop entries"
+info "Hooks installed: $HOOK_COUNT PreToolUse + $STOP_COUNT Stop + $POSTTOOL_COUNT PostToolUse entries"
 info "Settings keys preserved: $TOTAL_KEYS (was $BACKUP_KEYS)"
 
 if [[ "$TOTAL_KEYS" -lt "$BACKUP_KEYS" ]]; then
@@ -201,9 +224,10 @@ echo "  Hooks Installed!"
 echo "========================================"
 echo ""
 info "Hooks:"
-echo "  prevent-project-commit — Blocks unsafe git flags, main/master force-pushes, and local workflow state commits"
-echo "  check-resources        — Warns when tests run with constrained resources"
-echo "  check-plan-drift       — Warns at turn end when PLAN.md outpaces PROJECT.md"
+echo "  prevent-project-commit  — Blocks unsafe git flags, main/master force-pushes, and local workflow state commits"
+echo "  check-resources         — Warns when tests run with constrained resources"
+echo "  check-plan-drift        — Warns at turn end when PLAN.md outpaces PROJECT.md"
+echo "  agent-setup-edit-reminder — Reminds to load agent-setup-maintainer when an agent-setup file is edited"
 echo ""
 info "To remove: ./install-hooks.sh --remove"
 echo ""

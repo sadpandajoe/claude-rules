@@ -88,7 +88,7 @@ ai-toolkit/
 │   ├── review/              # Code/PR reviewer orchestration + lenses — local-review, pr-review, classify-diff, adversarial
 │   ├── feedback/            # PR feedback response — triage comments, fix approved items, post replies
 │   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, CI gather/classify/fix/verify
-│   ├── learning/            # Memory capture, review/prune, failure postmortems, rule promotion
+│   ├── reflection/          # Memory capture, review/prune, failure postmortems, rule promotion
 │   ├── qa/                  # QA — triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
@@ -106,7 +106,8 @@ ai-toolkit/
 │   ├── prevent-project-commit.sh  # Block unsafe git flags and local workflow state commits
 │   ├── test-prevent-project-commit.sh # Smoke tests for git safety hook behavior
 │   ├── check-resources.sh         # Warn on constrained resources before tests
-│   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
+│   ├── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
+│   └── agent-setup-edit-reminder.sh # Remind to load agent-setup-maintainer on agent-setup edits
 ├── extensions/
 │   └── pgm/                 # Program management (optional, install with --with-pgm)
 │       ├── commands/         # /create-status-report, /create-velocity-report
@@ -126,7 +127,7 @@ ai-toolkit/
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
     ├── address-feedback.md # Address PR feedback
-    ├── learn.md                 # Memory management — add, list, review, prune, propose rules
+    ├── reflect.md               # Memory management — add, list, review, prune, propose rules
     ├── create-pr.md             # Generate PR title + description from diff/commits
     ├── review-code-adversarial.md # Red-team review for security and edge cases
     ├── custom-skills-info.md    # Print toolkit reference card
@@ -304,6 +305,8 @@ Hooks enforce toolkit rules at runtime via Claude Code's hook system. They are s
 |------|-------|----------|
 | `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks unsafe git flags, force-pushes to main/master, and commits of local workflow state files |
 | `check-resources.sh` | PreToolUse (Bash) | Warns when running tests with constrained resources |
+| `check-plan-drift.sh` | Stop | Warns at turn end when PLAN.md outpaces PROJECT.md |
+| `agent-setup-edit-reminder.sh` | PostToolUse (Edit/Write/MultiEdit/NotebookEdit) | Reminds to load `agent-setup-maintainer` when an agent-setup file is edited |
 
 ```bash
 ./install-hooks.sh           # Install hooks
