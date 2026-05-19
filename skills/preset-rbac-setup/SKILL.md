@@ -1,6 +1,6 @@
 ---
 name: preset-rbac-setup
-description: Use when seeding RBAC test users (workspace roles + data access roles) on a Preset workspace via the Manager API — typically a fresh staging workspace that needs the canonical e2e role mix before any RBAC-related QA or testing. Trigger phrases include "set up rbac users", "set up permissions for the rbac test users", "seed the test users on this workspace", "give the test logins their roles". Do NOT use for: changing roles on real customer workspaces, creating new test user accounts (this skill assumes the seven test accounts already exist as team members), or generic team/membership administration.
+description: Seeding the canonical RBAC test users (workspace roles + data access roles) on a fresh Preset staging workspace via the Manager API, before RBAC-related QA. Do NOT use for changing roles on real customer workspaces, creating new test accounts (the seven test logins must already exist), or generic team administration.
 user-invocable: false
 ---
 

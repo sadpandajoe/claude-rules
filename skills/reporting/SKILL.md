@@ -1,6 +1,6 @@
 ---
 name: reporting
-description: Use when an end-to-end command needs a final summary or continuation checkpoint shape from shared templates. Do NOT use for progress logging, metrics emission, code review findings, or PROJECT.md archival.
+description: Shared shape for end-to-end command summaries and continuation checkpoints, with per-command templates.
 user-invocable: false
 disable-model-invocation: true
 ---

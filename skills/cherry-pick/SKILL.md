@@ -1,6 +1,6 @@
 ---
 name: cherry-pick
-description: Use when the user asks to cherry-pick, backport, port a fix, or apply commits/PRs onto another branch. Covers safety gates, scope-leak detection, adaptation, and per-change validation. Do NOT use for ordinary same-branch bug fixes, broad refactors, dependency upgrades, or behavior-changing rewrites without an explicit cross-branch move.
+description: Cherry-pick, backport, or apply commits/PRs onto another branch with safety gates and per-change validation. Do NOT use for same-branch bug fixes, broad refactors, dependency upgrades, or general behavior rewrites.
 argument-hint: "[pr-url | sha...] [--target branch] [--force] [--plan-only] [--push]"
 allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Edit
 ---

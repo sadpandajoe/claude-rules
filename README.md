@@ -88,7 +88,7 @@ ai-toolkit/
 │   ├── review/              # Code/PR reviewer orchestration + lenses — local-review, pr-review, classify-diff, adversarial
 │   ├── feedback/            # PR feedback response — triage comments, fix approved items, post replies
 │   ├── debug/               # Diagnostic umbrella — investigate-change, review-rca, check-existing-fix, CI gather/classify/fix/verify
-│   ├── learning/            # Memory capture, review/prune, failure postmortems, rule promotion
+│   ├── reflection/          # Memory capture, review/prune, failure postmortems, rule promotion
 │   ├── qa/                  # QA — triage-bug, validate-fix, assess-impact, analyze/expand/execute-use-cases, file-bug
 │   ├── testing/             # Test-harness work — create/update suites, review tests + test plans
 │   ├── preflight/           # Pre-work environment checks — worktree setup + app-runnable env prep
@@ -106,7 +106,8 @@ ai-toolkit/
 │   ├── prevent-project-commit.sh  # Block unsafe git flags and local workflow state commits
 │   ├── test-prevent-project-commit.sh # Smoke tests for git safety hook behavior
 │   ├── check-resources.sh         # Warn on constrained resources before tests
-│   └── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
+│   ├── check-plan-drift.sh        # Warn at turn end when PLAN.md outpaces PROJECT.md
+│   └── agent-setup-edit-reminder.sh # Remind to load agent-setup-maintainer on agent-setup edits
 ├── extensions/
 │   └── pgm/                 # Program management (optional, install with --with-pgm)
 │       ├── commands/         # /create-status-report, /create-velocity-report
@@ -126,14 +127,13 @@ ai-toolkit/
     ├── review-code.md      # Local review + autofix loop
     ├── review-pr.md        # Review GitHub PRs
     ├── address-feedback.md # Address PR feedback
-    ├── learn.md                 # Memory management — add, list, review, prune, propose rules
+    ├── reflect.md               # Memory management — add, list, review, prune, propose rules
     ├── create-pr.md             # Generate PR title + description from diff/commits
     ├── review-code-adversarial.md # Red-team review for security and edge cases
     ├── custom-skills-info.md    # Print toolkit reference card
     ├── checkpoint.md            # Save workflow state, log progress, or full save-and-clear
     ├── verify.md                # Run tests on changed files
     ├── review-plan.md           # One-off plan review with iteration
-    ├── audit-agent-setup.md     # Audit commands, skills, rules, and agent docs
     ├── complete-project.md      # Project capstone summary
     ├── metrics.md               # Workflow metrics summary
     ├── show-cost.md             # Token usage and cost summary
@@ -191,14 +191,14 @@ ai-toolkit/
 |---------|---------|
 | `/check-resources` | Local environment capacity check — running containers, stale ones, headroom verdict |
 
-### Learning & Memory
+### Reflection & Memory
 | Command | Purpose |
 |---------|---------|
-| `/learn` | Add a memory — capture workflow patterns, preferences, knowledge |
-| `/learn list` | Show all memories with type, description, and staleness |
-| `/learn review` | Assess memories for accuracy, staleness, and duplication |
-| `/learn prune` | Remove outdated or redundant memories |
-| `/learn propose-rule` | Extract a recurring pattern into a draft rule |
+| `/reflect` | Add a memory — capture workflow patterns, preferences, knowledge |
+| `/reflect list` | Show all memories with type, description, and staleness |
+| `/reflect review` | Assess memories for accuracy, staleness, and duplication |
+| `/reflect prune` | Remove outdated or redundant memories |
+| `/reflect propose-rule` | Extract a recurring pattern into a draft rule |
 
 ### Extension (PGM)
 | Command | Purpose |
@@ -209,9 +209,10 @@ ai-toolkit/
 ### Toolkit Maintenance
 | Command | Purpose |
 |---------|---------|
-| `/audit-agent-setup` | Audit command/skill/rule/docs layout against the agentic primer model |
 | `/toolkit-doctor` | Validate symlinks, build output, imports, path portability, and README accuracy |
 | `/custom-skills-info` | Print reference card of all commands with gates |
+
+The `agent-setup-maintainer` skill activates automatically when you edit any agent-setup file (skills, commands, rules, CLAUDE.md, hooks) — see `hooks/agent-setup-edit-reminder.sh`.
 
 Claude's built-in `/review` is still available for review-only output; `/review-code` is the repo-standard wrapper when you want fix + verify loops.
 
@@ -294,7 +295,7 @@ Use `/review-code` when you want the repo-standard wrapper: review, fix, validat
 | `rules/shortcut-api.md` | Commands that query Shortcut REST API |
 | `rules/input-detection.md` | Commands that accept Shortcut/GitHub ticket inputs |
 | `rules/model-assignment.md` | Worker dispatch and provider-neutral model/effort tiering |
-| `rules/rule-maintenance.md` | `/learn propose-rule`, rule editing |
+| `rules/rule-maintenance.md` | `/reflect propose-rule`, rule editing |
 
 ## Hooks (optional)
 
@@ -304,6 +305,8 @@ Hooks enforce toolkit rules at runtime via Claude Code's hook system. They are s
 |------|-------|----------|
 | `prevent-project-commit.sh` | PreToolUse (Bash) | Blocks unsafe git flags, force-pushes to main/master, and commits of local workflow state files |
 | `check-resources.sh` | PreToolUse (Bash) | Warns when running tests with constrained resources |
+| `check-plan-drift.sh` | Stop | Warns at turn end when PLAN.md outpaces PROJECT.md |
+| `agent-setup-edit-reminder.sh` | PostToolUse (Edit/Write/MultiEdit/NotebookEdit) | Reminds to load `agent-setup-maintainer` when an agent-setup file is edited |
 
 ```bash
 ./install-hooks.sh           # Install hooks

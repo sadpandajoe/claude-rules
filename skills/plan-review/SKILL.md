@@ -1,6 +1,6 @@
 ---
 name: plan-review
-description: "Use when critiquing a technical plan before implementation: architecture, backend, frontend, or implementation feasibility lenses. Do NOT use for reviewing shipped code, product briefs, test files, or post-implementation diffs."
+description: "Umbrella for reviewer lenses that critique a technical plan before implementation: architecture, backend, frontend, implementation feasibility."
 user-invocable: false
 disable-model-invocation: true
 ---

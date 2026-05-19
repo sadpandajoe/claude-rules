@@ -54,5 +54,5 @@ Internal callers such as `/create-feature`, `/fix-bug`, `/fix-ci`, `/create-test
 ## Notes
 
 - This command is used standalone and as an internal review phase.
-- The selected team should be visible in the summary so bad selections can be corrected with `/learn`.
+- The selected team should be visible in the summary so bad selections can be corrected with `/reflect`.
 - Optional second-opinion review is allowed for STANDARD complexity when available.

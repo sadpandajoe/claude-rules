@@ -1,6 +1,6 @@
 ---
 name: preflight
-description: "Use before work that needs a ready worktree or runnable app: dependency/env checks, build artifacts, Docker/service readiness, seed data, and feature flags. Do NOT use for writing tests, implementing code, or validating product behavior after the environment is ready."
+description: "Umbrella for pre-work readiness checks: worktree preflight (deps/env/build artifacts) and environment prep (services, seed data, feature flags)."
 user-invocable: false
 disable-model-invocation: true
 ---

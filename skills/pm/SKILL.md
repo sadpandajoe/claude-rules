@@ -1,6 +1,6 @@
 ---
 name: pm
-description: "Use for product scoping before technical planning: feature briefs, acceptance criteria, milestones, brief review, or epic decomposition. Do NOT use for technical implementation plans, code changes, code review, or test execution."
+description: "Umbrella for product scoping before technical planning: feature briefs, acceptance criteria, milestones, brief review, epic decomposition."
 user-invocable: false
 disable-model-invocation: true
 ---

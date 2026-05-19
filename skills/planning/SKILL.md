@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Use when producing a technical implementation plan, iterating a plan through reviewer feedback, finalizing a plan with a cold read before implementation, or classifying review findings as plan-level (re-plan) vs code-level (fix in place). Trigger phrases include "plan this", "draft a plan", "finalize the plan", "should we re-plan", "is this a code or plan issue". Do NOT use for product scoping (use pm/), writing the code itself, reviewing finished code, or running QA scenarios.
+description: Producing a technical implementation plan, iterating it through reviewer feedback, finalizing with a cold read, or classifying review findings as plan-level (re-plan) vs code-level (fix in place). Do NOT use for product scoping (use pm/), writing code (use implement-change/), or reviewing finished code (use review/).
 user-invocable: false
 ---
 
